@@ -1363,22 +1363,84 @@ class EditPurchase extends Component {
           showsVerticalScrollIndicator={false}>
           <View style={styles.subContainer}>
             <View style={styles.firstContainer}>
-              <View style={{flex: 1}}>
-                <Text style={styles.adminTextStyle}>
-                  {translate('Casual purchase')}
-                </Text>
-              </View>
               <TouchableOpacity
+                onPress={() => this.props.navigation.goBack()}
+                style={styles.goBackContainer}>
+                <Image source={img.backIcon} style={styles.tileImageBack} />
+              </TouchableOpacity>
+              <View style={styles.flex}>
+                <Text style={styles.adminTextStyle}>{supplier}</Text>
+              </View>
+              {swapButton ? (
+                <TouchableOpacity
+                  onPress={() => this.deleteCasualPurchase(yourOrder.id)}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    // flex: 1,
+                    justifyContent: 'flex-end',
+                  }}>
+                  <Image
+                    source={img.deleteIconNew}
+                    style={{
+                      width: 18,
+                      height: 18,
+                      marginRight: 10,
+                      resizeMode: 'contain',
+                      tintColor: '#FF0303',
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontFamily: 'Inter-Regular',
+                      color: '#FF0303',
+                    }}>
+                    {translate('Delete')}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => this.editCasualPurchase()}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    // flex: 1,
+                    justifyContent: 'flex-end',
+                    backgroundColor: '#fff',
+                    borderRadius: 100,
+                    padding: 6,
+                  }}>
+                  <Image
+                    source={img.editIconGreen}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      resizeMode: 'contain',
+                      tintColor: '#77a3d6',
+                    }}
+                  />
+                  {/* <Text
+                    style={{
+                      fontSize: 18,
+                      fontFamily: 'Inter-Regular',
+                      color: '#94C01F',
+                    }}>
+                    {translate('Edit')}
+                  </Text> */}
+                </TouchableOpacity>
+              )}
+              {/* <TouchableOpacity
                 onPress={() => this.props.navigation.goBack()}
                 style={styles.goBackContainer}>
                 <Text style={styles.goBackTextStyle}>
                   {' '}
                   {translate('Go Back')}
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
-          <View style={{}}>
+          {/* <View style={{}}>
             <View style={styles.firstContainer}>
               <View style={{flex: 1}}>
                 <Text style={styles.adminTextStyle}>
@@ -1442,7 +1504,7 @@ class EditPurchase extends Component {
                 </TouchableOpacity>
               )}
             </View>
-          </View>
+          </View> */}
 
           {editDataLoader ? (
             <ActivityIndicator color="grey" size="large" />

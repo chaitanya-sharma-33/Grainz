@@ -19,12 +19,13 @@ const styles = StyleSheet.create({
   adminTextStyle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#523622',
+    color: '#1C1C1C',
+    fontWeight: 'bold',
   },
   goBackContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
+    backgroundColor: '#fff',
+    borderRadius: 100,
+    padding: 5,
   },
   goBackTextStyle: {
     fontSize: 16,
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').width / numColumns,
     borderRadius: 50,
   },
-  flex: {flex: 1},
+  flex: {flex: 1, marginLeft: wp('3%')},
   addNewContainer: {
     height: hp('6%'),
     width: wp('80%'),
@@ -69,39 +70,40 @@ const styles = StyleSheet.create({
   },
   listHeading: {
     flexDirection: 'row',
-    borderBottomColor: '#EAEAF0',
+    borderColor: '#EAEAF0',
+    borderWidth: 1,
     marginHorizontal: wp('3%'),
-    backgroundColor: '#EFFBCF',
+    backgroundColor: '#C9C9C9',
     paddingHorizontal: 10,
     paddingVertical: 15,
   },
   listSubHeading: {
     flexDirection: 'row',
     flex: 1,
-    alignItems: 'center',
   },
   listTextStyling: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    color: '#151B26',
+    color: 'black',
   },
   listImageStyling: {
-    width: 10,
-    height: 10,
+    width: 15,
+    height: 15,
     resizeMode: 'contain',
     marginLeft: 5,
   },
   listDataHeadingContainer: {
-    borderBottomColor: '#EAEAF0',
     marginHorizontal: wp('3%'),
     paddingVertical: 10,
+    // flexDirection: 'row',
+    paddingHorizontal: 10,
   },
   listDataHeadingSubContainer: {
     flexDirection: 'row',
-    paddingLeft: 10,
-    alignItems: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 15,
   },
-  listDataContainer: {flex: 3},
+  listDataContainer: {flex: 1, flexDirection: 'row'},
   listDataTextStyling: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
@@ -122,6 +124,11 @@ const styles = StyleSheet.create({
   tileImageStyling: {
     height: 40,
     width: 40,
+    resizeMode: 'contain',
+  },
+  tileImageBack: {
+    height: 20,
+    width: 20,
     resizeMode: 'contain',
   },
   tileTextContainer: {

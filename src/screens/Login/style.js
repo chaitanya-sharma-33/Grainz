@@ -7,7 +7,7 @@ import {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F8FE',
   },
   secondContainer: {
     flex: 1,
@@ -15,9 +15,15 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     flex: 1,
+    height: hp('15%'),
     justifyContent: 'center',
-    alignItems: 'center',
-    height: hp('30%'),
+    marginHorizontal: wp('5%'),
+  },
+  textStylingLogo: {
+    color: '#222526',
+    fontSize: 18,
+    fontFamily: 'Inter-Regular',
+    fontWeight: 'bold',
   },
   logoStyling: {
     height: 180,
@@ -25,7 +31,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   insideContainer: {
-    marginHorizontal: wp('10%'),
+    marginHorizontal: wp('5%'),
   },
   textStyling: {
     color: '#4A4C55',
@@ -33,17 +39,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
   },
   textInputStyling: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'grey',
     paddingVertical: hp('1%'),
-    marginTop: hp('2%'),
-    width: wp('72%'),
+    marginLeft: '5%',
+    marginTop: '1%',
   },
   errorContainer: {
     height: hp('5%'),
     justifyContent: 'center',
   },
-  passContainer: {marginTop: hp('4%')},
+  passContainer: {marginTop: '2%', marginLeft: '5%'},
   errorStyling: {fontSize: 14, color: 'red'},
   langContainer: {
     flexDirection: 'row',
@@ -58,13 +62,18 @@ const styles = StyleSheet.create({
   },
   signInStyling: {
     height: hp('7%'),
-    backgroundColor: '#99C13E',
+    backgroundColor: '#5297C1',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: hp('8%'),
-    width: wp('55%'),
-    borderRadius: 100,
+    marginTop: hp('25%'),
+    width: wp('85%'),
+    borderRadius: 10,
     alignSelf: 'center',
+  },
+  forgotPassStyling: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: hp('3%'),
   },
   signInStylingText: {
     fontSize: 20,

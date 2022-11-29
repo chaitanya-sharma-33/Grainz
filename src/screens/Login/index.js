@@ -23,6 +23,7 @@ import {connect} from 'react-redux';
 import {UserTokenAction} from '../../redux/actions/UserTokenAction';
 import {translate, setI18nConfig} from '../../utils/translations';
 import Loader from '../../components/Loader';
+import Header from '../../components/Header';
 
 var querystring = require('querystring');
 
@@ -162,6 +163,36 @@ class index extends Component {
     const {loader, passStatus} = this.state;
     return (
       <View style={styles.container}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+          }}>
+          <TouchableOpacity
+            onPress={this.props.logoFun}
+            style={{
+              flex: 2,
+              marginLeft: 20,
+            }}>
+            <Image
+              source={img.appLogo}
+              style={{
+                height: 100,
+                width: 150,
+                resizeMode: 'contain',
+              }}
+            />
+          </TouchableOpacity>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}></View>
+        </View>
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
@@ -169,26 +200,40 @@ class index extends Component {
           <Loader loaderComp={loader} />
           <View style={styles.secondContainer}>
             <View style={styles.imageContainer}>
-              <Image source={img.appLogo} style={styles.logoStyling} />
+              {/* <Image source={img.appLogo} style={styles.logoStyling} /> */}
+              <Text style={styles.textStylingLogo}>
+                {translate('Log in to your account')}
+              </Text>
             </View>
             <View>
               <View style={styles.insideContainer}>
-                <View>
-                  <Text style={styles.textStyling}>
-                    {translate('username')}*
-                  </Text>
+                <View
+                  style={{
+                    backgroundColor: '#fff',
+                    borderRadius: 5,
+                    // marginBottom: hp('3%'),
+                  }}>
+                  <View
+                    style={{
+                      marginLeft: '5%',
+                      marginTop: '2.5%',
+                    }}>
+                    <Text style={styles.textStyling}>
+                      {translate('username')}
+                    </Text>
+                  </View>
+                  <TextInput
+                    value={this.state.email}
+                    onChangeText={value =>
+                      this.setState({
+                        email: value,
+                        emailError: '',
+                      })
+                    }
+                    // placeholder={translate('username')}
+                    style={styles.textInputStyling}
+                  />
                 </View>
-                <TextInput
-                  value={this.state.email}
-                  onChangeText={value =>
-                    this.setState({
-                      email: value,
-                      emailError: '',
-                    })
-                  }
-                  placeholder={translate('username')}
-                  style={styles.textInputStyling}
-                />
                 {this.state.emailError ? (
                   <View style={styles.errorContainer}>
                     <Text style={styles.errorStyling}>
@@ -196,49 +241,58 @@ class index extends Component {
                     </Text>
                   </View>
                 ) : null}
-                <View style={styles.passContainer}>
-                  <Text style={styles.textStyling}>
-                    {translate('Password')}*
-                  </Text>
-                </View>
                 <View
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
+                    backgroundColor: '#fff',
+                    borderRadius: 5,
+                    marginTop: hp('2.5%'),
                   }}>
-                  <TextInput
-                    value={this.state.password}
-                    secureTextEntry={passStatus}
-                    onChangeText={value =>
-                      this.setState({
-                        password: value,
-                        passwordError: '',
-                      })
-                    }
-                    placeholder={translate('Password')}
-                    style={styles.textInputStyling}
-                  />
-                  <TouchableOpacity
-                    onPress={() =>
-                      this.setState({
-                        passStatus: !passStatus,
-                      })
-                    }
-                    style={{
-                      borderBottomColor: 'grey',
-                      borderBottomWidth: 1,
-                      paddingVertical: 7.9,
-                    }}>
-                    <Image
-                      source={passStatus ? img.eyeCloseIcon : img.eyeOpenIcon}
-                      style={{
-                        width: 25,
-                        height: 25,
-                        resizeMode: 'contain',
-                        marginTop: 10,
-                      }}
+                  <View style={styles.passContainer}>
+                    <Text style={styles.textStyling}>
+                      {translate('Password')}
+                    </Text>
+                  </View>
+                  <View
+                    style={
+                      {
+                        // flexDirection: 'row',
+                        // alignItems: 'center',
+                      }
+                    }>
+                    <TextInput
+                      value={this.state.password}
+                      secureTextEntry={passStatus}
+                      onChangeText={value =>
+                        this.setState({
+                          password: value,
+                          passwordError: '',
+                        })
+                      }
+                      // placeholder={translate('Password')}
+                      style={styles.textInputStyling}
                     />
-                  </TouchableOpacity>
+                    {/* <TouchableOpacity
+                      onPress={() =>
+                        this.setState({
+                          passStatus: !passStatus,
+                        })
+                      }
+                      style={{
+                        borderBottomColor: 'grey',
+                        borderBottomWidth: 1,
+                        paddingVertical: 7.9,
+                      }}>
+                      <Image
+                        source={passStatus ? img.eyeCloseIcon : img.eyeOpenIcon}
+                        style={{
+                          width: 25,
+                          height: 25,
+                          resizeMode: 'contain',
+                          marginTop: 10,
+                        }}
+                      />
+                    </TouchableOpacity> */}
+                  </View>
                 </View>
                 {this.state.passwordError ? (
                   <View style={styles.errorContainer}>
@@ -247,7 +301,7 @@ class index extends Component {
                     </Text>
                   </View>
                 ) : null}
-                <View style={styles.langContainer}>
+                {/* <View style={styles.langContainer}>
                   <Text style={styles.langStyling}>English</Text>
                   <Switch
                     thumbColor={'#94BB3B'}
@@ -257,17 +311,29 @@ class index extends Component {
                     value={this.state.switchValue}
                   />
                   <Text style={styles.langStyling}>Français</Text>
-                </View>
+                </View> */}
                 <TouchableOpacity
                   onPress={() => this.signInFun()}
                   style={styles.signInStyling}>
                   {this.state.buttonLoader ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (
+                    // <Text style={styles.signInStylingText}>
+                    //   {' '}
+                    //   {translate('Sign in')}
+                    // </Text>
                     <Text style={styles.signInStylingText}>
-                      {' '}
-                      {translate('Sign in')}
+                      {translate('Login')}
                     </Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => alert('Forget Pass')}
+                  style={styles.forgotPassStyling}>
+                  {this.state.buttonLoader ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={{}}>{translate('Forgoten Password?')}</Text>
                   )}
                 </TouchableOpacity>
               </View>

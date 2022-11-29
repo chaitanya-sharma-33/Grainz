@@ -6,7 +6,7 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
-  Pressable,
+  TextInput,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
@@ -18,6 +18,10 @@ import {UserTokenAction} from '../../redux/actions/UserTokenAction';
 import {getMyProfileApi, getCasualPurchasesApi} from '../../connectivity/api';
 import {translate} from '../../utils/translations';
 import styles from './style';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 class ViewPurchase extends Component {
   constructor(props) {
@@ -31,6 +35,8 @@ class ViewPurchase extends Component {
       arrangeStatusSupplier: 0,
       arrangeStatusDate: 0,
       arrangeStatusHTVA: 0,
+      searchItem: '',
+      casualPurchasesBackup: [],
     };
   }
 
@@ -75,7 +81,11 @@ class ViewPurchase extends Component {
       () =>
         getCasualPurchasesApi()
           .then(res => {
-            this.setState({casualPurchases: res.data, casualListLoader: false});
+            this.setState({
+              casualPurchases: res.data,
+              casualListLoader: false,
+              casualPurchasesBackup: res.data,
+            });
           })
           .catch(err => {
             this.setState({casualListLoader: false});
@@ -211,9 +221,43 @@ class ViewPurchase extends Component {
     }
   };
 
+  searchFun = txt => {
+    console.log('value={searchItem}', txt);
+    this.setState(
+      {
+        searchItem: txt,
+      },
+      () => this.filterData(txt),
+    );
+  };
+
+  filterData = text => {
+    console.log('casualPurchases', this.state.casualPurchases);
+    // passing the inserted text in textinput
+    const newData = this.state.casualPurchasesBackup.filter(function (item) {
+      //applying filter for the inserted text in search bar
+      const itemData = item.supplierName
+        ? item.supplierName.toUpperCase()
+        : ''.toUpperCase();
+      const textData = text.toUpperCase();
+      return itemData.indexOf(textData) > -1;
+    });
+    this.setState({
+      //setting the filtered newData on datasource
+      //After setting the data it will automatically re-render the view
+      casualPurchases: newData,
+      searchItem: text,
+    });
+  };
+
   render() {
-    const {casualPurchases, casualListLoader, buttonsSubHeader, recipeLoader} =
-      this.state;
+    const {
+      casualPurchases,
+      casualListLoader,
+      buttonsSubHeader,
+      recipeLoader,
+      searchItem,
+    } = this.state;
     return (
       <View style={styles.container}>
         <Header
@@ -225,70 +269,108 @@ class ViewPurchase extends Component {
         ) : (
           <SubHeader {...this.props} buttons={buttonsSubHeader} />
         )} */}
-        <ScrollView
+        {/* <ScrollView
           ref={ref => {
             this.scrollListReftop = ref;
-          }}>
-          <View>
-            <View style={styles.subContainer}>
-              <View style={styles.firstContainer}>
-                <View style={styles.flex}>
-                  <Text style={styles.adminTextStyle}>
-                    {translate('Casual purchase')}
-                  </Text>
-                </View>
-                <TouchableOpacity
+          }}> */}
+        <View>
+          <View style={styles.subContainer}>
+            <View style={styles.firstContainer}>
+              <TouchableOpacity
+                onPress={() => this.props.navigation.goBack()}
+                style={styles.goBackContainer}>
+                <Image source={img.backIcon} style={styles.tileImageBack} />
+              </TouchableOpacity>
+              <View style={styles.flex}>
+                <Text style={styles.adminTextStyle}>
+                  {translate('Casual purchase')}
+                </Text>
+              </View>
+              {/* <TouchableOpacity
                   onPress={() => this.props.navigation.goBack()}
                   style={styles.goBackContainer}>
                   <Text style={styles.goBackTextStyle}>
                     {' '}
                     {translate('Go Back')}
                   </Text>
-                </TouchableOpacity>
-              </View>
+                </TouchableOpacity> */}
             </View>
           </View>
-          <View style={{marginTop: '4%'}}>
-            <View style={styles.listHeading}>
-              <TouchableOpacity
-                style={styles.listSubHeading}
-                onPress={() => this.arrangeListFun('DATE')}>
-                <Text style={styles.listTextStyling}>{translate('Date')}</Text>
-                <View>
-                  <Image
-                    style={styles.listImageStyling}
-                    source={img.doubleArrowIconNew}
-                  />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.listSubHeading}
-                onPress={() => this.arrangeListFun('SUPPLIER')}>
-                <Text style={styles.listTextStyling}>
-                  {translate('Supplier')}
-                </Text>
-                <View>
-                  <Image
-                    style={styles.listImageStyling}
-                    source={img.doubleArrowIconNew}
-                  />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.listSubHeading}
-                onPress={() => this.arrangeListFun('HTVA')}>
-                <Text style={styles.listTextStyling}>
-                  € {translate('Total')} HTVA
-                </Text>
-                <View>
-                  <Image
-                    style={styles.listImageStyling}
-                    source={img.doubleArrowIconNew}
-                  />
-                </View>
-              </TouchableOpacity>
-              <View style={styles.listSubHeading}></View>
-            </View>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            paddingLeft: wp('5%'),
+          }}>
+          <View
+            style={{
+              width: wp('60%'),
+            }}>
+            <TextInput
+              placeholder="Search"
+              style={{
+                backgroundColor: '#fff',
+                padding: 12,
+                borderRadius: 5,
+              }}
+              value={searchItem}
+              onChangeText={value => this.searchFun(value)}
+            />
+          </View>
+          <View style={{width: wp('29%'), marginLeft: 10}}>
+            <TextInput
+              placeholder="Filter"
+              style={{
+                backgroundColor: '#fff',
+                padding: 12,
+                borderRadius: 5,
+              }}
+            />
+          </View>
+        </View>
+        <View style={{marginTop: '5%'}}>
+          <View style={styles.listHeading}>
+            <TouchableOpacity
+              style={styles.listSubHeading}
+              onPress={() => this.arrangeListFun('DATE')}>
+              <Text style={styles.listTextStyling}>{translate('Date')}</Text>
+              <View>
+                <Image
+                  style={styles.listImageStyling}
+                  source={img.doubleArrowIconNew}
+                />
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.listSubHeading}
+              onPress={() => this.arrangeListFun('SUPPLIER')}>
+              <Text style={styles.listTextStyling}>
+                {translate('Supplier')}
+              </Text>
+              <View>
+                <Image
+                  style={styles.listImageStyling}
+                  source={img.doubleArrowIconNew}
+                />
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.listSubHeading}
+              onPress={() => this.arrangeListFun('HTVA')}>
+              <Text style={styles.listTextStyling}>
+                € {translate('Total')} HTVA
+              </Text>
+              <View>
+                <Image
+                  style={styles.listImageStyling}
+                  source={img.doubleArrowIconNew}
+                />
+              </View>
+            </TouchableOpacity>
+            {/* <View style={styles.listSubHeading}></View> */}
+          </View>
+
+          <ScrollView>
             {casualListLoader ? (
               <ActivityIndicator color="grey" size="large" />
             ) : (
@@ -297,12 +379,54 @@ class ViewPurchase extends Component {
                 const date = moment(item.orderDate).format('DD/MM/YYYY');
                 const price = Math.round(item.htva);
                 return (
-                  <View
+                  <TouchableOpacity
+                    onPress={() => this.navigateToEditFun(item)}
                     style={{
                       ...styles.listDataHeadingContainer,
-                      backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F7F8F5',
+                      backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#EEF2FD',
+                      borderColor: '#EAEAF0',
+                      borderWidth: 1,
                     }}>
-                    <TouchableOpacity
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                      }}>
+                      <View
+                        style={styles.listSubHeading}
+                        onPress={() => this.arrangeListFun('DATE')}>
+                        <Text style={styles.listTextStyling}>{date}</Text>
+                      </View>
+                      <View
+                        style={styles.listSubHeading}
+                        onPress={() => this.arrangeListFun('SUPPLIER')}>
+                        <Text style={styles.listTextStyling} numberOfLines={1}>
+                          {item.supplierName}
+                        </Text>
+                      </View>
+                      <View
+                        style={styles.listSubHeading}
+                        onPress={() => this.arrangeListFun('HTVA')}>
+                        <Text style={styles.listTextStyling}>€ {price}</Text>
+                      </View>
+                    </View>
+
+                    <View>
+                      {item.hasWarning ? (
+                        <View style={styles.listDataContainer}>
+                          <Image
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                            }}
+                            source={img.errorIcon}
+                          />
+                        </View>
+                      ) : (
+                        <View style={styles.listDataContainer}></View>
+                      )}
+                    </View>
+                    {/* <TouchableOpacity
                       style={styles.listDataHeadingSubContainer}
                       onPress={() => this.navigateToEditFun(item)}>
                       <View style={styles.listDataContainer}>
@@ -332,13 +456,42 @@ class ViewPurchase extends Component {
                       ) : (
                         <View style={styles.listDataContainer}></View>
                       )}
-                    </TouchableOpacity>
-                  </View>
+                    </TouchableOpacity> */}
+                  </TouchableOpacity>
                 );
               })
             )}
-          </View>
-        </ScrollView>
+          </ScrollView>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate('AddPurchaseScreen')}
+            style={{
+              position: 'absolute',
+              right: 20,
+              top: hp('50%'),
+              flexDirection: 'row',
+              backgroundColor: '#5297c1',
+              padding: 15,
+              borderRadius: 5,
+            }}>
+            <View>
+              <Image
+                style={{...styles.listImageStyling, tintColor: '#fff'}}
+                source={img.plusIcon}
+              />
+            </View>
+            <Text
+              style={{
+                fontSize: 12,
+                fontFamily: 'Inter-SemiBold',
+                color: 'black',
+                marginLeft: 10,
+                color: '#fff',
+              }}>
+              {translate('New Purchase')}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {/* </ScrollView> */}
       </View>
     );
   }

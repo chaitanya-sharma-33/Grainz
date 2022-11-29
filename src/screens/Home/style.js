@@ -3,7 +3,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-const numColumns = 3;
+const numColumns = 2;
 
 const styles = StyleSheet.create({
   container: {
@@ -15,25 +15,26 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     width: Dimensions.get('window').width / numColumns,
-    height: Dimensions.get('window').width / numColumns,
+    height: hp('15%'),
     borderRadius: 50,
   },
   tileContainer: {
-    backgroundColor: '#fff',
     flex: 1,
     margin: 10,
     borderRadius: 8,
     padding: 10,
+    alignItems: 'flex-start',
   },
   tileImageContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    flex: 3,
     alignItems: 'center',
+    marginTop: 5,
   },
   tileImageStyling: {
-    height: 40,
-    width: 40,
+    height: 20,
+    width: 20,
     resizeMode: 'contain',
+    tintColor: '#fff',
   },
   tileTextContainer: {
     flex: 1,
@@ -41,9 +42,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tileTextStyling: {
-    fontSize: 13,
+    fontSize: 13.5,
+    fontFamily: 'Inter-Regular',
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  tileTextContainerSec: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tileTextStylingSec: {
+    fontSize: 10,
     textAlign: 'center',
     fontFamily: 'Inter-Regular',
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
 export default styles;

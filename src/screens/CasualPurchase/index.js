@@ -111,19 +111,16 @@ class index extends Component {
         )} */}
         <View style={styles.subContainer}>
           <View style={styles.firstContainer}>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.goBack()}
+              style={styles.goBackContainer}>
+              <Image source={img.backIcon} style={styles.tileImageBack} />
+            </TouchableOpacity>
             <View style={styles.flex}>
               <Text style={styles.adminTextStyle}>
                 {translate('Casual purchase')}
               </Text>
             </View>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.goBack()}
-              style={styles.goBackContainer}>
-              <Text style={styles.goBackTextStyle}>
-                {' '}
-                {translate('Go Back')}
-              </Text>
-            </TouchableOpacity>
           </View>
 
           <FlatList

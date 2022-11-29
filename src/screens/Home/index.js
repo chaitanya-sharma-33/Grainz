@@ -51,60 +51,93 @@ class index extends Component {
     getMyProfileApi()
       .then(res => {
         this.setState({
+          // buttons: [
+          //   {
+          //     id: 0,
+          //     name: translate('Stock Take'),
+          //     icon: img.stokeTakeIcon,
+          //     screen: 'StockTakeScreen',
+          //   },
+          //   {
+          //     id: 1,
+          //     name: translate('Mise-en-Place'),
+          //     icon: img.miscIcon,
+          //     screen: 'MepScreen',
+          //   },
+
+          //   // {
+          //   //   name: translate('Recipes'),
+          //   //   icon: img.searchIcon,
+          //   //   screen: 'RecipeScreen',
+          //   // },
+          //   // {
+          //   //   name: translate('Menu-Items'),
+          //   //   icon: img.searchIcon,
+          //   //   screen: 'MenuItemsScreen',
+          //   // },
+          //   {
+          //     id: 2,
+          //     name: translate('Manual Log small'),
+          //     icon: img.ManualIcon,
+          //     screen: 'ManualLogScreen',
+          //   },
+          //   // {
+          //   //   name: translate('Deliveries'),
+          //   //   icon: img.addIcon,
+          //   //   screen: 'DeliveriesScreen',
+          //   // },
+          //   {
+          //     id: 4,
+          //     name: translate('Casual purchase'),
+          //     icon: img.CasualIcon,
+          //     screen: 'CasualPurchaseScreen',
+          //   },
+          //   {
+          //     id: 5,
+          //     name: translate('Ordering'),
+          //     icon: img.orderingIcon,
+          //     screen: 'OrderingAdminScreen',
+          //   },
+          //   // {
+          //   //   id: 6,
+          //   //   name: translate('Dashboard'),
+          //   //   icon: img.dashboardIcon,
+          //   //   screen: 'DashboardScreen',
+          //   // },
+          //   // {name: translate('Events'), icon: img.addIcon, screen: 'EventsScreen'},
+          // ],
           buttons: [
             {
               id: 0,
-              name: translate('Stock Take'),
+              name: translate('Ordering'),
               icon: img.stokeTakeIcon,
-              screen: 'StockTakeScreen',
+              screen: 'OrderingAdminScreen',
             },
             {
               id: 1,
-              name: translate('Mise-en-Place'),
-              icon: img.miscIcon,
-              screen: 'MepScreen',
-            },
-
-            // {
-            //   name: translate('Recipes'),
-            //   icon: img.searchIcon,
-            //   screen: 'RecipeScreen',
-            // },
-            // {
-            //   name: translate('Menu-Items'),
-            //   icon: img.searchIcon,
-            //   screen: 'MenuItemsScreen',
-            // },
-            {
-              id: 2,
-              name: translate('Manual Log small'),
-              icon: img.ManualIcon,
-              screen: 'ManualLogScreen',
-            },
-            // {
-            //   name: translate('Deliveries'),
-            //   icon: img.addIcon,
-            //   screen: 'DeliveriesScreen',
-            // },
-            {
-              id: 4,
               name: translate('Casual purchase'),
               icon: img.CasualIcon,
-              screen: 'CasualPurchaseScreen',
+              screen: 'ViewPurchaseScreen',
             },
             {
-              id: 5,
-              name: translate('Ordering'),
-              icon: img.orderingIcon,
-              screen: 'OrderingAdminScreen',
+              id: 2,
+              name: translate('Suppliers'),
+              icon: img.CasualIcon,
+              screen: 'SupplierAdminScreen',
             },
-            // {
-            //   id: 6,
-            //   name: translate('Dashboard'),
-            //   icon: img.dashboardIcon,
-            //   screen: 'DashboardScreen',
-            // },
-            // {name: translate('Events'), icon: img.addIcon, screen: 'EventsScreen'},
+            {
+              id: 3,
+              name: translate('Reporting'),
+              icon: img.miscIcon,
+              screen: 'ReportingAdminScreen',
+            },
+
+            {
+              id: 4,
+              name: translate('Stock Take'),
+              icon: img.orderingIcon,
+              screen: 'StockTakeScreen',
+            },
           ],
           buttonsSubHeader: [
             {name: translate('ADMIN')},
@@ -129,9 +162,9 @@ class index extends Component {
   };
 
   componentDidMount() {
-    this.props.navigation.addListener('focus', () => {
-      this.getData();
-    });
+    // this.props.navigation.addListener('focus', () => {
+    this.getData();
+    // });
     this.setLanguage();
   }
 
@@ -178,7 +211,17 @@ class index extends Component {
                 <View style={styles.itemContainer}>
                   <TouchableOpacity
                     onPress={() => this.onPressFun(item)}
-                    style={styles.tileContainer}>
+                    style={{
+                      backgroundColor:
+                        item.screen === 'OrderingAdminScreen'
+                          ? '#C7408A'
+                          : item.screen === 'ViewPurchaseScreen'
+                          ? '#81A91D'
+                          : item.screen === 'SupplierAdminScreen'
+                          ? '#7662A9'
+                          : '#DCDCDC',
+                      ...styles.tileContainer,
+                    }}>
                     <View style={styles.tileImageContainer}>
                       <Image
                         source={item.icon}
@@ -189,15 +232,25 @@ class index extends Component {
                     </View>
                     <View style={styles.tileTextContainer}>
                       <Text style={styles.tileTextStyling} numberOfLines={1}>
-                        {' '}
                         {item.name}
+                      </Text>
+                    </View>
+                    <View style={styles.tileTextContainerSec}>
+                      <Text style={styles.tileTextStylingSec} numberOfLines={1}>
+                        {item.screen === 'OrderingAdminScreen'
+                          ? '1 Action'
+                          : item.screen === 'ViewPurchaseScreen'
+                          ? '2 Actions'
+                          : item.screen === 'SupplierAdminScreen'
+                          ? '3 Actions'
+                          : 'Coming Soon'}
                       </Text>
                     </View>
                   </TouchableOpacity>
                 </View>
               )}
               keyExtractor={item => item.id}
-              numColumns={3}
+              numColumns={2}
             />
           </View>
         )}

@@ -1152,18 +1152,23 @@ class index extends Component {
           <View>
             <View style={styles.subContainer}>
               <View style={styles.firstContainer}>
-                <View style={{flex: 1}}>
+                <TouchableOpacity
+                  onPress={() => this.props.navigation.goBack()}
+                  style={styles.goBackContainer}>
+                  <Image source={img.backIcon} style={styles.tileImageBack} />
+                </TouchableOpacity>
+                <View style={styles.flex}>
                   <Text style={styles.adminTextStyle}>
-                    {translate('Casual purchase')}
+                    {translate('New Casual Purchase')}
                   </Text>
                 </View>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => this.props.navigation.goBack()}
                   style={styles.goBackContainer}>
                   <Text style={styles.goBackTextStyle}>
                     {translate('Go Back')}
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
             </View>
             <View style={{marginHorizontal: wp('6%'), marginTop: hp('2%')}}>
@@ -1172,16 +1177,24 @@ class index extends Component {
               ) : (
                 <View>
                   <View style={{}}>
-                    <View style={{}}>
-                      <TouchableOpacity
-                        onPress={() => this.showDatePickerFun()}
+                    <TouchableOpacity
+                      onPress={() => this.showDatePickerFun()}
+                      style={{
+                        backgroundColor: '#fff',
+                        padding: Platform.OS === 'ios' ? 15 : 0,
+                        marginBottom: hp('3%'),
+                        borderRadius: 6,
+                      }}>
+                      <View style={{}}>
+                        <Text>Order Date</Text>
+                      </View>
+                      <View
                         style={{
-                          backgroundColor: '#fff',
-                          padding: Platform.OS === 'ios' ? 15 : 0,
-                          marginBottom: hp('3%'),
+                          // marginBottom: hp('3%'),
                           flexDirection: 'row',
                           justifyContent: 'space-between',
-                          borderRadius: 6,
+
+                          marginTop: 10,
                         }}>
                         <TextInput
                           placeholder="dd-mm-yy"
@@ -1199,8 +1212,8 @@ class index extends Component {
                             marginRight: Platform.OS === 'android' ? 10 : 0,
                           }}
                         />
-                      </TouchableOpacity>
-                    </View>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                   <DateTimePickerModal
                     isVisible={isDatePickerVisible}
