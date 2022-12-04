@@ -7,7 +7,6 @@ import {
   Alert,
   ActivityIndicator,
   Switch,
-  Modal,
   Image,
 } from 'react-native';
 import styles from './style';
@@ -17,13 +16,15 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {loginApi} from '../../connectivity/api';
+import {loginApi, resetPasswordApi} from '../../connectivity/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
 import {UserTokenAction} from '../../redux/actions/UserTokenAction';
 import {translate, setI18nConfig} from '../../utils/translations';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
+import CheckBox from '@react-native-community/checkbox';
+import Modal from 'react-native-modal';
 
 var querystring = require('querystring');
 
@@ -39,10 +40,30 @@ class index extends Component {
       switchValue: false,
       loader: false,
       passStatus: true,
+      switchValueRemember: false,
+      forgetPassModal: false,
+      resetEmail: '',
     };
   }
 
   async componentDidMount() {
+    // const rememberMe = await AsyncStorage.getItem('RememberMe');
+    // const rememberEmail = await AsyncStorage.getItem('email');
+    // const rememberPass = await AsyncStorage.getItem('password');
+
+    // if (rememberMe != null && rememberMe != undefined && rememberMe == 'true') {
+    //   this.setState({
+    //     switchValueRemember: rememberMe,
+    //     email: rememberEmail,
+    //     password: rememberPass,
+    //   });
+    // } else {
+    //   this.setState({
+    //     switchValueRemember: false,
+    //     email: '',
+    //     password: '',
+    //   });
+    // }
     setI18nConfig();
 
     const lang = await AsyncStorage.getItem('Language');
@@ -102,14 +123,27 @@ class index extends Component {
     }
   };
 
-  signInFun = () => {
+  signInFun = async () => {
     if (this.verification()) {
-      const {email, password} = this.state;
+      const {email, password, switchValueRemember} = this.state;
       const payload = {
         username: email.trim(),
         password: password.trim(),
         grant_type: 'password',
       };
+
+      // if (switchValueRemember === true) {
+      //   await AsyncStorage.setItem('RememberMe', 'true');
+      //   await AsyncStorage.setItem('email', email);
+      //   await AsyncStorage.setItem('password', password);
+      // } else {
+      //   this.setState(
+      //     {
+      //       switchValueRemember: false,
+      //     },
+      //     await AsyncStorage.setItem('RememberMe', 'false'),
+      //   );
+      // }
 
       console.log('payload', payload);
 
@@ -159,8 +193,53 @@ class index extends Component {
     );
   };
 
+  rememberMeFun = value => {
+    this.setState({
+      switchValueRemember: value,
+    });
+  };
+
+  setModalVisibleForgetPass = value => {
+    this.setState({
+      forgetPassModal: value,
+    });
+  };
+
+  sendLinkFun = () => {
+    const {resetEmail} = this.state;
+    let payload = {
+      email: resetEmail,
+    };
+    console.log('Payload', payload);
+
+    // resetPasswordApi(payload)
+    //   .then(res => {
+    //     this.setState({
+    //       forgetPassModal: false,
+    //     });
+    //   })
+    //   .catch(err => {
+    //     Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+    //       {
+    //         text: 'Okay',
+    //         onPress: () =>
+    //           this.setState({
+    //             forgetPassModal: false,
+    //           }),
+    //       },
+    //     ]);
+    //   })
+  };
+
   render() {
-    const {loader, passStatus} = this.state;
+    const {
+      loader,
+      passStatus,
+      switchValueRemember,
+      forgetPassModal,
+      resetEmail,
+    } = this.state;
+    // console.log('switchValueRemember', switchValueRemember);
     return (
       <View style={styles.container}>
         <View
@@ -312,6 +391,44 @@ class index extends Component {
                   />
                   <Text style={styles.langStyling}>Français</Text>
                 </View> */}
+                <View style={{flexDirection: 'row', marginTop: 15}}>
+                  <View>
+                    <CheckBox
+                      value={switchValueRemember}
+                      onValueChange={value => this.rememberMeFun(value)}
+                      style={{
+                        height: 18,
+                        width: 18,
+                        marginRight: 10,
+                      }}
+                    />
+                    {/* <Switch
+                            thumbColor={'#94BB3B'}
+                            trackColor={{false: 'grey', true: 'grey'}}
+                            ios_backgroundColor="white"
+                            onValueChange={value =>
+                              this.addDataFun(
+                                'index',
+                                'isRollingAverageUsed',
+                                value,
+                                'rollingAveragePrice',
+                                'quantityOrdered',
+                                'isRollingAverageUsed',
+                                'all',
+                              )
+                            }
+                            value={switchValue}
+                          /> */}
+                  </View>
+                  <Text
+                    style={{
+                      color: '#222526',
+                      fontSize: 14,
+                      fontFamily: 'Inter-Regular',
+                    }}>
+                    {translate('Remember me')}
+                  </Text>
+                </View>
                 <TouchableOpacity
                   onPress={() => this.signInFun()}
                   style={styles.signInStyling}>
@@ -328,7 +445,7 @@ class index extends Component {
                   )}
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => alert('Forget Pass')}
+                  onPress={() => this.setModalVisibleForgetPass(true)}
                   style={styles.forgotPassStyling}>
                   {this.state.buttonLoader ? (
                     <ActivityIndicator color="#fff" size="small" />
@@ -336,6 +453,102 @@ class index extends Component {
                     <Text style={{}}>{translate('Forgoten Password?')}</Text>
                   )}
                 </TouchableOpacity>
+                <Modal isVisible={forgetPassModal} backdropOpacity={0.35}>
+                  <View
+                    style={{
+                      width: wp('80%'),
+                      height: hp('35%'),
+                      backgroundColor: '#fff',
+                      alignSelf: 'center',
+                      borderRadius: 10,
+                    }}>
+                    <View
+                      style={{
+                        height: hp('7%'),
+                        flexDirection: 'row',
+                      }}>
+                      <View
+                        style={{
+                          flex: 3,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                          {translate('Forgoten Password?')}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <TouchableOpacity
+                          onPress={() => this.setModalVisibleForgetPass(false)}>
+                          <Image
+                            source={img.cancelIcon}
+                            style={{
+                              height: 22,
+                              width: 22,
+                              resizeMode: 'contain',
+                            }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <View style={{padding: hp('3%')}}>
+                      {/* <View>
+                        <Image
+                          style={{
+                            width: wp('60%'),
+                            height: 100,
+                            resizeMode: 'cover',
+                          }}
+                          source={{uri: imageData.path}}
+                        />
+                      </View> */}
+                      <View style={{}}>
+                        <TextInput
+                          placeholder="Email"
+                          value={resetEmail}
+                          style={{
+                            borderWidth: 1,
+                            padding: 12,
+                            marginBottom: hp('3%'),
+                            justifyContent: 'space-between',
+                            marginTop: 20,
+                          }}
+                          onChangeText={value => {
+                            this.setState({
+                              resetEmail: value,
+                            });
+                          }}
+                        />
+                      </View>
+
+                      <TouchableOpacity
+                        onPress={() => this.sendLinkFun()}
+                        style={{
+                          width: wp('70%'),
+                          height: hp('5%'),
+                          alignSelf: 'flex-end',
+                          backgroundColor: '#5297C1',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderRadius: 10,
+                        }}>
+                        <Text
+                          style={{
+                            color: '#fff',
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                          }}>
+                          {translate('Reset Password')}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
               </View>
             </View>
           </View>

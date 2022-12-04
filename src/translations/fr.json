@@ -866,5 +866,11 @@
   "Log in to your account": "Log in to your account",
   "Forgoten Password?": "Forgoten Password?",
   "New Purchase": "New Purchase",
-  "New Casual Purchase": "New Casual Purchase"
+  "New Casual Purchase": "New Casual Purchase",
+  "Remember me": "Remember me",
+  "Apply filters": "Apply filters",
+  "Clear all filters": "Clear all filters",
+  "From date": "From date",
+  "Show only flagged purchases": "Show only flagged purchases",
+  "Reset Password": "Reset Password"
 }

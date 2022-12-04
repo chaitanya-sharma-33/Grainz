@@ -63,4 +63,6 @@ export default {
   crossIcon: require('../assests/Images/crossIcon.png'),
   errorIcon: require('../assests/Images/errorIcon.jpg'),
   backIcon: require('../assests/Images/backIcon.png'),
+  filterIcon: require('../assests/Images/filterIcon.png'),
+  flagIcon: require('../assests/Images/flagIcon.png'),
 };

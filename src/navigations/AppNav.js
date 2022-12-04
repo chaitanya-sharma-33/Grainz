@@ -74,6 +74,7 @@ import EditHistoryOrderScreen from '../screens/Home/Admin/Ordering/HistoryOrder/
 import CategoryStockScreen from '../screens/StockTake/CategoryStockScreen';
 import AddManualLogScreen from '../screens/ManualLog/AddManualLog';
 import EditManualLogScreen from '../screens/ManualLog/EditManualLog';
+import FilterPurchaseScreen from '../screens/CasualPurchase/FilterPurchase';
 
 const AppNav = createStackNavigator();
 
@@ -258,6 +259,10 @@ export default function AppNavFun() {
       <AppNav.Screen
         name="ViewMenuItemsScreen"
         component={ViewMenuItemsScreen}
+      />
+      <AppNav.Screen
+        name="FilterPurchaseScreen"
+        component={FilterPurchaseScreen}
       />
     </AppNav.Navigator>
   );

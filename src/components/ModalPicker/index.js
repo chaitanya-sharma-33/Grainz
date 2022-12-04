@@ -94,11 +94,14 @@ class index extends Component {
             </Text>
           )}
           <Image
-            source={img.arrowDownIcon}
+            source={
+              this.props.imageIcon ? this.props.imageIcon : img.arrowDownIcon
+            }
             style={{
               height: 20,
               width: 20,
               resizeMode: 'contain',
+              tintColor: this.props.tintColor,
             }}
           />
         </TouchableOpacity>

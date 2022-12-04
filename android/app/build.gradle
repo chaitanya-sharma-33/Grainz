@@ -134,6 +134,11 @@ android {
        javaMaxHeapSize "3g"
     }
 
+     packagingOptions {
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libfbjni.so'
+    }
+
     defaultConfig {
         applicationId "com.grainz"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -141,6 +146,7 @@ android {
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
     }
     splits {
         abi {

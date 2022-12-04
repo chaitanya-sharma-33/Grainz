@@ -305,28 +305,75 @@ class ViewPurchase extends Component {
           <View
             style={{
               width: wp('60%'),
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: '#fff',
+              borderRadius: 5,
             }}>
             <TextInput
               placeholder="Search"
               style={{
-                backgroundColor: '#fff',
                 padding: 12,
                 borderRadius: 5,
+                width: '85%',
               }}
               value={searchItem}
               onChangeText={value => this.searchFun(value)}
             />
+            <View>
+              <Image
+                style={{
+                  width: 18,
+                  height: 18,
+                  resizeMode: 'contain',
+                }}
+                source={img.searchIcon}
+              />
+            </View>
           </View>
-          <View style={{width: wp('29%'), marginLeft: 10}}>
-            <TextInput
+          <TouchableOpacity
+            style={{
+              width: wp('29%'),
+              marginLeft: 10,
+              backgroundColor: '#fff',
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderRadius: 5,
+            }}
+            onPress={() =>
+              this.props.navigation.navigate('FilterPurchaseScreen')
+            }>
+            <View>
+              <Image
+                style={{
+                  width: 18,
+                  height: 18,
+                  resizeMode: 'contain',
+                  marginLeft: 10,
+                  tintColor: 'grey',
+                }}
+                source={img.filterIcon}
+              />
+            </View>
+            <View>
+              <Text
+                style={{
+                  padding: 12,
+                  color: 'grey',
+                }}>
+                Filter
+              </Text>
+            </View>
+            {/* <TextInput
               placeholder="Filter"
               style={{
                 backgroundColor: '#fff',
                 padding: 12,
                 borderRadius: 5,
               }}
-            />
-          </View>
+              editable={false}
+            /> */}
+          </TouchableOpacity>
         </View>
         <View style={{marginTop: '5%'}}>
           <View style={styles.listHeading}>
@@ -399,9 +446,31 @@ class ViewPurchase extends Component {
                       <View
                         style={styles.listSubHeading}
                         onPress={() => this.arrangeListFun('SUPPLIER')}>
-                        <Text style={styles.listTextStyling} numberOfLines={1}>
+                        <Text
+                          style={{
+                            ...styles.listTextStyling,
+                            width: wp('15%'),
+                          }}
+                          numberOfLines={1}>
                           {item.supplierName}
                         </Text>
+                        <View>
+                          {item.hasWarning ? (
+                            <View style={styles.listDataContainer}>
+                              <Image
+                                style={{
+                                  width: 15,
+                                  height: 15,
+                                  resizeMode: 'contain',
+                                  marginLeft: 10,
+                                }}
+                                source={img.flagIcon}
+                              />
+                            </View>
+                          ) : (
+                            <View style={styles.listDataContainer}></View>
+                          )}
+                        </View>
                       </View>
                       <View
                         style={styles.listSubHeading}
@@ -410,22 +479,6 @@ class ViewPurchase extends Component {
                       </View>
                     </View>
 
-                    <View>
-                      {item.hasWarning ? (
-                        <View style={styles.listDataContainer}>
-                          <Image
-                            style={{
-                              width: 15,
-                              height: 15,
-                              resizeMode: 'contain',
-                            }}
-                            source={img.errorIcon}
-                          />
-                        </View>
-                      ) : (
-                        <View style={styles.listDataContainer}></View>
-                      )}
-                    </View>
                     {/* <TouchableOpacity
                       style={styles.listDataHeadingSubContainer}
                       onPress={() => this.navigateToEditFun(item)}>
@@ -484,8 +537,9 @@ class ViewPurchase extends Component {
                 fontSize: 12,
                 fontFamily: 'Inter-SemiBold',
                 color: 'black',
-                marginLeft: 10,
+                marginLeft: 5,
                 color: '#fff',
+                fontWeight: 'bold',
               }}>
               {translate('New Purchase')}
             </Text>

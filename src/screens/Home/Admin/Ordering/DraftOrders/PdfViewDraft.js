@@ -30,7 +30,7 @@ import {
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
-import {WebView} from 'react-native-webview';
+// import {WebView} from 'react-native-webview';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Modal from 'react-native-modal';
 import {
@@ -374,7 +374,7 @@ class PdfViewDraft extends Component {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{flex: 3.5, backgroundColor: '#F0F4FE'}}>
+        {/* <View style={{flex: 3.5, backgroundColor: '#F0F4FE'}}>
           <WebView
             startInLoadingState={true}
             renderLoading={() => {
@@ -547,7 +547,7 @@ class PdfViewDraft extends Component {
               </ScrollView>
             </View>
           </Modal>
-        </View>
+        </View> */}
         <View
           style={{
             flex: 1,

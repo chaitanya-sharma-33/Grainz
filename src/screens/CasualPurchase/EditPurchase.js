@@ -481,7 +481,7 @@ class EditPurchase extends Component {
   };
 
   handleConfirm = date => {
-    let newdate = moment(date).format('DD-MM-YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     this.setState({
       finalDate: newdate,
       productionDate: date,
@@ -1414,8 +1414,8 @@ class EditPurchase extends Component {
                   <Image
                     source={img.editIconGreen}
                     style={{
-                      width: 15,
-                      height: 15,
+                      width: 21,
+                      height: 21,
                       resizeMode: 'contain',
                       tintColor: '#77a3d6',
                     }}
@@ -1518,29 +1518,44 @@ class EditPurchase extends Component {
                     style={{
                       padding: Platform.OS === 'ios' ? 14 : 0,
                       marginBottom: hp('3%'),
-                      flexDirection: 'row',
                       justifyContent: 'space-between',
-                      backgroundColor: '#fff',
+                      backgroundColor: '#f2f2f2',
                       borderRadius: 6,
                     }}>
-                    <TextInput
-                      placeholder={moment(yourOrder.orderDate).format(
-                        'DD-MM-YYYY',
-                      )}
-                      value={finalDate}
-                      editable={false}
-                      style={{}}
-                    />
-                    <Image
-                      source={img.calenderIcon}
+                    <View>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                        }}>
+                        Purchase Date
+                      </Text>
+                    </View>
+                    <View
                       style={{
-                        width: 20,
-                        height: 20,
-                        resizeMode: 'contain',
-                        alignSelf: Platform.OS === 'android' ? 'center' : null,
-                        marginRight: Platform.OS === 'android' ? 10 : 0,
-                      }}
-                    />
+                        flexDirection: 'row',
+                      }}>
+                      <TextInput
+                        placeholder={moment(yourOrder.orderDate).format(
+                          'DD/MM/YYYY',
+                        )}
+                        placeholderTextColor="black"
+                        value={finalDate}
+                        editable={false}
+                        style={{width: wp('75%'), marginTop: 10}}
+                      />
+                      <Image
+                        source={img.calenderIcon}
+                        style={{
+                          width: 18,
+                          height: 18,
+                          resizeMode: 'contain',
+                          alignSelf:
+                            Platform.OS === 'android' ? 'center' : null,
+                          marginRight: Platform.OS === 'android' ? 10 : 0,
+                          tintColor: 'grey',
+                        }}
+                      />
+                    </View>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -1553,7 +1568,7 @@ class EditPurchase extends Component {
                 onCancel={this.hideDatePicker}
                 minimumDate={minTime}
               />
-
+              {/* 
               {editDisabled ? (
                 <View style={{}}>
                   <View style={{}}>
@@ -1591,7 +1606,7 @@ class EditPurchase extends Component {
                     onSelectFun={item => this.selectUserNameFun(item)}
                   />
                 </View>
-              )}
+              )} */}
 
               {!editDisabled ? (
                 <View
@@ -1883,257 +1898,322 @@ class EditPurchase extends Component {
                   </View>
                 </View>
               ) : null}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View>
-                  {yourOrderItems.map((item, indexOrder) => {
-                    console.log('item-->YPOURORDERITMS', item);
-                    return (
-                      <View style={{marginBottom: 10}}>
-                        {item.action !== 'Delete' ? (
-                          <View style={{marginLeft: wp('5%')}}>
-                            {!editDisabled && selectedItems.length === 0 ? (
-                              <View
+              {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}> */}
+              <View>
+                {yourOrderItems.map((item, indexOrder) => {
+                  console.log('item-->YPOURORDERITMS', item);
+                  return (
+                    <View style={{marginBottom: 10}}>
+                      {item.action !== 'Delete' ? (
+                        <View
+                          style={{
+                            backgroundColor: '#fff',
+                            // marginLeft: wp('5%')
+                          }}>
+                          {!editDisabled && selectedItems.length === 0 ? (
+                            <View
+                              style={{
+                                marginLeft: -11,
+                                zIndex: 10,
+                              }}>
+                              <TouchableOpacity
+                                disabled={editDisabled}
+                                onPress={() =>
+                                  this.deletePurchaseLine(indexOrder, 'action')
+                                }>
+                                <Image
+                                  source={img.cancelIcon}
+                                  style={{
+                                    width: 25,
+                                    height: 25,
+                                    resizeMode: 'contain',
+                                  }}
+                                />
+                              </TouchableOpacity>
+                            </View>
+                          ) : null}
+                          <View
+                            style={
+                              {
+                                // flexDirection: 'row',
+                                // alignItems: 'center',
+                                // flex: 1,
+                                // backgroundColor: 'red',
+                              }
+                            }>
+                            <View
+                              style={{
+                                // flex: 0.7,
+                                // backgroundColor: 'red',
+                                padding: 10,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}>
+                              <Text
                                 style={{
-                                  marginLeft: -11,
-                                  zIndex: 10,
+                                  fontWeight: 'bold',
+                                  fontSize: 14,
                                 }}>
-                                <TouchableOpacity
-                                  disabled={editDisabled}
-                                  onPress={() =>
-                                    this.deletePurchaseLine(
-                                      indexOrder,
-                                      'action',
-                                    )
-                                  }>
+                                {item.name}
+                              </Text>
+                              {item.isRollingAverageUsed ? (
+                                <View style={styles.listDataContainer}>
                                   <Image
-                                    source={img.cancelIcon}
                                     style={{
-                                      width: 25,
-                                      height: 25,
+                                      width: 15,
+                                      height: 15,
                                       resizeMode: 'contain',
+                                      marginLeft: 10,
                                     }}
+                                    source={img.flagIcon}
                                   />
-                                </TouchableOpacity>
-                              </View>
-                            ) : null}
+                                </View>
+                              ) : (
+                                <View
+                                  style={{
+                                    width: 15,
+                                    height: 15,
+                                  }}></View>
+                              )}
+                            </View>
                             <View
                               style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                flex: 1,
+                                // flex: 2,
+                                // marginLeft: wp('2%'),
                               }}>
                               <View
                                 style={{
-                                  flex: 0.7,
-                                  width: wp('20%'),
+                                  padding: 12,
+                                  width: wp('30%'),
                                 }}>
-                                <Text>{item.name}</Text>
-                              </View>
-                              <View
-                                style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  flex: 2,
-                                  marginLeft: wp('2%'),
-                                }}>
-                                <View>
-                                  <TextInput
-                                    editable={!editDisabled}
-                                    placeholder="Quantity"
-                                    style={{
-                                      padding: 12,
-                                      borderTopLeftRadius: 5,
-                                      borderBottomLeftRadius: 5,
-                                      backgroundColor: '#fff',
-                                      width: wp('20%'),
-                                    }}
-                                    keyboardType="number-pad"
-                                    value={item.quantityOrdered}
-                                    onChangeText={value =>
-                                      this.addDataFun(
-                                        indexOrder,
-                                        'quantityOrdered',
-                                        value,
-                                        item.rollingAveragePrice,
-                                        item.quantityOrdered,
-                                        item.isRollingAverageUsed,
-                                        'quanOrdered',
-                                        item,
-                                      )
-                                    }
-                                  />
-                                </View>
-                                <View
+                                <Text
                                   style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
+                                    fontSize: 12,
                                   }}>
-                                  <View
-                                    style={{
-                                      flexDirection: 'row',
-                                      borderTopRightRadius: 5,
-                                      borderBottomRightRadius: 5,
-                                      backgroundColor: '#68AFFF',
-                                    }}>
-                                    <View
-                                      style={{
-                                        alignSelf: 'center',
-                                        justifyContent: 'center',
-                                        width: wp('15%'),
-                                      }}>
-                                      <RNPickerSelect
-                                        disabled={editDisabled}
-                                        placeholder={{
-                                          label: 'Select Unit*',
-                                          value: null,
-                                          color: 'black',
-                                        }}
-                                        onValueChange={(value, index) => {
-                                          this.addDataFun(
-                                            indexOrder,
-                                            'unitId',
-                                            value,
-                                            item.rollingAveragePrice,
-                                            item.quantityOrdered,
-                                            item.isRollingAverageUsed,
-                                            'key',
-                                            item,
-                                            index,
-                                          );
-                                        }}
-                                        style={{
-                                          inputIOS: {
-                                            fontSize: 14,
-                                            paddingHorizontal: '3%',
-                                            width: '100%',
-                                            alignSelf: 'center',
-                                            paddingVertical: 12,
-                                            marginLeft: 10,
-                                            color: '#fff',
-                                          },
-                                          inputAndroid: {
-                                            fontSize: 14,
-                                            paddingHorizontal: '3%',
-                                            color: '#161C27',
-                                            width: '100%',
-                                            alignSelf: 'center',
-                                          },
-                                          iconContainer: {
-                                            top: '40%',
-                                          },
-                                        }}
-                                        items={item.units}
-                                        value={item.unitId}
-                                        useNativeAndroidPickerStyle={false}
-                                      />
-                                    </View>
-                                    <View style={{marginRight: wp('4%')}}>
-                                      <Image
-                                        source={img.arrowDownIcon}
-                                        resizeMode="contain"
-                                        style={{
-                                          height: 15,
-                                          width: 15,
-                                          resizeMode: 'contain',
-                                          tintColor: '#fff',
-                                          marginTop:
-                                            Platform.OS === 'ios' ? 12 : 15,
-                                        }}
-                                      />
-                                    </View>
-                                  </View>
-                                </View>
-                              </View>
-
-                              <View
-                                style={{
-                                  flex: 1,
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  marginLeft: 10,
-                                }}>
-                                <Text style={{}}>€</Text>
+                                  Quantity
+                                </Text>
                                 <TextInput
                                   editable={!editDisabled}
-                                  placeholder="Price"
+                                  placeholder="Quantity"
                                   style={{
-                                    padding: 15,
-                                    marginLeft: wp('2%'),
-                                    width: wp('25%'),
+                                    padding: 12,
+                                    borderTopLeftRadius: 5,
+                                    borderBottomLeftRadius: 5,
                                     backgroundColor: '#fff',
-                                    borderRadius: 6,
+                                    width: wp('30%'),
+                                    fontWeight: 'bold',
                                   }}
+                                  keyboardType="number-pad"
+                                  value={item.quantityOrdered}
                                   onChangeText={value =>
                                     this.addDataFun(
                                       indexOrder,
-                                      'unitPrice',
+                                      'quantityOrdered',
                                       value,
+                                      item.rollingAveragePrice,
+                                      item.quantityOrdered,
+                                      item.isRollingAverageUsed,
+                                      'quanOrdered',
+                                      item,
                                     )
                                   }
-                                  value={String(item.unitPrice)}
                                 />
                               </View>
                               <View
                                 style={{
-                                  flex: 1,
-                                  flexDirection: 'row',
+                                  // flexDirection: 'row',
                                   alignItems: 'center',
-                                  marginLeft: 10,
                                 }}>
-                                <Text
-                                  style={{
-                                    marginRight: 10,
-                                    fontSize: 10,
-                                  }}>
-                                  Use average price
-                                </Text>
                                 <View
-                                  style={{
-                                    backgroundColor: '#fff',
-                                    borderRadius: 6,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    paddingHorizontal: 10,
-                                  }}>
-                                  <TextInput
-                                    placeholder="Average Price"
-                                    editable={false}
+                                  style={
+                                    {
+                                      // flexDirection: 'row',
+                                    }
+                                  }>
+                                  <Text
                                     style={{
-                                      padding: 15,
-                                      width: wp('25%'),
-                                    }}
-                                    // onChangeText={value =>
-                                    //   this.addDataFun(
-                                    //     indexOrder,
-                                    //     'rollingAveragePrice',
-                                    //     value,
-                                    //   )
-                                    // }
-                                    value={`€ ${Number(
-                                      item.rollingAveragePrice.toFixed(2),
-                                    )}`}
-                                  />
-                                  <View>
-                                    <CheckBox
-                                      value={item.isRollingAverageUsed}
-                                      onValueChange={val =>
+                                      fontSize: 12,
+                                    }}>
+                                    Unit
+                                  </Text>
+                                  <View
+                                    style={{
+                                      // alignSelf: 'center',
+                                      // justifyContent: 'center',
+                                      width: wp('20%'),
+                                    }}>
+                                    <RNPickerSelect
+                                      disabled={editDisabled}
+                                      placeholder={{
+                                        label: 'Select Unit*',
+                                        value: null,
+                                        color: 'black',
+                                      }}
+                                      onValueChange={(value, index) => {
                                         this.addDataFun(
                                           indexOrder,
-                                          'isRollingAverageUsed',
-                                          val,
+                                          'unitId',
+                                          value,
                                           item.rollingAveragePrice,
                                           item.quantityOrdered,
                                           item.isRollingAverageUsed,
-                                          'singleRolling',
+                                          'key',
                                           item,
-                                        )
-                                      }
+                                          index,
+                                        );
+                                      }}
                                       style={{
-                                        height: 20,
-                                        width: 20,
+                                        inputIOS: {
+                                          fontSize: 14,
+                                          // paddingHorizontal: '3%',
+                                          width: '100%',
+                                          // alignSelf: 'center',
+                                          paddingVertical: 12,
+                                          marginLeft: 10,
+                                          color: 'black',
+                                          fontWeight: 'bold',
+                                        },
+                                        inputAndroid: {
+                                          fontSize: 14,
+                                          // paddingHorizontal: '3%',
+                                          color: 'black',
+                                          width: '100%',
+                                          fontWeight: 'bold',
+                                          // alignSelf: 'center',
+                                        },
+                                        iconContainer: {
+                                          top: '40%',
+                                        },
+                                      }}
+                                      items={item.units}
+                                      value={item.unitId}
+                                      useNativeAndroidPickerStyle={false}
+                                    />
+                                  </View>
+                                  {/* <View style={{marginRight: wp('4%')}}>
+                                    <Image
+                                      source={img.arrowDownIcon}
+                                      resizeMode="contain"
+                                      style={{
+                                        height: 15,
+                                        width: 15,
+                                        resizeMode: 'contain',
+                                        tintColor: '#fff',
+                                        marginTop:
+                                          Platform.OS === 'ios' ? 12 : 15,
                                       }}
                                     />
-                                    {/* <Switch
+                                  </View> */}
+                                </View>
+                              </View>
+                              <View
+                                style={{
+                                  // flexDirection: 'row',
+                                  alignItems: 'center',
+                                  width: wp('20%'),
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                  }}>
+                                  Value
+                                </Text>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <TextInput
+                                    editable={!editDisabled}
+                                    placeholder="Price"
+                                    style={{
+                                      padding: 12,
+                                      fontWeight: 'bold',
+                                      // width: wp('25%'),
+                                    }}
+                                    onChangeText={value =>
+                                      this.addDataFun(
+                                        indexOrder,
+                                        'unitPrice',
+                                        value,
+                                      )
+                                    }
+                                    value={String(item.unitPrice)}
+                                  />
+                                  <Text
+                                    style={{
+                                      fontWeight: 'bold',
+                                      fontSize: 12,
+                                    }}>
+                                    €
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+
+                            {/* <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                marginLeft: 10,
+                              }}>
+                              <Text
+                                style={{
+                                  marginRight: 10,
+                                  fontSize: 10,
+                                }}>
+                                Use average price
+                              </Text>
+                              <View
+                                style={{
+                                  backgroundColor: '#fff',
+                                  borderRadius: 6,
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  paddingHorizontal: 10,
+                                }}>
+                                <TextInput
+                                  placeholder="Average Price"
+                                  editable={false}
+                                  style={{
+                                    padding: 15,
+                                    width: wp('25%'),
+                                  }}
+                                  // onChangeText={value =>
+                                  //   this.addDataFun(
+                                  //     indexOrder,
+                                  //     'rollingAveragePrice',
+                                  //     value,
+                                  //   )
+                                  // }
+                                  value={`€ ${Number(
+                                    item.rollingAveragePrice.toFixed(2),
+                                  )}`}
+                                /> */}
+                            {/* <View>
+                                  <CheckBox
+                                    value={item.isRollingAverageUsed}
+                                    onValueChange={val =>
+                                      this.addDataFun(
+                                        indexOrder,
+                                        'isRollingAverageUsed',
+                                        val,
+                                        item.rollingAveragePrice,
+                                        item.quantityOrdered,
+                                        item.isRollingAverageUsed,
+                                        'singleRolling',
+                                        item,
+                                      )
+                                    }
+                                    style={{
+                                      height: 20,
+                                      width: 20,
+                                    }}
+                                  /> */}
+                            {/* <Switch
                                       disabled={editDisabled}
                                       thumbColor={'#94BB3B'}
                                       trackColor={{
@@ -2155,43 +2235,43 @@ class EditPurchase extends Component {
                                       }
                                       value={item.isRollingAverageUsed}
                                     /> */}
-                                  </View>
-                                </View>
-                              </View>
+                            {/* </View> */}
+                            {/* </View>
+                            </View> */}
+                            {/* <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                marginLeft: 10,
+                              }}>
                               <View
                                 style={{
-                                  flex: 1,
+                                  borderRadius: 6,
                                   flexDirection: 'row',
                                   alignItems: 'center',
-                                  marginLeft: 10,
+                                  paddingHorizontal: 10,
                                 }}>
-                                <View
-                                  style={{
-                                    borderRadius: 6,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    paddingHorizontal: 10,
-                                  }}>
-                                  {item.isRollingAverageUsed ? (
-                                    // {item.hasWarning ? (
-                                    <View style={styles.listDataContainer}>
-                                      <Image
-                                        style={{
-                                          width: 15,
-                                          height: 15,
-                                          resizeMode: 'contain',
-                                        }}
-                                        source={img.errorIcon}
-                                      />
-                                    </View>
-                                  ) : (
-                                    <View
+                                {item.isRollingAverageUsed ? (
+                                  // {item.hasWarning ? (
+                                  <View style={styles.listDataContainer}>
+                                    <Image
                                       style={{
                                         width: 15,
                                         height: 15,
-                                      }}></View>
-                                  )}
+                                        resizeMode: 'contain',
+                                      }}
+                                      source={img.errorIcon}
+                                    />
+                                  </View>
+                                ) : (
                                   <View
+                                    style={{
+                                      width: 15,
+                                      height: 15,
+                                    }}></View>
+                                )}
+                                {/* <View
                                     style={{
                                       marginLeft: 15,
                                       flexDirection: 'row',
@@ -2226,24 +2306,24 @@ class EditPurchase extends Component {
                                       }
                                       value={item.isCorrect}
                                     />
-                                  </View>
-                                </View>
-                              </View>
+                                  </View> */}
+                            {/* </View> */}
+                            {/* </View> */}
+                          </View>
+                          {item.error ? (
+                            <View>
+                              <Text
+                                style={{
+                                  color: 'red',
+                                  fontSize: 12,
+                                  fontFamily: 'Inter-Regular',
+                                  marginTop: 5,
+                                }}>
+                                {item.error}
+                              </Text>
                             </View>
-                            {item.error ? (
-                              <View>
-                                <Text
-                                  style={{
-                                    color: 'red',
-                                    fontSize: 12,
-                                    fontFamily: 'Inter-Regular',
-                                    marginTop: 5,
-                                  }}>
-                                  {item.error}
-                                </Text>
-                              </View>
-                            ) : null}
-                            {/* <View>
+                          ) : null}
+                          {/* <View>
                         {!editDisabled ? (
                           <View
                             style={{
@@ -2436,13 +2516,13 @@ class EditPurchase extends Component {
                           </View>
                         </View>
                       </View> */}
-                          </View>
-                        ) : null}
-                      </View>
-                    );
-                  })}
-                </View>
-              </ScrollView>
+                        </View>
+                      ) : null}
+                    </View>
+                  );
+                })}
+              </View>
+              {/* </ScrollView> */}
               {/* <View>
                 {editDisabled ? null : (
                   <View>
@@ -2486,6 +2566,8 @@ class EditPurchase extends Component {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     marginBottom: hp('2%'),
+                    backgroundColor: '#fff',
+                    padding: 10,
                   }}>
                   <View>
                     <Text
@@ -2493,6 +2575,7 @@ class EditPurchase extends Component {
                         fontFamily: 'Inter-Regular',
                         fontSize: 16,
                         color: '#151B26',
+                        fontWeight: 'bold',
                       }}>
                       {translate('Total')}
                     </Text>
@@ -2503,12 +2586,13 @@ class EditPurchase extends Component {
                         fontFamily: 'Inter-Regular',
                         fontSize: 16,
                         color: '#151B26',
+                        fontWeight: 'bold',
                       }}>
-                      € {orderTotal.toFixed(2)}
+                      {orderTotal.toFixed(2)} €
                     </Text>
                   </View>
                 </View>
-                <View
+                {/* <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -2535,7 +2619,7 @@ class EditPurchase extends Component {
                       width: 20,
                     }}
                   />
-                </View>
+                </View> */}
                 <View
                   style={{
                     flexDirection: 'row',
