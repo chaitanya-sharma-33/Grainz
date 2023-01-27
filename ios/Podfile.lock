@@ -209,8 +209,6 @@ PODS:
     - React-Core
   - react-native-splash-screen (3.2.0):
     - React
-  - react-native-webview (11.6.5):
-    - React-Core
   - React-perflogger (0.64.0)
   - React-RCTActionSheet (0.64.0):
     - React-Core/RCTActionSheetHeaders (= 0.64.0)
@@ -283,7 +281,7 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.11):
     - React
-  - RNCPicker (1.16.1):
+  - RNCPicker (1.16.2):
     - React-Core
   - RNDateTimePicker (3.5.2):
     - React-Core
@@ -357,7 +355,6 @@ DEPENDENCIES:
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
-  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -426,8 +423,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
-  react-native-webview:
-    :path: "../node_modules/react-native-webview"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -499,7 +494,6 @@ SPEC CHECKSUMS:
   react-native-html-to-pdf: 1214f9c795a587fe60a950d11a891cd05be29625
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
-  react-native-webview: 2e8fe70dc32b50d3231c23043f8e8b5a5525d346
   React-perflogger: 9c547d8f06b9bf00cb447f2b75e8d7f19b7e02af
   React-RCTActionSheet: 3080b6e12e0e1a5b313c8c0050699b5c794a1b11
   React-RCTAnimation: 3f96f21a497ae7dabf4d2f150ee43f906aaf516f
@@ -516,7 +510,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 56a3355a10b5d660c48c6e37325ac85ebfd09885
   RNCCheckbox: 6bd119c26c6eb8264a29d59ff66cb70a14de3349
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
-  RNCPicker: 61c7a0645b9e4ac67960aa7f22a3effcecfdfb8d
+  RNCPicker: 84976445593b0f5bb6f63ed6de308d367f8e340d
   RNDateTimePicker: 7658208086d86d09e1627b5c34ba0cf237c60140
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584

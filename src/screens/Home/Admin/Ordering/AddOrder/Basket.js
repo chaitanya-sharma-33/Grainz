@@ -86,6 +86,8 @@ class Basket extends Component {
       supplierName: '',
       loaderCompStatus: false,
       arrangeStatusName: 0,
+      finalDataSec: '',
+      showMoreStatus: false,
     };
   }
 
@@ -141,8 +143,14 @@ class Basket extends Component {
   componentDidMount() {
     this.getData();
     this.getUsersListData();
-    const {finalData, supplierId, itemType, productId, supplierName} =
-      this.props.route && this.props.route.params;
+    const {
+      finalData,
+      supplierId,
+      itemType,
+      productId,
+      supplierName,
+      finalDataSec,
+    } = this.props.route && this.props.route.params;
     this.setState(
       {
         supplierId,
@@ -154,6 +162,7 @@ class Basket extends Component {
         apiOrderDate: new Date().toISOString(),
         productId,
         supplierName,
+        finalDataSec,
       },
       () => this.getBasketDataFun(),
     );
@@ -186,7 +195,8 @@ class Basket extends Component {
   };
 
   createApiData = () => {
-    const {modalData} = this.state;
+    const {modalData, finalDataSec} = this.state;
+    console.log('FINAAP', finalDataSec);
     const finalArr = [];
     modalData.map(item => {
       finalArr.push({
@@ -201,6 +211,10 @@ class Basket extends Component {
     });
     this.setState({
       finalApiData: [...finalArr],
+      placedByValue: finalDataSec.placedByData,
+      supplierId: finalDataSec.supplierId,
+      apiDeliveryDate: finalDataSec.productionDateDelivery,
+      apiOrderDate: finalDataSec.productionDateOrder,
     });
   };
 
@@ -848,6 +862,15 @@ class Basket extends Component {
     }
   };
 
+  previewPDFFun = () => {
+    this.setState(
+      {
+        loaderCompStatus: true,
+      },
+      () => this.viewFun(),
+    );
+  };
+
   render() {
     const {
       buttonsSubHeader,
@@ -879,6 +902,8 @@ class Basket extends Component {
       loaderCompStatus,
       basketId,
       finalOrderMinDate,
+      finalDataSec,
+      showMoreStatus,
     } = this.state;
 
     return (
@@ -898,27 +923,182 @@ class Basket extends Component {
           showsVerticalScrollIndicator={false}>
           <View style={styles.subContainer}>
             <View style={styles.firstContainer}>
-              <View style={{flex: 1}}>
-                <Text style={styles.adminTextStyle}>Basket</Text>
-              </View>
               <TouchableOpacity
-                // onPress={() =>
-                //   this.props.navigation.navigate('AddItemsOrderScreen', {
-                //     basketId: basketId,
-                //     screen: 'Update',
-                //   })
-                // }
-                onPress={() =>
-                  this.props.navigation.navigate('OrderingAdminScreen')
-                }
+                onPress={() => this.props.navigation.goBack()}
                 style={styles.goBackContainer}>
-                <Text style={styles.goBackTextStyle}>{translate('Home')}</Text>
+                <Image source={img.backIcon} style={styles.tileImageBack} />
               </TouchableOpacity>
+              <View style={styles.flex}>
+                <Text style={styles.adminTextStyle}>
+                  {translate('Items of New order')}
+                </Text>
+              </View>
             </View>
           </View>
 
           <View style={{marginHorizontal: wp('3%')}}>
-            <View
+            <TouchableOpacity
+              onPress={() =>
+                this.setState({
+                  showMoreStatus: !showMoreStatus,
+                })
+              }
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flex: 1,
+              }}>
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    backgroundColor: '#fff',
+                    padding: Platform.OS === 'ios' ? 15 : 0,
+                    borderTopLeftRadius: 6,
+                    borderBottomLeftRadius: 6,
+                  }}>
+                  <View style={{}}>
+                    <Text
+                      style={{
+                        fontSize: 11,
+                      }}>
+                      {translate('Supplier')}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      marginTop: 10,
+                    }}>
+                    <TextInput
+                      value={finalDataSec.supplierName}
+                      editable={false}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    backgroundColor: '#fff',
+                    padding: Platform.OS === 'ios' ? 15 : 0,
+                    borderTopLeftRadius: 6,
+                    borderBottomLeftRadius: 6,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 11,
+                      }}>
+                      {translate('Delivery date')}
+                    </Text>
+                    <Image
+                      source={
+                        showMoreStatus === false
+                          ? img.arrowDownIcon
+                          : img.upArrowIcon
+                      }
+                      style={{
+                        width: 15,
+                        height: 15,
+                        resizeMode: 'contain',
+                        alignSelf: Platform.OS === 'android' ? 'center' : null,
+                        marginRight: Platform.OS === 'android' ? 10 : 0,
+                      }}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      marginTop: 10,
+                    }}>
+                    <TextInput
+                      value={finalDataSec.finalDeliveryDate}
+                      editable={false}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+            {showMoreStatus ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flex: 1,
+                }}>
+                <View style={{flex: 1}}>
+                  <View
+                    style={{
+                      backgroundColor: '#fff',
+                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      borderTopLeftRadius: 6,
+                      borderBottomLeftRadius: 6,
+                    }}>
+                    <View style={{}}>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                        }}>
+                        {translate('Placed by')}
+                      </Text>
+                    </View>
+                    <View style={{marginTop: 10}}>
+                      <TextInput
+                        value={finalDataSec.placedByData}
+                        editable={false}
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+                <View style={{flex: 1}}>
+                  <View
+                    style={{
+                      backgroundColor: '#fff',
+                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      borderTopLeftRadius: 6,
+                      borderBottomLeftRadius: 6,
+                    }}>
+                    <View style={{}}>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                        }}>
+                        {translate('Order date')}
+                      </Text>
+                    </View>
+                    <View style={{marginTop: 10}}>
+                      <TextInput
+                        value={finalDataSec.finalOrderDate}
+                        editable={false}
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ) : null}
+            {/* <View
               style={{
                 marginTop: hp('3%'),
               }}>
@@ -939,9 +1119,8 @@ class Basket extends Component {
                   />
                 </View>
               </View>
-            </View>
-            <View>
-              <View
+            </View> */}
+            {/* <View
                 style={{
                   marginTop: hp('3%'),
                 }}>
@@ -979,8 +1158,8 @@ class Basket extends Component {
                     onCancel={this.hideDatePickerOrderDate}
                   />
                 </View>
-              </View>
-              <View
+              </View> */}
+            {/* <View
                 style={{
                   marginTop: hp('3%'),
                 }}>
@@ -1019,9 +1198,8 @@ class Basket extends Component {
                     minimumDate={finalOrderMinDate}
                   />
                 </View>
-              </View>
-            </View>
-            <View>
+              </View> */}
+            {/* <View>
               <View
                 style={{
                   marginTop: hp('3%'),
@@ -1089,7 +1267,7 @@ class Basket extends Component {
                   </View>
                 </View>
               </View>
-            </View>
+            </View> */}
           </View>
 
           {recipeLoader ? (
@@ -1391,15 +1569,15 @@ class Basket extends Component {
 
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <TouchableOpacity
-              onPress={() => this.saveDraftFunGreen()}
+              onPress={() => this.previewPDFFun()}
               style={{
-                height: hp('6%'),
+                height: hp('5.5%'),
                 width: wp('80%'),
-                backgroundColor: '#94C036',
+                backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginTop: hp('2%'),
-                borderRadius: 100,
+                borderRadius: 10,
               }}>
               <View
                 style={{
@@ -1411,7 +1589,7 @@ class Basket extends Component {
                     marginLeft: 10,
                     fontFamily: 'Inter-SemiBold',
                   }}>
-                  {translate('Save')}
+                  {translate('Preview PDF')}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -1420,12 +1598,11 @@ class Basket extends Component {
               style={{
                 height: hp('6%'),
                 width: wp('80%'),
-                backgroundColor: '#94C036',
+                backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginTop: hp('3%'),
-                borderRadius: 100,
-                marginBottom: hp('3%'),
+                borderRadius: 10,
               }}>
               <View
                 style={{
@@ -1441,8 +1618,62 @@ class Basket extends Component {
                 </Text>
               </View>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => this.saveDraftFunGreen()}
+              style={{
+                height: hp('6%'),
+                width: wp('80%'),
+                backgroundColor: '#5197C1',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('3%'),
+                borderRadius: 10,
+              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: 'white',
+                    marginLeft: 10,
+                    fontFamily: 'Inter-SemiBold',
+                  }}>
+                  {translate('Save')}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() =>
+                this.props.navigation.navigate('OrderingAdminScreen')
+              }
+              style={{
+                height: hp('6%'),
+                width: wp('80%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('1.5%'),
+                borderRadius: 10,
+                marginBottom: hp('3%'),
+              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#5197C1',
+                    marginLeft: 10,
+                    fontFamily: 'Inter-SemiBold',
+                  }}>
+                  {translate('Cancel')}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
-          <View style={{}}>
+          {/* <View style={{}}>
             <FlatList
               horizontal
               data={buttons}
@@ -1495,19 +1726,18 @@ class Basket extends Component {
               keyExtractor={item => item.id}
               // numColumns={3}
             />
-          </View>
+          </View> */}
           <Modal isVisible={mailModalVisible} backdropOpacity={0.35}>
             <View
               style={{
                 width: wp('80%'),
                 height: hp('65%'),
-                backgroundColor: '#F0F4FE',
                 alignSelf: 'center',
                 borderRadius: 6,
+                backgroundColor: '#F5F8FE',
               }}>
               <View
                 style={{
-                  backgroundColor: '#87AF30',
                   height: hp('6%'),
                   flexDirection: 'row',
                   borderTopRightRadius: 6,
@@ -1519,7 +1749,10 @@ class Basket extends Component {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                  <Text style={{fontSize: 16, color: '#fff'}}>Send Mail</Text>
+                  <Text
+                    style={{fontSize: 16, color: 'black', fontWeight: 'bold'}}>
+                    Send Order
+                  </Text>
                 </View>
               </View>
               <ScrollView showsVerticalScrollIndicator={false}>
@@ -1528,10 +1761,11 @@ class Basket extends Component {
                     padding: hp('3%'),
                   }}>
                   <View style={{}}>
-                    <View style={{}}>
+                    <View style={{backgroundColor: '#fff', padding: 5}}>
+                      <Text style={{fontSize: 11, paddingLeft: 15}}>From</Text>
                       <TextInput
                         value={mailTitleValue}
-                        placeholder="Title"
+                        placeholder="From"
                         style={{
                           padding: 15,
                           width: '100%',
@@ -1545,7 +1779,13 @@ class Basket extends Component {
                         }
                       />
                     </View>
-                    <View style={{marginTop: hp('3%')}}>
+                    <View
+                      style={{
+                        marginTop: hp('3%'),
+                        backgroundColor: '#fff',
+                        padding: 5,
+                      }}>
+                      <Text style={{fontSize: 11, paddingLeft: 15}}> To </Text>
                       <TextInput
                         value={toRecipientValue}
                         placeholder="To"
@@ -1554,6 +1794,8 @@ class Basket extends Component {
                           width: '100%',
                           backgroundColor: '#fff',
                           borderRadius: 5,
+                          fontSize: 14,
+                          fontWeight: 'bold',
                         }}
                         onChangeText={value =>
                           this.setState({
@@ -1562,7 +1804,13 @@ class Basket extends Component {
                         }
                       />
                     </View>
-                    <View style={{marginTop: hp('3%')}}>
+                    <View
+                      style={{
+                        marginTop: hp('3%'),
+                        backgroundColor: '#fff',
+                        padding: 5,
+                      }}>
+                      <Text style={{fontSize: 11, paddingLeft: 15}}> Cc </Text>
                       <TextInput
                         value={ccRecipientValue}
                         placeholder="CC"
@@ -1571,6 +1819,8 @@ class Basket extends Component {
                           width: '100%',
                           backgroundColor: '#fff',
                           borderRadius: 5,
+                          fontSize: 14,
+                          fontWeight: 'bold',
                         }}
                         onChangeText={value =>
                           this.setState({
@@ -1580,15 +1830,25 @@ class Basket extends Component {
                       />
                     </View>
 
-                    <View style={{marginTop: hp('3%')}}>
+                    <View
+                      style={{
+                        marginTop: hp('3%'),
+                        backgroundColor: '#fff',
+                        padding: 5,
+                      }}>
+                      <Text style={{fontSize: 11, paddingLeft: 15}}>
+                        Message
+                      </Text>
                       <TextInput
                         value={mailMessageValue}
-                        placeholder="Message"
+                        placeholder="Note"
                         style={{
                           padding: 15,
                           width: '100%',
                           backgroundColor: '#fff',
                           borderRadius: 5,
+                          fontSize: 14,
+                          fontWeight: 'bold',
                         }}
                         onChangeText={value =>
                           this.setState({
@@ -1599,21 +1859,19 @@ class Basket extends Component {
                     </View>
                     <View
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
                         justifyContent: 'center',
                         marginTop: hp('4%'),
                       }}>
                       {loaderCompStatus ? (
                         <View
                           style={{
-                            width: wp('30%'),
+                            width: wp('68%'),
                             height: hp('5%'),
                             alignSelf: 'flex-end',
-                            backgroundColor: '#94C036',
+                            backgroundColor: '#5197C1',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            borderRadius: 100,
+                            borderRadius: 10,
                           }}>
                           <ActivityIndicator size="small" color="#fff" />
                         </View>
@@ -1621,13 +1879,12 @@ class Basket extends Component {
                         <TouchableOpacity
                           onPress={() => this.sendMailFun()}
                           style={{
-                            width: wp('30%'),
+                            width: wp('68%'),
                             height: hp('5%'),
-                            alignSelf: 'flex-end',
-                            backgroundColor: '#94C036',
+                            backgroundColor: '#5197C1',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            borderRadius: 100,
+                            borderRadius: 10,
                           }}>
                           <Text
                             style={{
@@ -1642,19 +1899,18 @@ class Basket extends Component {
                       <TouchableOpacity
                         onPress={() => this.closeMailModal()}
                         style={{
-                          width: wp('30%'),
+                          width: wp('68%'),
                           height: hp('5%'),
                           alignSelf: 'flex-end',
                           justifyContent: 'center',
                           alignItems: 'center',
                           marginLeft: wp('2%'),
                           borderRadius: 100,
-                          borderColor: '#482813',
-                          borderWidth: 1,
+                          marginTop: hp('2%'),
                         }}>
                         <Text
                           style={{
-                            color: '#482813',
+                            color: '#5197C1',
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>

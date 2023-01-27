@@ -11,14 +11,14 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
-import img from '../../../../../constants/images';
-import SubHeader from '../../../../../components/SubHeader';
-import Header from '../../../../../components/Header';
+import img from '../../constants/images';
+import SubHeader from '../../components/SubHeader';
+import Header from '../../components/Header';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {UserTokenAction} from '../../../../../redux/actions/UserTokenAction';
+import {UserTokenAction} from '../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
   getInventoryBySupplierIdApi,
@@ -31,18 +31,18 @@ import {
   updateInventoryProductApi,
   addDraftApi,
   getBasketApi,
-} from '../../../../../connectivity/api';
+} from '../../connectivity/api';
 import Accordion from 'react-native-collapsible/Accordion';
-import styles from '../style';
+import styles from './style';
 import RNPickerSelect from 'react-native-picker-select';
 import Modal from 'react-native-modal';
 import moment from 'moment';
 import CheckBox from '@react-native-community/checkbox';
-import {ARRAY} from '../../../../../constants/dummy';
+import {ARRAY} from '../../constants/dummy';
 
-import {translate} from '../../../../../utils/translations';
+import {translate} from '../../utils/translations';
 
-class AddItems extends Component {
+class DepartmentPurchase extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -105,8 +105,6 @@ class AddItems extends Component {
       draftStatus: false,
       innerIndex: 0,
       closeStatus: false,
-      departmentId: '',
-      finalData: '',
     };
   }
 
@@ -222,16 +220,8 @@ class AddItems extends Component {
   componentDidMount() {
     this.getData();
     this.props.navigation.addListener('focus', () => {
-      const {
-        supplierValue,
-        screen,
-        basketId,
-        navigateType,
-        supplierName,
-        departName,
-        departID,
-        finalData,
-      } = this.props.route && this.props.route.params;
+      const {supplierValue, screen, basketId, navigateType, supplierName} =
+        this.props.route && this.props.route.params;
       this.setState(
         {
           supplierId: supplierValue,
@@ -240,15 +230,13 @@ class AddItems extends Component {
           screenType: screen,
           basketId,
           navigateType,
-          departmentName: departName,
+          departmentName: '',
           supplierName,
           searchItemInventory: '',
           searchItemSupplier: '',
           listIndex: '',
           SECTIONS: [],
           modalData: [],
-          departmentId: departID,
-          finalData,
         },
         () => this.getManualLogsData(),
       );
@@ -276,7 +264,7 @@ class AddItems extends Component {
     return (
       <View
         style={{
-          backgroundColor: '#F2F2F2',
+          backgroundColor: '#FFFFFF',
           flexDirection: 'row',
           borderTopWidth: 1,
           borderLeftWidth: 1,
@@ -285,7 +273,7 @@ class AddItems extends Component {
           borderRightWidth: 1,
           borderRightColor: '#F0F0F0',
           height: 60,
-          marginTop: hp('1.5%'),
+          marginTop: hp('2%'),
           alignItems: 'center',
           borderRadius: 6,
           justifyContent: 'space-around',
@@ -739,7 +727,7 @@ class AddItems extends Component {
                     index === section.content.length - 1 ? 30 : null,
                 }}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <View style={{width: wp('25%'), marginTop: 10}}>
+                  <View style={{width: wp('25%')}}>
                     <TouchableOpacity
                       onPress={() => this.openModalFun(item)}
                       style={{
@@ -1610,14 +1598,8 @@ class AddItems extends Component {
   };
 
   navigateToBasket = () => {
-    const {
-      supplierId,
-      productId,
-      supplierName,
-      basketId,
-      closeStatus,
-      finalData,
-    } = this.state;
+    const {supplierId, productId, supplierName, basketId, closeStatus} =
+      this.state;
     if (closeStatus) {
       this.props.navigation.navigate('BasketOrderScreen', {
         finalData: basketId,
@@ -1625,7 +1607,6 @@ class AddItems extends Component {
         itemType: 'Inventory',
         productId,
         supplierName,
-        finalDataSec: finalData,
       });
     }
   };
@@ -1738,7 +1719,6 @@ class AddItems extends Component {
       basketId,
       draftStatus,
       finalBasketData,
-      finalData,
     } = this.state;
 
     if (draftStatus) {
@@ -1748,7 +1728,6 @@ class AddItems extends Component {
         itemType: 'Inventory',
         productId,
         supplierName,
-        finalData,
       });
     } else {
       this.saveChangesFun();
@@ -1806,7 +1785,11 @@ class AddItems extends Component {
           logoutFun={this.myProfile}
           logoFun={() => this.props.navigation.navigate('HomeScreen')}
         />
-
+        {/* {recipeLoader ? (
+          <ActivityIndicator color="#94C036" size="small" />
+        ) : (
+          <SubHeader {...this.props} buttons={buttonsSubHeader} index={0} />
+        )} */}
         <ScrollView
           style={{marginBottom: hp('5%')}}
           showsVerticalScrollIndicator={false}>
@@ -1818,8 +1801,15 @@ class AddItems extends Component {
                 <Image source={img.backIcon} style={styles.tileImageBack} />
               </TouchableOpacity>
               <View style={styles.flex}>
-                <Text style={styles.adminTextStyle}>{departmentName}</Text>
+                <Text style={styles.adminTextStyle}>{}</Text>
               </View>
+              {/* <TouchableOpacity
+                  onPress={() => this.props.navigation.goBack()}
+                  style={styles.goBackContainer}>
+                  <Text style={styles.goBackTextStyle}>
+                    {translate('Go Back')}
+                  </Text>
+                </TouchableOpacity> */}
             </View>
           </View>
           <View style={{}}>
@@ -1836,19 +1826,17 @@ class AddItems extends Component {
                 style={{
                   flex: 1,
                   alignItems: 'center',
-                  borderBottomColor: inventoryStatus ? '#5197C1' : '#D8DCE6',
+                  borderBottomColor: inventoryStatus ? '#82A72F' : '#D8DCE6',
                   borderBottomWidth: 3,
                   paddingBottom: 5,
-                  backgroundColor: inventoryStatus ? '#E6F3F3' : '#fff',
-                  padding: 5,
                 }}>
                 <Text
                   style={{
                     fontSize: 18,
                     fontFamily: inventoryStatus
-                      ? 'Inter-SemiBold'
-                      : 'Inter-Regular',
-                    color: inventoryStatus ? '#5197C1' : '#DCDCDC',
+                      ? 'Inter-Regular'
+                      : 'Inter-SemiBold',
+                    color: inventoryStatus ? '#82A72F' : '#D8DCE6',
                   }}>
                   {translate('InventoryList')}
                 </Text>
@@ -1857,27 +1845,25 @@ class AddItems extends Component {
                 onPress={() => this.supplierFun()}
                 style={{
                   flex: 1,
-                  borderBottomColor: supplierStatus ? '#5197C1' : '#D8DCE6',
+                  borderBottomColor: supplierStatus ? '#82A72F' : '#D8DCE6',
                   borderBottomWidth: 3,
                   paddingBottom: 5,
-                  padding: 5,
-                  backgroundColor: supplierStatus ? '#E6F3F3' : '#fff',
                 }}>
                 <Text
                   numberOfLines={1}
                   style={{
                     fontSize: 18,
                     fontFamily: supplierStatus
-                      ? 'Inter-SemiBold'
-                      : 'Inter-Regular',
-                    color: supplierStatus ? '#5197C1' : '#D8DCE6',
+                      ? 'Inter-Regular'
+                      : 'Inter-SemiBold',
+                    color: supplierStatus ? '#82A72F' : '#D8DCE6',
                   }}>
                   {translate('Supplier catalog')}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
-          {/* {inventoryStatus ? (
+          {inventoryStatus ? (
             <View
               style={{
                 flexDirection: 'row',
@@ -1957,7 +1943,7 @@ class AddItems extends Component {
                 />
               </View>
             </View>
-          ) : null} */}
+          ) : null}
 
           <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
             <ScrollView horizontal style={{}}>
@@ -1966,8 +1952,9 @@ class AddItems extends Component {
                   <TouchableOpacity
                     onPress={() => this.onPressInventoryFun(item, index)}
                     style={{
-                      borderRadius: 5,
-                      backgroundColor: index === listIndex ? '#5197C1' : '#fff',
+                      borderRadius: 50,
+                      backgroundColor:
+                        index === listIndex ? '#412916' : '#94C01F',
                       height: hp('5%'),
                       marginRight: 10,
                       justifyContent: 'center',
@@ -1976,7 +1963,7 @@ class AddItems extends Component {
                     }}>
                     <Text
                       style={{
-                        color: index === listIndex ? '#fff' : 'black',
+                        color: '#fff',
                         fontFamily: 'Inter-SemiBold',
                         fontSize: 12,
                       }}>
@@ -2043,17 +2030,69 @@ class AddItems extends Component {
           ) : null} */}
 
           {SECTIONS.length > 0 || modalData.length > 0 ? (
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              {basketLoader ? (
+                <View
+                  style={{
+                    height: hp('6%'),
+                    width: wp('80%'),
+                    backgroundColor: '#94C036',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: hp('3%'),
+                    borderRadius: 100,
+                    marginBottom: hp('2%'),
+                  }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                    }}>
+                    <ActivityIndicator color="#fff" size="small" />
+                  </View>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => this.closeBasketFun()}
+                  style={{
+                    height: hp('6%'),
+                    width: wp('80%'),
+                    backgroundColor: '#94C036',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: hp('3%'),
+                    borderRadius: 100,
+                    marginBottom: hp('2%'),
+                  }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        marginLeft: 10,
+                        fontFamily: 'Inter-SemiBold',
+                      }}>
+                      {translate('Save')}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+          ) : null}
+
+          {SECTIONS.length > 0 || modalData.length > 0 ? (
             <View>
               {inventoryStatus ? (
                 <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    height: hp('5.5%'),
+                    height: hp('7%'),
                     width: wp('90%'),
                     alignSelf: 'center',
                     marginVertical: hp('2%'),
-                    borderRadius: 10,
+                    borderRadius: 100,
                     backgroundColor: '#fff',
                   }}>
                   <TextInput
@@ -2076,7 +2115,7 @@ class AddItems extends Component {
                       padding: 10,
                     }}>
                     <Image
-                      source={img.searchIcon}
+                      source={img.crossIcon}
                       style={{
                         height: 15,
                         width: 15,
@@ -2953,124 +2992,7 @@ class AddItems extends Component {
               </ScrollView>
             </View>
           )}
-          {/* {SECTIONS.length > 0 || modalData.length > 0 ? (
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-              {basketLoader ? (
-                <View
-                  style={{
-                    height: hp('6%'),
-                    width: wp('80%'),
-                    backgroundColor: '#94C036',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: hp('3%'),
-                    borderRadius: 100,
-                    marginBottom: hp('2%'),
-                  }}>
-                  <View
-                    style={{
-                      alignItems: 'center',
-                    }}>
-                    <ActivityIndicator color="#fff" size="small" />
-                  </View>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  onPress={() =>
-                    this.props.navigation.navigate('NewOrderSecScreen', {
-                      item: '',
-                    })
-                  }
-                  // onPress={() =>
-                  //   this.props.navigation.navigate('OrderCreationScreen', {
-                  //     item: '',
-                  //   })
-                  // }
-                  style={{
-                    position: 'absolute',
-                    right: 20,
-                    top: hp('65%'),
-                    flexDirection: 'row',
-                    backgroundColor: '#5297c1',
-                    padding: 15,
-                    borderRadius: 5,
-                  }}>
-                  <View>
-                    <Image
-                      style={{
-                        tintColor: '#fff',
-                        width: 15,
-                        height: 15,
-                        resizeMode: 'contain',
-                        marginLeft: 5,
-                      }}
-                      source={img.plusIcon}
-                    />
-                  </View>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontFamily: 'Inter-SemiBold',
-                      color: 'black',
-                      marginLeft: 5,
-                      color: '#fff',
-                      fontWeight: 'bold',
-                    }}>
-                    {translate('New Order')}
-                  </Text>
-                </TouchableOpacity>
-                // <TouchableOpacity
-                //   onPress={() => this.closeBasketFun()}
-                //   style={{
-                //     height: hp('6%'),
-                //     width: wp('80%'),
-                //     backgroundColor: '#94C036',
-                //     justifyContent: 'center',
-                //     alignItems: 'center',
-                //     marginTop: hp('3%'),
-                //     borderRadius: 100,
-                //     marginBottom: hp('2%'),
-                //   }}>
-                //   <View
-                //     style={{
-                //       alignItems: 'center',
-                //     }}>
-                //     <Text
-                //       style={{
-                //         color: 'white',
-                //         marginLeft: 10,
-                //         fontFamily: 'Inter-SemiBold',
-                //       }}>
-                //       {translate('Save')}
-                //     </Text>
-                //   </View>
-                // </TouchableOpacity>
-              )}
-            </View>
-          ) : null} */}
         </ScrollView>
-        <TouchableOpacity
-          onPress={() => this.closeBasketFun()}
-          style={{
-            position: 'absolute',
-            right: 20,
-            top: hp('75%'),
-            backgroundColor: '#5297c1',
-            padding: 15,
-            borderRadius: 5,
-          }}>
-          <Text
-            style={{
-              fontSize: 12,
-              fontFamily: 'Inter-SemiBold',
-              color: 'black',
-              marginLeft: 5,
-              color: '#fff',
-              fontWeight: 'bold',
-            }}>
-            {translate('Apply')}
-          </Text>
-        </TouchableOpacity>
       </View>
     );
   }
@@ -3083,4 +3005,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, {UserTokenAction})(AddItems);
+export default connect(mapStateToProps, {UserTokenAction})(DepartmentPurchase);

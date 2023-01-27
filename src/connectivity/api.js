@@ -93,6 +93,15 @@ export const deleteMepApi = async payload => {
   });
 };
 
+export const forgotPassApi = async payload => {
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(baseURL + '/Account/Forgot Password', payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export const getMepRecipesApi = async date => {
   let url = baseURL + `/Recipe/mep recipes?productionDate=${date}`;
   const token = await AsyncStorage.getItem('@appToken');
@@ -1103,4 +1112,17 @@ export const getCasualListNewApi = async () => {
       Authorization: `Bearer ${token}`,
     },
   });
+};
+
+export const getListByDepartment = async DepartmentId => {
+  console.log('ID--->', DepartmentId);
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.get(
+    baseURL + `/Inventory/get list by department?DepartmentId=${DepartmentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 };

@@ -15,9 +15,9 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
-import img from '../../constants/images';
-import SubHeader from '../../components/SubHeader';
-import Header from '../../components/Header';
+import img from '../../../../../constants/images';
+import SubHeader from '../../../../../components/SubHeader';
+import Header from '../../../../../components/Header';
 import CheckBox from '@react-native-community/checkbox';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import moment from 'moment';
@@ -25,7 +25,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {UserTokenAction} from '../../redux/actions/UserTokenAction';
+import {UserTokenAction} from '../../../../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
   getSupplierListApi,
@@ -33,15 +33,15 @@ import {
   getInventoryListApi,
   getCasualListNewApi,
   lookupDepartmentsApi,
-} from '../../connectivity/api';
+} from '../../../../../connectivity/api';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {translate} from '../../utils/translations';
+import {translate} from '../../../../../utils/translations';
 import ImagePicker from 'react-native-image-crop-picker';
 import Modal from 'react-native-modal';
-import styles from './style';
+import styles from '../style';
 import RNPickerSelect from 'react-native-picker-select';
-import ModalPicker from '../../components/ModalPicker';
+import ModalPicker from '../../../../../components/ModalPicker';
 import TreeSelect from 'react-native-tree-select';
 
 var minTime = new Date();
@@ -52,7 +52,7 @@ minTime.setMilliseconds(0);
 let todayDate = moment(new Date()).format('DD-MM-YYYY');
 let todayDateProd = moment.utc(new Date()).format();
 
-class index extends Component {
+class OrderCreationScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -309,13 +309,9 @@ class index extends Component {
 
   onPressFun = item => {
     console.log('item', item);
-    const {supplierId} = this.state;
-    this.props.navigation.navigate('DepartmentPurchaseScreen', {
+    this.props.navigation.navigate('DepartmentPurchaScreen', {
       departID: item.id,
       departName: item.name,
-      supplierValue: supplierId,
-      screen: 'New',
-      supplierName: item.name,
     });
   };
 
@@ -3185,4 +3181,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, {UserTokenAction})(index);
+export default connect(mapStateToProps, {UserTokenAction})(OrderCreationScreen);

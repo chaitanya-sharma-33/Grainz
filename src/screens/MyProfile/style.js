@@ -6,9 +6,38 @@ import {
 
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: '#EEF2FD'},
-  subContainer: {
-    marginTop: hp('2%'),
-    marginBottom: hp('2%'),
+  subContainer: {},
+  flex: {flex: 1, marginLeft: wp('3%')},
+  firstContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: wp('5%'),
+    marginVertical: hp('2%'),
+  },
+  adminTextStyle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1C1C1C',
+    fontWeight: 'bold',
+  },
+  goBackContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 100,
+    padding: 5,
+  },
+  goBackTextStyle: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#523622',
+    borderWidth: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 15,
+  },
+  tileImageBack: {
+    height: 20,
+    width: 20,
+    resizeMode: 'contain',
   },
   dataContainer: {
     height: hp('10%'),
@@ -20,7 +49,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dataSecondContainer: {flex: 3, justifyContent: 'center'},
-  textStyling: {fontFamily: 'Inter-SemiBold', fontSize: 14},
+  textStyling: {fontSize: 14},
   textInputStyling: {
     borderWidth: 0.5,
     paddingVertical: '5%',

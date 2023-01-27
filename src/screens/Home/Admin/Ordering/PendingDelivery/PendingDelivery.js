@@ -27,6 +27,7 @@ import {
 import moment from 'moment';
 import styles from '../style';
 import Modal from 'react-native-modal';
+import SurePopUp from '../../../../../components/SurePopUp';
 
 import {translate} from '../../../../../utils/translations';
 
@@ -52,6 +53,9 @@ class PendingDelivery extends Component {
       ccRecipientValue: '',
       mailMessageValue: '',
       loaderCompStatus: false,
+      duplicateModalStatus: false,
+      deleteModalStatus: false,
+      param: '',
     };
   }
 
@@ -403,6 +407,27 @@ class PendingDelivery extends Component {
     //   });
   };
 
+  closeModalFun = () => {
+    this.setState({
+      pickerModalStatus: false,
+      duplicateModalStatus: false,
+      deleteModalStatus: false,
+    });
+  };
+
+  pickerFun = item => {
+    this.setState({
+      duplicateModalStatus: true,
+      param: item,
+    });
+  };
+
+  duplicateModalFunSec = () => {
+    this.setState({
+      duplicateModalStatus: false,
+    });
+  };
+
   render() {
     const {
       buttonsSubHeader,
@@ -418,6 +443,9 @@ class PendingDelivery extends Component {
       ccRecipientValue,
       mailMessageValue,
       loaderCompStatus,
+      pickerModalStatus,
+      duplicateModalStatus,
+      deleteModalStatus,
     } = this.state;
 
     return (
@@ -431,10 +459,31 @@ class PendingDelivery extends Component {
         ) : (
           <SubHeader {...this.props} buttons={buttonsSubHeader} index={0} />
         )} */}
-        <ScrollView
-          style={{marginBottom: hp('2%')}}
-          showsVerticalScrollIndicator={false}>
-          <View style={styles.subContainer}>
+        <View style={{marginBottom: hp('2%')}}>
+          <View>
+            <View style={styles.subContainer}>
+              <View style={styles.firstContainer}>
+                <TouchableOpacity
+                  onPress={() => this.props.navigation.goBack()}
+                  style={styles.goBackContainer}>
+                  <Image source={img.backIcon} style={styles.tileImageBack} />
+                </TouchableOpacity>
+                <View style={styles.flex}>
+                  <Text style={styles.adminTextStyle}>
+                    {listId === 2
+                      ? translate('Pending Deliveries')
+                      : listId === 3
+                      ? translate('Review')
+                      : listId === 4
+                      ? translate('History')
+                      : null}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* <View style={styles.subContainer}>
             <View style={styles.firstContainer}>
               <View style={{flex: 1}}>
                 <Text style={styles.adminTextStyle}>
@@ -455,9 +504,79 @@ class PendingDelivery extends Component {
                 </Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </View> */}
 
           <View
+            style={{
+              flexDirection: 'row',
+              paddingLeft: wp('5%'),
+            }}>
+            <View
+              style={{
+                width: wp('60%'),
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: '#fff',
+                borderRadius: 5,
+              }}>
+              <TextInput
+                placeholder="Search"
+                style={{
+                  padding: 12,
+                  borderRadius: 5,
+                  width: '85%',
+                }}
+                value={searchItem}
+                onChangeText={value => this.searchFun(value)}
+              />
+              <View>
+                <Image
+                  style={{
+                    width: 18,
+                    height: 18,
+                    resizeMode: 'contain',
+                  }}
+                  source={img.searchIcon}
+                />
+              </View>
+            </View>
+            <TouchableOpacity
+              style={{
+                width: wp('29%'),
+                marginLeft: 10,
+                backgroundColor: '#fff',
+                flexDirection: 'row',
+                alignItems: 'center',
+                borderRadius: 5,
+              }}
+              onPress={() =>
+                this.props.navigation.navigate('FilterPurchaseScreen')
+              }>
+              <View>
+                <Image
+                  style={{
+                    width: 18,
+                    height: 18,
+                    resizeMode: 'contain',
+                    marginLeft: 10,
+                    tintColor: 'grey',
+                  }}
+                  source={img.filterIcon}
+                />
+              </View>
+              <View>
+                <Text
+                  style={{
+                    padding: 12,
+                    color: 'grey',
+                  }}>
+                  Filter
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -489,36 +608,42 @@ class PendingDelivery extends Component {
               }}
               source={img.searchIcon}
             />
-          </View>
+          </View> */}
 
           {recipeLoader ? (
             <ActivityIndicator size="small" color="#94C036" />
           ) : (
-            <View style={{}}>
-              <ScrollView>
+            <View style={{marginTop: hp('3%'), height: hp('60%')}}>
+              <ScrollView showsVerticalScrollIndicator={false}>
                 {modalLoaderDrafts ? (
                   <ActivityIndicator size="large" color="grey" />
                 ) : (
                   <View
                     style={{
-                      padding: hp('2%'),
+                      marginHorizontal: wp('4%'),
                     }}>
-                    <ScrollView
-                      horizontal
-                      showsHorizontalScrollIndicator={false}>
-                      <View>
-                        <View
-                          style={{
-                            paddingVertical: 15,
-                            paddingHorizontal: 5,
-                            marginTop: 10,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            backgroundColor: '#EFFBCF',
-                            borderTopLeftRadius: 5,
-                            borderTopRightRadius: 5,
-                          }}>
-                          <View
+                    <View
+                      style={{
+                        // paddingVertical: 15,
+                        // paddingHorizontal: 5,
+                        // marginTop: 10,
+                        // flexDirection: 'row',
+                        // justifyContent: 'space-between',
+                        // backgroundColor: '#EFFBCF',
+                        // borderTopLeftRadius: 5,
+                        // borderTopRightRadius: 5,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        flex: 1,
+                        backgroundColor: '#C9C9C9',
+                        paddingVertical: hp('2%'),
+                        borderTopLeftRadius: 5,
+                        borderTopRightRadius: 5,
+                        paddingHorizontal: wp('2%'),
+                        borderWidth: 0.2,
+                        borderColor: 'grey',
+                      }}>
+                      {/* <View
                             style={{
                               width: wp('30%'),
                               alignItems: 'center',
@@ -530,125 +655,155 @@ class PendingDelivery extends Component {
                               }}>
                               {translate('Order')}#
                             </Text>
-                          </View>
-                          <TouchableOpacity
-                            onPress={() => this.arrangeListFun('SUPPLIER')}
-                            style={{
-                              width: wp('30%'),
-                              alignItems: 'center',
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                            }}>
-                            <Text
-                              style={{
-                                color: '#161C27',
-                                fontFamily: 'Inter-SemiBold',
-                              }}>
-                              {translate('Supplier')}
-                            </Text>
-                            <View>
-                              <Image
-                                style={{
-                                  width: 13,
-                                  height: 13,
-                                  resizeMode: 'contain',
-                                  marginLeft: 5,
-                                }}
-                                source={img.doubleArrowIconNew}
-                              />
-                            </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => this.arrangeListFun('DATE')}
-                            style={{
-                              width: wp('30%'),
-                              alignItems: 'center',
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                            }}>
-                            <Text
-                              style={{
-                                color: '#161C27',
-                                fontFamily: 'Inter-SemiBold',
-                              }}>
-                              {listId === 2
-                                ? translate('Delivery date')
-                                : translate('Order date')}
-                            </Text>
-                            <View>
-                              <Image
-                                style={{
-                                  width: 13,
-                                  height: 13,
-                                  resizeMode: 'contain',
-                                  marginLeft: 5,
-                                }}
-                                source={img.doubleArrowIconNew}
-                              />
-                            </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => this.arrangeListFun('HTVA')}
-                            style={{
-                              width: wp('30%'),
-                              alignItems: 'center',
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                            }}>
-                            <Text
-                              style={{
-                                color: '#161C27',
-                                fontFamily: 'Inter-SemiBold',
-                              }}>
-                              {translate('HTVA')}
-                            </Text>
-                            <View>
-                              <Image
-                                style={{
-                                  width: 13,
-                                  height: 13,
-                                  resizeMode: 'contain',
-                                  marginLeft: 5,
-                                }}
-                                source={img.doubleArrowIconNew}
-                              />
-                            </View>
-                          </TouchableOpacity>
-                          {/* <View
-                            style={{
-                              width: wp('30%'),
-                              alignItems: 'center',
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                            }}>
-                            <Text
-                              style={{
-                                color: '#161C27',
-                                fontFamily: 'Inter-SemiBold',
-                              }}>
-                              {translate('Action')}
-                            </Text>
                           </View> */}
-                        </View>
+
+                      <TouchableOpacity
+                        onPress={() => this.arrangeListFun('DATE')}
+                        style={{
+                          // width: wp('30%'),
+                          // alignItems: 'center',
+                          // flexDirection: 'row',
+                          // justifyContent: 'center',
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}>
+                        <Text
+                          style={{
+                            color: '#161C27',
+                            fontFamily: 'Inter-SemiBold',
+                            fontSize: 14,
+                          }}>
+                          {listId === 2
+                            ? translate('Delivery date')
+                            : translate('Order date')}
+                        </Text>
                         <View>
-                          {deliveryPendingData && deliveryPendingData.length > 0
-                            ? deliveryPendingData.map((item, index) => {
-                                return (
-                                  <View
-                                    style={{
-                                      paddingVertical: 10,
-                                      paddingHorizontal: 5,
-                                      flexDirection: 'row',
-                                      backgroundColor:
-                                        index % 2 === 0 ? '#FFFFFF' : '#F7F8F5',
-                                    }}>
-                                    <TouchableOpacity
-                                      onPress={() => this.viewFun(item)}
-                                      style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                      }}>
-                                      <View
+                          <Image
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                              marginLeft: 5,
+                            }}
+                            source={img.doubleArrowIconNew}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => this.arrangeListFun('SUPPLIER')}
+                        style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          // width: wp('30%'),
+                          // alignItems: 'center',
+                          // flexDirection: 'row',
+                          // justifyContent: 'center',
+                        }}>
+                        <Text
+                          style={{
+                            color: '#161C27',
+                            fontFamily: 'Inter-SemiBold',
+                            fontSize: 14,
+                          }}>
+                          {translate('Supplier')}
+                        </Text>
+                        <View>
+                          <Image
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                              marginLeft: 5,
+                            }}
+                            source={img.doubleArrowIconNew}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => this.arrangeListFun('HTVA')}
+                        style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          // width: wp('30%'),
+                          // alignItems: 'center',
+                          // flexDirection: 'row',
+                          // justifyContent: 'center',
+                        }}>
+                        <Text
+                          style={{
+                            color: '#161C27',
+                            fontFamily: 'Inter-SemiBold',
+                            fontSize: 14,
+                          }}>
+                          {translate('HTVA')}
+                        </Text>
+                        <View>
+                          <Image
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                              marginLeft: 5,
+                            }}
+                            source={img.doubleArrowIconNew}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                      <View
+                        style={{
+                          flex: 0.5,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          // width: wp('30%'),
+                          // alignItems: 'center',
+                          // flexDirection: 'row',
+                          // justifyContent: 'center',
+                        }}>
+                        <Text
+                          style={{
+                            color: '#161C27',
+                            fontFamily: 'Inter-SemiBold',
+                          }}></Text>
+                      </View>
+                    </View>
+                    <View>
+                      {deliveryPendingData && deliveryPendingData.length > 0
+                        ? deliveryPendingData.map((item, index) => {
+                            return (
+                              <View
+                                style={{
+                                  // paddingVertical: 10,
+                                  // paddingHorizontal: 5,
+                                  // flexDirection: 'row',
+                                  // backgroundColor:
+                                  //   index % 2 === 0 ? '#FFFFFF' : '#F5F8FE',
+                                  flexDirection: 'row',
+                                  justifyContent: 'space-between',
+                                  flex: 1,
+                                  backgroundColor:
+                                    index % 2 === 0 ? '#FFFFFF' : '#F5F8FE',
+                                  paddingHorizontal: wp('3%'),
+                                  borderWidth: 0.2,
+                                  borderColor: 'grey',
+                                }}>
+                                <TouchableOpacity
+                                  onPress={() => this.viewFun(item)}
+                                  style={{
+                                    // flexDirection: 'row',
+                                    // alignItems: 'center',
+                                    flexDirection: 'row',
+                                    flex: 2.2,
+                                    paddingVertical: hp('2%'),
+                                  }}>
+                                  {/* <View
                                         style={{
                                           width: wp('30%'),
                                           alignItems: 'center',
@@ -661,59 +816,88 @@ class PendingDelivery extends Component {
                                           numberOfLines={1}>
                                           {item.orderReference}
                                         </Text>
-                                      </View>
-                                      <View
-                                        style={{
-                                          width: wp('30%'),
-                                          alignItems: 'center',
-                                        }}>
-                                        <Text
-                                          numberOfLines={1}
-                                          style={{
-                                            color: item.isRed ? 'red' : 'black',
-                                          }}>
-                                          {item.supplierName}
-                                        </Text>
-                                      </View>
-                                      <View
-                                        style={{
-                                          width: wp('30%'),
-                                          alignItems: 'center',
-                                        }}>
-                                        <Text
-                                          style={{
-                                            color: item.isRed ? 'red' : 'black',
-                                          }}>
-                                          {type === 'Pending'
-                                            ? moment(item.deliveryDate).format(
-                                                'DD/MM/YYYY',
-                                              )
-                                            : type === 'Review'
-                                            ? moment(item.orderDate).format(
-                                                'DD/MM/YYYY',
-                                              )
-                                            : type === 'History'
-                                            ? moment(item.orderDate).format(
-                                                'DD/MM/YYYY',
-                                              )
-                                            : null}
-                                        </Text>
-                                      </View>
-                                      <View
-                                        style={{
-                                          width: wp('30%'),
-                                          alignItems: 'center',
-                                        }}>
-                                        <Text
-                                          style={{
-                                            color: item.isRed ? 'red' : 'black',
-                                          }}>
-                                          €{' '}
-                                          {item && Number(item.htva).toFixed(2)}
-                                        </Text>
-                                      </View>
-                                    </TouchableOpacity>
-                                    {/* <TouchableOpacity
+                                      </View> */}
+
+                                  <View
+                                    style={{
+                                      // width: wp('30%'),
+                                      // alignItems: 'center',
+                                      flex: 1,
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
+                                    }}>
+                                    <Text
+                                      style={{
+                                        color: item.isRed ? 'red' : 'black',
+                                        fontSize: 14,
+                                      }}>
+                                      {type === 'Pending'
+                                        ? moment(item.deliveryDate).format(
+                                            'DD/MM/YYYY',
+                                          )
+                                        : type === 'Review'
+                                        ? moment(item.orderDate).format(
+                                            'DD/MM/YYYY',
+                                          )
+                                        : type === 'History'
+                                        ? moment(item.orderDate).format(
+                                            'DD/MM/YYYY',
+                                          )
+                                        : null}
+                                    </Text>
+                                  </View>
+                                  <View
+                                    style={{
+                                      flex: 1,
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
+                                      // width: wp('30%'),
+                                      // alignItems: 'center',
+                                    }}>
+                                    <Text
+                                      numberOfLines={1}
+                                      style={{
+                                        color: item.isRed ? 'red' : 'black',
+                                        fontSize: 14,
+                                      }}>
+                                      {item.supplierName}
+                                    </Text>
+                                  </View>
+                                  <View
+                                    style={{
+                                      // width: wp('30%'),
+                                      // alignItems: 'center',
+                                      flex: 1,
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
+                                    }}>
+                                    <Text
+                                      style={{
+                                        color: item.isRed ? 'red' : 'black',
+                                        fontSize: 14,
+                                      }}>
+                                      € {item && Number(item.htva).toFixed(2)}
+                                    </Text>
+                                  </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  onPress={() => this.pickerFun(item)}
+                                  style={{
+                                    flex: 0.5,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                  }}>
+                                  <Image
+                                    style={{
+                                      width: 17,
+                                      height: 17,
+                                      resizeMode: 'contain',
+                                      tintColor: 'grey',
+                                    }}
+                                    source={img.threeDotsIcon}
+                                  />
+                                </TouchableOpacity>
+                                {/* <TouchableOpacity
                                       onPress={() => this.openMailFun(item)}
                                       style={{
                                         width: wp('30%'),
@@ -728,190 +912,264 @@ class PendingDelivery extends Component {
                                         source={img.emailIcon}
                                       />
                                     </TouchableOpacity> */}
-                                  </View>
-                                );
-                              })
-                            : null}
-                        </View>
-                      </View>
-                    </ScrollView>
+                              </View>
+                            );
+                          })
+                        : null}
+                    </View>
                   </View>
                 )}
               </ScrollView>
-            </View>
-          )}
-        </ScrollView>
-        <Modal isVisible={mailModalVisible} backdropOpacity={0.35}>
-          <View
-            style={{
-              width: wp('80%'),
-              height: hp('60%'),
-              backgroundColor: '#F0F4FE',
-              alignSelf: 'center',
-              borderRadius: 6,
-            }}>
-            <View
-              style={{
-                backgroundColor: '#87AF30',
-                height: hp('6%'),
-                flexDirection: 'row',
-                borderTopRightRadius: 6,
-                borderTopLeftRadius: 6,
-              }}>
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text style={{fontSize: 16, color: '#fff'}}>Send Mail</Text>
-              </View>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View
-                style={{
-                  padding: hp('3%'),
-                }}>
-                <View style={{}}>
-                  <View style={{}}>
-                    <TextInput
-                      value={mailTitleValue}
-                      placeholder="Title"
-                      style={{
-                        padding: 15,
-                        width: '100%',
-                        backgroundColor: '#fff',
-                        borderRadius: 5,
-                      }}
-                      onChangeText={value =>
-                        this.setState({
-                          mailTitleValue: value,
-                        })
-                      }
-                    />
-                  </View>
-                  <View style={{marginTop: hp('3%')}}>
-                    <TextInput
-                      value={toRecipientValue}
-                      placeholder="To"
-                      style={{
-                        padding: 15,
-                        width: '100%',
-                        backgroundColor: '#fff',
-                        borderRadius: 5,
-                      }}
-                      onChangeText={value =>
-                        this.setState({
-                          toRecipientValue: value,
-                        })
-                      }
-                    />
-                  </View>
-                  <View style={{marginTop: hp('3%')}}>
-                    <TextInput
-                      value={ccRecipientValue}
-                      placeholder="CC"
-                      style={{
-                        padding: 15,
-                        width: '100%',
-                        backgroundColor: '#fff',
-                        borderRadius: 5,
-                      }}
-                      onChangeText={value =>
-                        this.setState({
-                          ccRecipientValue: value,
-                        })
-                      }
-                    />
-                  </View>
-
-                  <View style={{marginTop: hp('3%')}}>
-                    <TextInput
-                      value={mailMessageValue}
-                      placeholder="Message"
-                      style={{
-                        padding: 15,
-                        width: '100%',
-                        backgroundColor: '#fff',
-                        borderRadius: 5,
-                      }}
-                      onChangeText={value =>
-                        this.setState({
-                          mailMessageValue: value,
-                        })
-                      }
-                    />
-                  </View>
+              <Modal isVisible={mailModalVisible} backdropOpacity={0.35}>
+                <View
+                  style={{
+                    width: wp('80%'),
+                    height: hp('60%'),
+                    backgroundColor: '#F0F4FE',
+                    alignSelf: 'center',
+                    borderRadius: 6,
+                  }}>
                   <View
                     style={{
+                      backgroundColor: '#87AF30',
+                      height: hp('6%'),
                       flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginTop: hp('4%'),
+                      borderTopRightRadius: 6,
+                      borderTopLeftRadius: 6,
                     }}>
-                    {loaderCompStatus ? (
-                      <View
-                        style={{
-                          width: wp('30%'),
-                          height: hp('5%'),
-                          alignSelf: 'flex-end',
-                          backgroundColor: '#94C036',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          borderRadius: 100,
-                        }}>
-                        <ActivityIndicator size="small" color="#fff" />
-                      </View>
-                    ) : (
-                      <TouchableOpacity
-                        onPress={() => this.sendMailFun()}
-                        style={{
-                          width: wp('30%'),
-                          height: hp('5%'),
-                          alignSelf: 'flex-end',
-                          backgroundColor: '#94C036',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          borderRadius: 100,
-                        }}>
-                        <Text
-                          style={{
-                            color: '#fff',
-                            fontSize: 15,
-                            fontWeight: 'bold',
-                          }}>
-                          {translate('Confirm')}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                    <TouchableOpacity
-                      onPress={() => this.closeMailModal()}
+                    <View
                       style={{
-                        width: wp('30%'),
-                        height: hp('5%'),
-                        alignSelf: 'flex-end',
-                        justifyContent: 'center',
+                        flex: 1,
                         alignItems: 'center',
-                        marginLeft: wp('2%'),
-                        borderRadius: 100,
-                        borderColor: '#482813',
-                        borderWidth: 1,
+                        justifyContent: 'center',
                       }}>
-                      <Text
-                        style={{
-                          color: '#482813',
-                          fontSize: 15,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('Close')}
+                      <Text style={{fontSize: 16, color: '#fff'}}>
+                        Send Mail
                       </Text>
-                    </TouchableOpacity>
+                    </View>
                   </View>
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    <View
+                      style={{
+                        padding: hp('3%'),
+                      }}>
+                      <View style={{}}>
+                        <View style={{}}>
+                          <TextInput
+                            value={mailTitleValue}
+                            placeholder="Title"
+                            style={{
+                              padding: 15,
+                              width: '100%',
+                              backgroundColor: '#fff',
+                              borderRadius: 5,
+                            }}
+                            onChangeText={value =>
+                              this.setState({
+                                mailTitleValue: value,
+                              })
+                            }
+                          />
+                        </View>
+                        <View style={{marginTop: hp('3%')}}>
+                          <TextInput
+                            value={toRecipientValue}
+                            placeholder="To"
+                            style={{
+                              padding: 15,
+                              width: '100%',
+                              backgroundColor: '#fff',
+                              borderRadius: 5,
+                            }}
+                            onChangeText={value =>
+                              this.setState({
+                                toRecipientValue: value,
+                              })
+                            }
+                          />
+                        </View>
+                        <View style={{marginTop: hp('3%')}}>
+                          <TextInput
+                            value={ccRecipientValue}
+                            placeholder="CC"
+                            style={{
+                              padding: 15,
+                              width: '100%',
+                              backgroundColor: '#fff',
+                              borderRadius: 5,
+                            }}
+                            onChangeText={value =>
+                              this.setState({
+                                ccRecipientValue: value,
+                              })
+                            }
+                          />
+                        </View>
+
+                        <View style={{marginTop: hp('3%')}}>
+                          <TextInput
+                            value={mailMessageValue}
+                            placeholder="Message"
+                            style={{
+                              padding: 15,
+                              width: '100%',
+                              backgroundColor: '#fff',
+                              borderRadius: 5,
+                            }}
+                            onChangeText={value =>
+                              this.setState({
+                                mailMessageValue: value,
+                              })
+                            }
+                          />
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: hp('4%'),
+                          }}>
+                          {loaderCompStatus ? (
+                            <View
+                              style={{
+                                width: wp('30%'),
+                                height: hp('5%'),
+                                alignSelf: 'flex-end',
+                                backgroundColor: '#94C036',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: 100,
+                              }}>
+                              <ActivityIndicator size="small" color="#fff" />
+                            </View>
+                          ) : (
+                            <TouchableOpacity
+                              onPress={() => this.sendMailFun()}
+                              style={{
+                                width: wp('30%'),
+                                height: hp('5%'),
+                                alignSelf: 'flex-end',
+                                backgroundColor: '#94C036',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: 100,
+                              }}>
+                              <Text
+                                style={{
+                                  color: '#fff',
+                                  fontSize: 15,
+                                  fontWeight: 'bold',
+                                }}>
+                                {translate('Confirm')}
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                          <TouchableOpacity
+                            onPress={() => this.closeMailModal()}
+                            style={{
+                              width: wp('30%'),
+                              height: hp('5%'),
+                              alignSelf: 'flex-end',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginLeft: wp('2%'),
+                              borderRadius: 100,
+                              borderColor: '#482813',
+                              borderWidth: 1,
+                            }}>
+                            <Text
+                              style={{
+                                color: '#482813',
+                                fontSize: 15,
+                                fontWeight: 'bold',
+                              }}>
+                              {translate('Close')}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  </ScrollView>
                 </View>
-              </View>
-            </ScrollView>
-          </View>
-        </Modal>
+              </Modal>
+              <SurePopUp
+                pickerModalStatus={duplicateModalStatus}
+                headingText={translate('Duplicate')}
+                crossFun={() => this.closeModalFun()}
+                bodyText="Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?"
+                cancelFun={() => this.closeModalFun()}
+                saveFun={() => this.duplicateModalFunSec()}
+                yesStatus
+              />
+              <SurePopUp
+                pickerModalStatus={deleteModalStatus}
+                headingText={translate('Delete')}
+                crossFun={() => this.closeModalFun()}
+                bodyText="Are you sure you want to delete this item from the list?"
+                cancelFun={() => this.closeModalFun()}
+                saveFun={() => this.deleteFun()}
+                yesStatus
+              />
+              <TouchableOpacity
+                // onPress={() =>
+                //   this.props.navigation.navigate('NewOrderScreen', {
+                //     ScreenType: '',
+                //   })
+                // }
+                onPress={() =>
+                  this.props.navigation.navigate('OrderCreationScreen', {
+                    item: '',
+                  })
+                }
+                style={{
+                  position: 'absolute',
+                  right: 20,
+                  top: hp('50%'),
+                  flexDirection: 'row',
+                  backgroundColor: '#5297c1',
+                  padding: 15,
+                  borderRadius: 5,
+                }}>
+                <View>
+                  <Image
+                    style={{...styles.listImageStyling, tintColor: '#fff'}}
+                    source={img.plusIcon}
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontFamily: 'Inter-SemiBold',
+                    color: 'black',
+                    marginLeft: 5,
+                    color: '#fff',
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('New Order')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                // onPress={() => alert('View More')}
+                style={{
+                  marginTop: hp('4%'),
+                  alignSelf: 'center',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: 'Inter-SemiBold',
+                    color: 'black',
+                    color: '#5297c1',
+                    fontWeight: 'bold',
+                    textDecorationLine: 'underline',
+                  }}>
+                  {translate('Load more')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
     );
   }

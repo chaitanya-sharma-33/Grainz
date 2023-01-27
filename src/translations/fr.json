@@ -872,5 +872,14 @@
   "Clear all filters": "Clear all filters",
   "From date": "From date",
   "Show only flagged purchases": "Show only flagged purchases",
-  "Reset Password": "Reset Password"
+  "Reset Password": "Reset Password",
+  "Select Supplier": "Select Supplier",
+  "Items": "Items",
+  "Add custom item": "Add custom item",
+  "Mark all as flag": "Mark all as flag",
+  "Items of New order": "Items of New orderF",
+  "Preview PDF": "Preview PDF_F",
+  "Profile": "Profile",
+  "Load more": "Load more",
+  "Duplicate": "Duplicate"
 }

@@ -16,7 +16,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {loginApi, resetPasswordApi} from '../../connectivity/api';
+import {loginApi, forgotPassApi} from '../../connectivity/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
 import {UserTokenAction} from '../../redux/actions/UserTokenAction';
@@ -209,26 +209,28 @@ class index extends Component {
     const {resetEmail} = this.state;
     let payload = {
       email: resetEmail,
+      clientURI: 'string',
     };
     console.log('Payload', payload);
 
-    // resetPasswordApi(payload)
-    //   .then(res => {
-    //     this.setState({
-    //       forgetPassModal: false,
-    //     });
-    //   })
-    //   .catch(err => {
-    //     Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-    //       {
-    //         text: 'Okay',
-    //         onPress: () =>
-    //           this.setState({
-    //             forgetPassModal: false,
-    //           }),
-    //       },
-    //     ]);
-    //   })
+    forgotPassApi(payload)
+      .then(res => {
+        this.setState({
+          forgetPassModal: false,
+        });
+      })
+      .catch(err => {
+        console.log('ERR', err);
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () =>
+              this.setState({
+                forgetPassModal: false,
+              }),
+          },
+        ]);
+      });
   };
 
   render() {

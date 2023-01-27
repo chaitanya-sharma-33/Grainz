@@ -27,7 +27,7 @@ import {
 import {translate, setI18nConfig} from '../../utils/translations';
 import styles from './style';
 import RNPickerSelect from 'react-native-picker-select';
-import Loader from '../../components/Loader';
+import SurePopUp from '../../components/SurePopUp';
 
 class index extends Component {
   constructor(props) {
@@ -41,11 +41,29 @@ class index extends Component {
       pageLoader: true,
       buttonsSubHeader: [],
       locationArr: [],
+      languageArr: [
+        {
+          label: 'French',
+          value: 'fr',
+        },
+        {
+          label: 'English',
+          value: 'en',
+        },
+      ],
+      finalLang: '',
       finalLocation: '',
       switchValue: false,
       loader: false,
+      pickerModalStatus: false,
     };
   }
+
+  closeModalFun = () => {
+    this.setState({
+      pickerModalStatus: false,
+    });
+  };
 
   getProfileData = () => {
     getMyProfileApi()
@@ -83,15 +101,19 @@ class index extends Component {
     const lan = await AsyncStorage.getItem('Language');
     console.log('LANNNN', lan);
 
-    if (lan === 'en') {
-      this.setState({
-        switchValue: false,
-      });
-    } else {
-      this.setState({
-        switchValue: true,
-      });
-    }
+    this.setState({
+      finalLang: lan,
+    });
+
+    // if (lan === 'en') {
+    //   this.setState({
+    //     switchValue: false,
+    //   });
+    // } else {
+    //   this.setState({
+    //     switchValue: true,
+    //   });
+    // }
   };
 
   getUserLocationFun = () => {
@@ -153,21 +175,36 @@ class index extends Component {
     }
   };
 
-  toggleSwitch = value => {
-    this.setState({switchValue: value, loader: true}, () =>
-      this.languageSelector(),
-    );
+  setLanguageFun = value => {
+    if (value) {
+      this.setState(
+        {
+          finalLang: value,
+          pageLoader: true,
+        },
+        () =>
+          setTimeout(() => {
+            this.languageSelector(value);
+          }, 300),
+      );
+    }
   };
+
+  // toggleSwitch = value => {
+  //   this.setState({switchValue: value, loader: true}, () =>
+  //     this.languageSelector(),
+  //   );
+  // };
 
   languageSelector = async () => {
     let language = '';
-    this.state.switchValue === true ? (language = 'fr') : (language = 'en');
+    this.state.finalLang === 'fr' ? (language = 'fr') : (language = 'en');
     await AsyncStorage.setItem('Language', language);
     setI18nConfig();
     setTimeout(
       () =>
         this.setState({
-          loader: false,
+          pageLoader: false,
         }),
       2000,
     );
@@ -185,6 +222,10 @@ class index extends Component {
       locationArr,
       finalLocation,
       loader,
+      languageArr,
+      finalLang,
+
+      pickerModalStatus,
     } = this.state;
     return (
       <View style={styles.container}>
@@ -192,102 +233,167 @@ class index extends Component {
           logoutFun={this.myProfile}
           logoFun={() => this.props.navigation.navigate('HomeScreen')}
         />
-        <Loader loaderComp={loader} />
-        {/* {pageLoader ? (
-          <ActivityIndicator size="small" color="#94C036" />
-        ) : (
-          <SubHeader {...this.props} buttons={buttonsSubHeader} />
-        )} */}
+        {/* <Loader loaderComp={loader} /> */}
+
         <ScrollView style={styles.subContainer}>
           {pageLoader ? (
             <ActivityIndicator color="#94C036" size="large" />
           ) : (
             <View>
-              <View style={styles.dataContainer}>
-                <View style={styles.dataFirstContainer}>
-                  <Text style={styles.textStyling}>
+              <View style={styles.subContainer}>
+                <View style={styles.firstContainer}>
+                  <TouchableOpacity
+                    onPress={() => this.props.navigation.goBack()}
+                    style={styles.goBackContainer}>
+                    <Image source={img.backIcon} style={styles.tileImageBack} />
+                  </TouchableOpacity>
+                  <View style={styles.flex}>
+                    <Text style={styles.adminTextStyle}>
+                      {translate('Profile')}
+                    </Text>
+                  </View>
+                  {/* <TouchableOpacity
+                  onPress={() => this.props.navigation.goBack()}
+                  style={styles.goBackContainer}>
+                  <Text style={styles.goBackTextStyle}>
+                    {translate('Go Back')}
+                  </Text>
+                </TouchableOpacity> */}
+                </View>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  marginHorizontal: wp('7%'),
+                }}>
+                <View
+                  style={{
+                    padding: 5,
+                    borderRadius: 6,
+                    flex: 1,
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                    }}>
                     {translate('First name')}
                   </Text>
-                </View>
-                <View style={styles.dataSecondContainer}>
                   <TextInput
                     value={firstName}
                     placeholder={translate('First name')}
-                    style={styles.textInputStyling}
+                    style={{paddingVertical: 10, fontWeight: 'bold'}}
                     editable={false}
                   />
-                </View>
-              </View>
-              <View style={styles.dataContainer}>
-                <View style={styles.dataFirstContainer}>
-                  <Text style={styles.textStyling}>
-                    {translate('Last name')}
-                  </Text>
-                </View>
-                <View style={styles.dataSecondContainer}>
-                  <TextInput
-                    value={lastName}
-                    placeholder={translate('Last name')}
-                    style={styles.textInputStyling}
-                    editable={false}
-                  />
-                </View>
-              </View>
-              <View style={styles.dataContainer}>
-                <View style={styles.dataFirstContainer}>
-                  <Text style={styles.textStyling}>{translate('job')}</Text>
-                </View>
-                <View style={styles.dataSecondContainer}>
-                  <TextInput
-                    value={jobTitle}
-                    placeholder={translate('job')}
-                    style={styles.textInputStyling}
-                    editable={false}
-                  />
-                </View>
-              </View>
-              <View style={styles.dataContainer}>
-                <View style={styles.dataFirstContainer}>
-                  <Text style={styles.textStyling}>
-                    {translate('Mobile phone')}
-                  </Text>
-                </View>
-                <View style={styles.dataSecondContainer}>
-                  <TextInput
-                    value={phoneNumber}
-                    placeholder={translate('Mobile phone')}
-                    style={styles.textInputStyling}
-                    editable={false}
-                  />
-                </View>
-              </View>
-              <View style={styles.dataContainer}>
-                <View style={styles.dataFirstContainer}>
-                  <Text style={styles.textStyling}>{translate('Email')}</Text>
-                </View>
-                <View style={styles.dataSecondContainer}>
-                  <TextInput
-                    value={email}
-                    placeholder={translate('Email')}
-                    style={styles.textInputStyling}
-                    editable={false}
-                  />
-                </View>
-              </View>
-              <View style={styles.dataContainer}>
-                <View style={styles.dataFirstContainer}>
-                  <Text style={styles.textStyling}>
-                    {translate('Location')}
-                  </Text>
                 </View>
                 <View
                   style={{
+                    padding: 5,
+                    borderRadius: 6,
+                    flex: 1,
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                    }}>
+                    {translate('Last name')}
+                  </Text>
+                  <TextInput
+                    value={lastName}
+                    placeholder={translate('Last name')}
+                    style={{paddingVertical: 10, fontWeight: 'bold'}}
+                    editable={false}
+                  />
+                </View>
+              </View>
+
+              <View
+                style={{
+                  padding: 5,
+                  borderRadius: 6,
+                  flex: 1,
+                  marginHorizontal: wp('7%'),
+                }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                  }}>
+                  {translate('Email')}
+                </Text>
+                <TextInput
+                  value={email}
+                  placeholder={translate('Email')}
+                  style={{paddingVertical: 10, fontWeight: 'bold'}}
+                  editable={false}
+                />
+              </View>
+
+              <View
+                style={{
+                  padding: 5,
+                  borderRadius: 6,
+                  flex: 1,
+                  marginHorizontal: wp('7%'),
+                  backgroundColor: '#fff',
+                  marginBottom: hp('2%'),
+                }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                  }}>
+                  {translate('job')}
+                </Text>
+                <TextInput
+                  value={jobTitle}
+                  placeholder={translate('job')}
+                  style={{paddingVertical: 8, fontWeight: 'bold'}}
+                  editable={false}
+                />
+              </View>
+
+              <View
+                style={{
+                  padding: 5,
+                  borderRadius: 6,
+                  flex: 1,
+                  marginHorizontal: wp('6%'),
+                  backgroundColor: '#fff',
+                  marginBottom: hp('2%'),
+                }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                  }}>
+                  {translate('Mobile phone')}
+                </Text>
+                <TextInput
+                  value={phoneNumber}
+                  placeholder={translate('Mobile phone')}
+                  style={{paddingVertical: 10, fontWeight: 'bold'}}
+                  editable={false}
+                />
+              </View>
+
+              <View
+                style={{
+                  padding: 5,
+                  borderRadius: 6,
+                  flex: 1,
+                  marginHorizontal: wp('6%'),
+                  backgroundColor: '#fff',
+                  marginBottom: hp('2%'),
+                }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                  }}>
+                  {translate('Location')}
+                </Text>
+                <View
+                  style={{
                     flexDirection: 'row',
-                    backgroundColor: '#fff',
-                    borderRadius: 5,
                     justifyContent: 'space-between',
-                    borderWidth: 0.5,
-                    borderColor: 'grey',
                     flex: 3,
                     height: hp('6%'),
                     alignSelf: 'center',
@@ -311,14 +417,12 @@ class index extends Component {
                       style={{
                         inputIOS: {
                           fontSize: 14,
-                          paddingHorizontal: '3%',
                           color: '#161C27',
                           width: '100%',
                           alignSelf: 'center',
                         },
                         inputAndroid: {
                           fontSize: 14,
-                          paddingHorizontal: '3%',
                           color: '#161C27',
                           width: '100%',
                           alignSelf: 'center',
@@ -347,7 +451,85 @@ class index extends Component {
                   </View>
                 </View>
               </View>
-              <View style={styles.dataContainer}>
+
+              <View
+                style={{
+                  padding: 5,
+                  borderRadius: 6,
+                  flex: 1,
+                  marginHorizontal: wp('6%'),
+                  backgroundColor: '#fff',
+                  marginBottom: hp('2%'),
+                }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                  }}>
+                  {translate('Language')}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    flex: 3,
+                    height: hp('6%'),
+                    alignSelf: 'center',
+                  }}>
+                  <View
+                    style={{
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                      flex: 3,
+                    }}>
+                    <RNPickerSelect
+                      placeholder={{
+                        label: 'Please select language*',
+                        value: null,
+                        color: 'black',
+                      }}
+                      placeholderTextColor="red"
+                      onValueChange={value => {
+                        this.setLanguageFun(value);
+                      }}
+                      style={{
+                        inputIOS: {
+                          fontSize: 14,
+                          color: '#161C27',
+                          width: '100%',
+                          alignSelf: 'center',
+                        },
+                        inputAndroid: {
+                          fontSize: 14,
+                          color: '#161C27',
+                          width: '100%',
+                          alignSelf: 'center',
+                          paddingVertical: 6,
+                        },
+                        iconContainer: {
+                          top: '40%',
+                        },
+                      }}
+                      items={languageArr}
+                      value={finalLang}
+                      useNativeAndroidPickerStyle={false}
+                    />
+                  </View>
+                  <View style={{marginRight: wp('5%')}}>
+                    <Image
+                      source={img.arrowDownIcon}
+                      resizeMode="contain"
+                      style={{
+                        height: 15,
+                        width: 15,
+                        resizeMode: 'contain',
+                        marginTop: Platform.OS === 'ios' ? 13 : 13,
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
+
+              {/* <View style={styles.dataContainer}>
                 <View style={styles.dataFirstContainer}>
                   <Text style={styles.textStyling}>
                     {translate('Language')}
@@ -366,8 +548,8 @@ class index extends Component {
                     <Text style={styles.langStyling}>Français</Text>
                   </View>
                 </View>
-              </View>
-              <View style={styles.dataContainer}>
+              </View> */}
+              {/* <View style={styles.dataContainer}>
                 <View style={styles.dataSecondContainer}></View>
                 <TouchableOpacity
                   onPress={() => this.removeToken()}
@@ -382,7 +564,62 @@ class index extends Component {
                     style={styles.logOutIconStyling}
                   />
                 </TouchableOpacity>
-              </View>
+              </View> */}
+              <TouchableOpacity
+                onPress={() => this.createOrder()}
+                style={{
+                  width: wp('90%'),
+                  height: hp('5%'),
+                  backgroundColor: '#5297c1',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  alignSelf: 'center',
+                  marginTop: hp('3%'),
+                }}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('Save')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  this.setState({
+                    pickerModalStatus: true,
+                  })
+                }
+                style={{
+                  width: wp('90%'),
+                  height: hp('5%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  alignSelf: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#5297c1',
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('Cancel')}
+                </Text>
+              </TouchableOpacity>
+              <SurePopUp
+                pickerModalStatus={pickerModalStatus}
+                headingText="Heading"
+                crossFun={() => this.closeModalFun()}
+                extraButton
+                extraButtonText="Discard"
+                bodyText="Are you sure!"
+                cancelFun={() => this.closeModalFun()}
+              />
             </View>
           )}
         </ScrollView>

@@ -184,7 +184,9 @@ class index extends Component {
   };
 
   onPressFun = item => {
-    this.props.navigation.navigate(item.screen);
+    this.props.navigation.navigate(item.screen, {
+      item: '',
+    });
   };
 
   render() {

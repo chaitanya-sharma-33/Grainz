@@ -22,6 +22,8 @@ import AddNewEventAdminScreen from '../screens/Home/Admin/Events/AddNewEvent';
 import InventoryAdminScreen from '../screens/Home/Admin/Inventory/Inventory';
 import OrderingAdminScreen from '../screens/Home/Admin/Ordering';
 import NewOrderScreen from '../screens/Home/Admin/Ordering/AddOrder/NewOrder';
+import NewOrderSecScreen from '../screens/Home/Admin/Ordering/AddOrder/NewOrderSec';
+import NewOrderThirdScreen from '../screens/Home/Admin/Ordering/AddOrder/NewOrderThird';
 import OrderingThreeAdminScreen from '../screens/Home/Admin/Ordering/OrderingThree';
 import DraftOrderAdminScreen from '../screens/Home/Admin/Ordering/DraftOrders/DraftOrder';
 import ViewDraftOrdersScreen from '../screens/Home/Admin/Ordering/DraftOrders/ViewDraftOrders';
@@ -53,6 +55,8 @@ import AddBuilderMepScreen from '../screens/Mep/AddBuilder';
 import ViewRecipeMepScreen from '../screens/Mep/ViewRecipe';
 import ViewInventoryMepScreen from '../screens/MepAdvance/ViewInventory';
 import AddPurchaseScreen from '../screens/CasualPurchase/AddPurchase';
+import DepartmentPurchaseScreen from '../screens/CasualPurchase/DepartmentPurchase';
+import SupplierListScreen from '../screens/CasualPurchase/SupplierList';
 import ViewPurchaseScreen from '../screens/CasualPurchase/ViewPurchase';
 import AddItemsOrderScreen from '../screens/Home/Admin/Ordering/AddOrder/AddItems';
 import InventoryListOrderScreen from '../screens/Home/Admin/Ordering/AddOrder/InventoryList';
@@ -75,6 +79,7 @@ import CategoryStockScreen from '../screens/StockTake/CategoryStockScreen';
 import AddManualLogScreen from '../screens/ManualLog/AddManualLog';
 import EditManualLogScreen from '../screens/ManualLog/EditManualLog';
 import FilterPurchaseScreen from '../screens/CasualPurchase/FilterPurchase';
+import OrderCreationScreen from '../screens/Home/Admin/Ordering/AddOrder/OrderCreationScreen';
 
 const AppNav = createStackNavigator();
 
@@ -208,6 +213,8 @@ export default function AppNavFun() {
       />
       <AppNav.Screen name="ReportsAdminScreen" component={ReportsAdminScreen} />
       <AppNav.Screen name="NewOrderScreen" component={NewOrderScreen} />
+      <AppNav.Screen name="NewOrderSecScreen" component={NewOrderSecScreen} />
+
       <AppNav.Screen
         name="OrderingThreeAdminScreen"
         component={OrderingThreeAdminScreen}
@@ -263,6 +270,19 @@ export default function AppNavFun() {
       <AppNav.Screen
         name="FilterPurchaseScreen"
         component={FilterPurchaseScreen}
+      />
+      <AppNav.Screen name="SupplierListScreen" component={SupplierListScreen} />
+      <AppNav.Screen
+        name="DepartmentPurchaseScreen"
+        component={DepartmentPurchaseScreen}
+      />
+      <AppNav.Screen
+        name="OrderCreationScreen"
+        component={OrderCreationScreen}
+      />
+      <AppNav.Screen
+        name="NewOrderThirdScreen"
+        component={NewOrderThirdScreen}
       />
     </AppNav.Navigator>
   );

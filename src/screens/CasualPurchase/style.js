@@ -3,12 +3,12 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-const numColumns = 3;
+const numColumns = 2;
 
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: '#EEF2FD'},
   subContainer: {
-    marginTop: hp('2%'),
+    // marginTop: hp('2%'),
   },
   firstContainer: {
     flexDirection: 'row',
@@ -36,11 +36,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 15,
   },
-  itemContainer: {
-    width: Dimensions.get('window').width / numColumns,
-    height: Dimensions.get('window').width / numColumns,
-    borderRadius: 50,
-  },
+
   flex: {flex: 1, marginLeft: wp('3%')},
   addNewContainer: {
     height: hp('6%'),
@@ -109,23 +105,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#151B26',
   },
-  tileContainer: {
-    backgroundColor: '#fff',
-    flex: 1,
-    margin: 10,
-    borderRadius: 8,
-    padding: 10,
-  },
-  tileImageContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tileImageStyling: {
-    height: 40,
-    width: 40,
-    resizeMode: 'contain',
-  },
+
   tileImageBack: {
     height: 20,
     width: 20,
@@ -136,11 +116,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  tileTextStyling: {
-    fontSize: 13,
-    textAlign: 'center',
-    fontFamily: 'Inter-Regular',
-  },
+
   container: {
     flex: 1,
     backgroundColor: '#F5F8FE',
@@ -228,6 +204,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: wp('1000%'),
     height: hp('100%'),
+  },
+  itemContainer: {
+    width: Dimensions.get('window').width / numColumns - wp('5%'),
+    height: hp('15%'),
+    borderRadius: 50,
+  },
+  tileContainer: {
+    flex: 1,
+    margin: 10,
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'flex-start',
+  },
+  tileImageContainer: {
+    flex: 3,
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  tileImageStyling: {
+    height: 20,
+    width: 20,
+    resizeMode: 'contain',
+    tintColor: '#fff',
+  },
+
+  tileTextStyling: {
+    fontSize: 13.5,
+    fontFamily: 'Inter-Regular',
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  tileTextContainerSec: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tileTextStylingSec: {
+    fontSize: 10,
+    textAlign: 'center',
+    fontFamily: 'Inter-Regular',
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
 export default styles;

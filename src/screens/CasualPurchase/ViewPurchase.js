@@ -516,7 +516,11 @@ class ViewPurchase extends Component {
             )}
           </ScrollView>
           <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('AddPurchaseScreen')}
+            onPress={() =>
+              this.props.navigation.navigate('AddPurchaseScreen', {
+                item: '',
+              })
+            }
             style={{
               position: 'absolute',
               right: 20,
