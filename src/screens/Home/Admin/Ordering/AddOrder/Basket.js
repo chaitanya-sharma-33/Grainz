@@ -1892,7 +1892,7 @@ class Basket extends Component {
                               fontSize: 15,
                               fontWeight: 'bold',
                             }}>
-                            {translate('Confirm')}
+                            {translate('Send')}
                           </Text>
                         </TouchableOpacity>
                       )}
@@ -1914,7 +1914,7 @@ class Basket extends Component {
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>
-                          {translate('Close')}
+                          {translate('Cancel')}
                         </Text>
                       </TouchableOpacity>
                     </View>

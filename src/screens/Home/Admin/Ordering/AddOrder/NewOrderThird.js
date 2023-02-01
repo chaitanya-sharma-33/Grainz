@@ -12,6 +12,7 @@ import {
   Switch,
   FlatList,
   Platform,
+  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
@@ -44,6 +45,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import ModalPicker from '../../../../../components/ModalPicker';
 import TreeSelect from 'react-native-tree-select';
 
+const numColumns = 2;
 var minTime = new Date();
 minTime.setHours(0);
 minTime.setMinutes(0);
@@ -242,7 +244,6 @@ class NewOrderThird extends Component {
                         backgroundColor: '#fff',
                         padding: Platform.OS === 'ios' ? 15 : 0,
                         borderTopLeftRadius: 6,
-                        borderBottomLeftRadius: 6,
                       }}>
                       <View style={{}}>
                         <Text
@@ -272,8 +273,7 @@ class NewOrderThird extends Component {
                       style={{
                         backgroundColor: '#fff',
                         padding: Platform.OS === 'ios' ? 15 : 0,
-                        borderTopLeftRadius: 6,
-                        borderBottomLeftRadius: 6,
+                        borderTopRightRadius: 6,
                       }}>
                       <View
                         style={{
@@ -334,7 +334,6 @@ class NewOrderThird extends Component {
                           backgroundColor: '#fff',
                           padding: Platform.OS === 'ios' ? 15 : 0,
                           marginBottom: hp('3%'),
-                          borderTopLeftRadius: 6,
                           borderBottomLeftRadius: 6,
                         }}>
                         <View style={{}}>
@@ -354,17 +353,30 @@ class NewOrderThird extends Component {
                               fontWeight: 'bold',
                             }}
                           />
+                          <TouchableOpacity
+                            onPress={() => this.props.navigation.goBack()}
+                            style={{
+                              marginTop: 15,
+                            }}>
+                            <Text
+                              style={{
+                                fontWeight: 'bold',
+                                color: '#66A4C8',
+                              }}>
+                              Edit Details
+                            </Text>
+                          </TouchableOpacity>
                         </View>
                       </View>
                     </View>
+
                     <View style={{flex: 1}}>
                       <View
                         style={{
                           backgroundColor: '#fff',
-                          padding: Platform.OS === 'ios' ? 15 : 0,
+                          padding: Platform.OS === 'ios' ? 18 : 0,
                           marginBottom: hp('3%'),
-                          borderTopLeftRadius: 6,
-                          borderBottomLeftRadius: 6,
+                          borderBottomRightRadius: 6,
                         }}>
                         <View style={{}}>
                           <Text
@@ -384,6 +396,15 @@ class NewOrderThird extends Component {
                             }}
                           />
                         </View>
+                        <TouchableOpacity
+                          style={{
+                            marginTop: 10,
+                          }}>
+                          <Text
+                            style={{
+                              fontWeight: 'bold',
+                            }}></Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
                   </View>
@@ -392,25 +413,41 @@ class NewOrderThird extends Component {
                 {buttonsLoader ? (
                   <ActivityIndicator size="small" color="grey" />
                 ) : (
-                  <View style={styles.subContainer}>
+                  <View style={{...styles.subContainer, alignItems: 'center'}}>
                     <FlatList
                       data={buttons}
                       renderItem={({item}) => (
-                        <View style={styles.itemContainer}>
+                        <View
+                          style={{
+                            width:
+                              Dimensions.get('window').width / numColumns -
+                              wp('5%'),
+                            height: hp('12%'),
+                            borderRadius: 50,
+                          }}>
                           <TouchableOpacity
                             onPress={() => this.onPressFun(item)}
                             style={{
                               backgroundColor:
                                 item.name === 'Kitchen'
-                                  ? '#C7408A'
+                                  ? '#D448A7'
                                   : item.name === 'Bar'
-                                  ? '#81A91D'
+                                  ? '#B2B4B8'
                                   : item.name === 'Retail'
-                                  ? '#7662A9'
-                                  : '#DCDCDC',
-                              ...styles.tileContainer,
+                                  ? '#E1A72E'
+                                  : '#7CBF31',
+                              flex: 1,
+                              margin: 10,
+                              borderRadius: 8,
+                              padding: 10,
+                              flexDirection: 'row',
                             }}>
-                            <View style={styles.tileImageContainer}>
+                            <View
+                              style={{
+                                flex: 1.5,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
                               <Image
                                 source={
                                   item.name === 'Kitchen'
@@ -422,29 +459,55 @@ class NewOrderThird extends Component {
                                     : img.miscIcon
                                 }
                                 style={{
-                                  ...styles.tileImageStyling,
+                                  height: 20,
+                                  width: 20,
+                                  resizeMode: 'contain',
+                                  tintColor: '#fff',
                                 }}
                               />
                             </View>
-                            <View style={styles.tileTextContainer}>
-                              <Text
-                                style={styles.tileTextStyling}
-                                numberOfLines={1}>
-                                {item.name}
-                              </Text>
-                            </View>
-                            <View style={styles.tileTextContainerSec}>
-                              <Text
-                                style={styles.tileTextStylingSec}
-                                numberOfLines={1}>
-                                {item.name === 'Kitchen'
-                                  ? '1 Selected'
-                                  : item.name === 'Bar'
-                                  ? '2 Selected'
-                                  : item.name === 'Retail'
-                                  ? '3 Selected'
-                                  : '4 Selected'}
-                              </Text>
+                            <View
+                              style={{
+                                flex: 3,
+                              }}>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  justifyContent: 'flex-end',
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 13.5,
+                                    fontFamily: 'Inter-Regular',
+                                    fontWeight: 'bold',
+                                    color: '#fff',
+                                  }}
+                                  numberOfLines={1}>
+                                  {item.name}
+                                </Text>
+                              </View>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  justifyContent: 'flex-start',
+                                  marginTop: 5,
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 10,
+                                    fontFamily: 'Inter-Regular',
+                                    color: '#fff',
+                                  }}
+                                  numberOfLines={1}>
+                                  {item.name === 'Kitchen'
+                                    ? '1 Selected'
+                                    : item.name === 'Bar'
+                                    ? '2 Selected'
+                                    : item.name === 'Retail'
+                                    ? '3 Selected'
+                                    : '4 Selected'}
+                                </Text>
+                              </View>
                             </View>
                           </TouchableOpacity>
                         </View>

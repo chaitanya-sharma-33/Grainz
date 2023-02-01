@@ -881,5 +881,10 @@
   "Preview PDF": "Preview PDF_F",
   "Profile": "Profile",
   "Load more": "Load more",
-  "Duplicate": "Duplicate"
+  "Duplicate": "Duplicate",
+  "Confirm Quantity": "Confirm Quantity",
+  "Draft": "Draft",
+  "Ordered Val": "Ordered Val",
+  "Ordered Qty": "Ordered Qty",
+  "Send Order": "Send Order"
 }

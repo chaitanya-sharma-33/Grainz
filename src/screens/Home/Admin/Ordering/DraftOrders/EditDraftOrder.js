@@ -10,6 +10,7 @@ import {
   Alert,
   FlatList,
   Platform,
+  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
@@ -32,6 +33,7 @@ import {
   viewShoppingBasketApi,
   viewHTMLApi,
   deleteOrderApi,
+  lookupDepartmentsApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -40,6 +42,8 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {translate} from '../../../../../utils/translations';
 import Modal from 'react-native-modal';
 import LoaderComp from '../../../../../components/Loader';
+
+const numColumns = 2;
 
 class EditDraftOrder extends Component {
   constructor(props) {
@@ -73,7 +77,31 @@ class EditDraftOrder extends Component {
       mailModalVisible: false,
       loaderCompStatus: false,
       finalOrderMinDate: '',
+      showMoreStatus: false,
+      deliveryDateOrder: '',
+      departmentData: [],
+      buttonsLoader: true,
     };
+  }
+
+  getDepartmentData() {
+    lookupDepartmentsApi()
+      .then(res => {
+        console.log('resss', res.data);
+        let finalArray = res.data.map((item, index) => {
+          return {
+            id: item.id,
+            name: item.name,
+          };
+        });
+        this.setState({
+          departmentData: finalArray,
+          buttonsLoader: false,
+        });
+      })
+      .catch(error => {
+        console.log('err', error.response);
+      });
   }
 
   getData = async () => {
@@ -250,17 +278,20 @@ class EditDraftOrder extends Component {
     this.getData();
     this.getSupplierListData();
     this.getUsersListData();
-    const {productId, basketId} = this.props.route && this.props.route.params;
-    this.props.navigation.addListener('focus', () => {
-      this.setState(
-        {
-          productId,
-          basketId,
-          modalLoaderDrafts: true,
-        },
-        () => this.getInventoryFun(),
-      );
-    });
+    this.getDepartmentData();
+    const {productId, basketId, finalData} =
+      this.props.route && this.props.route.params;
+    // this.props.navigation.addListener('focus', () => {
+    this.setState(
+      {
+        productId,
+        basketId,
+        modalLoaderDrafts: true,
+        finalData,
+      },
+      () => this.getInventoryFun(),
+    );
+    // });
   }
 
   getSupplierListData = () => {
@@ -336,6 +367,15 @@ class EditDraftOrder extends Component {
         () => this.viewFun(),
       );
     }
+  };
+
+  previewPDFFun = () => {
+    this.setState(
+      {
+        loaderCompStatus: true,
+      },
+      () => this.viewFun(),
+    );
   };
 
   viewFun = () => {
@@ -512,7 +552,7 @@ class EditDraftOrder extends Component {
     }
   };
 
-  deleteFun = (data, index) => {
+  deleteFunOrder = (data, index) => {
     this.setState(
       {
         actionModalStatus: false,
@@ -643,22 +683,62 @@ class EditDraftOrder extends Component {
     );
   };
 
-  editQuantityFun = (index, type, value) => {
+  editQuantityFun = (index, type, value, data, valueType) => {
     const {inventoryData} = this.state;
 
-    let newArr = inventoryData.map((item, i) =>
-      index === i
-        ? {
-            ...item,
-            [type]: value,
-            ['action']: 'Update',
-          }
-        : item,
-    );
-    this.setState({
-      inventoryData: [...newArr],
-      finalApiData: [...newArr],
-    });
+    console.log('data', data);
+
+    const valueSec = data.quantity === '' ? Number(0) : Number(data.quantity);
+
+    const valueMinus = valueSec - Number(1);
+    console.log('valueMinus--> ', valueMinus);
+
+    const valueAdd = Number(1) + valueSec;
+    console.log('valueAdd--> ', valueAdd);
+
+    if (valueType === 'minus') {
+      let newArr = inventoryData.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: valueMinus,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+      this.setState({
+        inventoryData: [...newArr],
+        finalApiData: [...newArr],
+      });
+    } else if (valueType === 'input') {
+      let newArr = inventoryData.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: value,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+      this.setState({
+        inventoryData: [...newArr],
+        finalApiData: [...newArr],
+      });
+    } else if (valueType === 'add') {
+      let newArr = inventoryData.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: valueAdd,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+      this.setState({
+        inventoryData: [...newArr],
+        finalApiData: [...newArr],
+      });
+    }
   };
 
   updateBasketFun = () => {
@@ -706,6 +786,15 @@ class EditDraftOrder extends Component {
   };
 
   sendMailFun = () => {
+    this.setState(
+      {
+        loaderCompStatus: true,
+      },
+      () => this.sendFunSec(),
+    );
+  };
+
+  sendMailFunSec = () => {
     const {
       basketId,
       toRecipientValue,
@@ -727,6 +816,7 @@ class EditDraftOrder extends Component {
       .then(res => {
         this.setState(
           {
+            loaderCompStatus: false,
             mailModalVisible: false,
           },
           () => this.props.navigation.navigate('OrderingAdminScreen'),
@@ -811,6 +901,10 @@ class EditDraftOrder extends Component {
       loaderCompStatus,
       finalOrderMinDate,
       apiDeliveryDate,
+      showMoreStatus,
+      finalData,
+      buttonsLoader,
+      departmentData,
     } = this.state;
 
     console.log('apiDeliveryDate', apiDeliveryDate);
@@ -830,7 +924,34 @@ class EditDraftOrder extends Component {
         <ScrollView
           style={{marginBottom: hp('2%')}}
           showsVerticalScrollIndicator={false}>
-          <View style={styles.subContainer}>
+          <View>
+            <View style={styles.subContainer}>
+              <View style={styles.firstContainer}>
+                <TouchableOpacity
+                  onPress={() => this.props.navigation.goBack()}
+                  style={styles.goBackContainer}>
+                  <Image source={img.backIcon} style={styles.tileImageBack} />
+                </TouchableOpacity>
+                <View style={styles.flex}>
+                  <Text style={styles.adminTextStyle}>
+                    {translate('Draft')} - {finalData.supplierName}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => alert('DELETE')} style={{}}>
+                  <Image
+                    source={img.threeDotsIcon}
+                    style={{
+                      height: 16,
+                      width: 16,
+                      resizeMode: 'contain',
+                      tintColor: 'grey',
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          {/* <View style={styles.subContainer}>
             <View style={styles.firstContainer}>
               <View style={{flex: 1}}>
                 <Text style={styles.adminTextStyle}>Order Edit</Text>
@@ -844,9 +965,193 @@ class EditDraftOrder extends Component {
                 </Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </View> */}
           <View style={{marginHorizontal: wp('5%')}}>
-            <View
+            <TouchableOpacity
+              onPress={() =>
+                this.setState({
+                  showMoreStatus: !showMoreStatus,
+                })
+              }
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flex: 1,
+              }}>
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    backgroundColor: '#fff',
+                    padding: Platform.OS === 'ios' ? 15 : 0,
+                    borderTopLeftRadius: 6,
+                  }}>
+                  <View style={{}}>
+                    <Text
+                      style={{
+                        fontSize: 11,
+                      }}>
+                      {translate('Supplier')}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      marginTop: 10,
+                    }}>
+                    <TextInput
+                      value={finalData.supplierName}
+                      editable={false}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    backgroundColor: '#fff',
+                    padding: Platform.OS === 'ios' ? 15 : 0,
+                    borderTopRightRadius: 6,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 11,
+                      }}>
+                      {translate('Delivery date')}
+                    </Text>
+                    <Image
+                      source={
+                        showMoreStatus === false
+                          ? img.arrowDownIcon
+                          : img.upArrowIcon
+                      }
+                      style={{
+                        width: 15,
+                        height: 15,
+                        resizeMode: 'contain',
+                        alignSelf: Platform.OS === 'android' ? 'center' : null,
+                        marginRight: Platform.OS === 'android' ? 10 : 0,
+                      }}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      marginTop: 10,
+                    }}>
+                    <TextInput
+                      value={moment(finalData.deliveryDate).format(
+                        'DD/MM/YYYY',
+                      )}
+                      editable={false}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+            {showMoreStatus ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flex: 1,
+                }}>
+                <View style={{flex: 1}}>
+                  <View
+                    style={{
+                      backgroundColor: '#fff',
+                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      marginBottom: hp('3%'),
+                      borderBottomLeftRadius: 6,
+                    }}>
+                    <View style={{}}>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                        }}>
+                        {translate('Placed by')}
+                      </Text>
+                    </View>
+                    <View style={{marginTop: 10}}>
+                      <TextInput
+                        value={finalData.placedBy}
+                        editable={false}
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                        }}
+                      />
+                      {/* <TouchableOpacity
+                        onPress={() => this.props.navigation.goBack()}
+                        style={{
+                          marginTop: 15,
+                        }}>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: '#66A4C8',
+                          }}>
+                          Edit Details
+                        </Text>
+                      </TouchableOpacity> */}
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{flex: 1}}>
+                  <View
+                    style={{
+                      backgroundColor: '#fff',
+                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      marginBottom: hp('3%'),
+                      borderBottomRightRadius: 6,
+                    }}>
+                    <View style={{}}>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                        }}>
+                        {translate('Order date')}
+                      </Text>
+                    </View>
+                    <View style={{marginTop: 10}}>
+                      <TextInput
+                        value={moment(finalData.orderDate).format('DD/MM/YYYY')}
+                        editable={false}
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                        }}
+                      />
+                    </View>
+                    {/* <TouchableOpacity
+                      style={{
+                        marginTop: 10,
+                      }}>
+                      <Text
+                        style={{
+                          fontWeight: 'bold',
+                        }}></Text>
+                    </TouchableOpacity> */}
+                  </View>
+                </View>
+              </View>
+            ) : null}
+            {/* <View
               style={{
                 flexDirection: 'row',
                 width: wp('90%'),
@@ -897,20 +1202,9 @@ class EditDraftOrder extends Component {
                   useNativeAndroidPickerStyle={false}
                 />
               </View>
-              {/* <View style={{marginRight: wp('5%')}}>
-                <Image
-                  source={img.arrowDownIcon}
-                  resizeMode="contain"
-                  style={{
-                    height: 18,
-                    width: 18,
-                    resizeMode: 'contain',
-                    marginTop: Platform.OS === 'ios' ? 0 : 15,
-                  }}
-                />
-              </View> */}
-            </View>
-            <View
+             
+            </View> */}
+            {/* <View
               style={{
                 marginTop: hp('3%'),
               }}>
@@ -948,8 +1242,8 @@ class EditDraftOrder extends Component {
                   onCancel={this.hideDatePickerOrderDate}
                 />
               </View>
-            </View>
-            <View
+            </View> */}
+            {/* <View
               style={{
                 marginTop: hp('3%'),
               }}>
@@ -988,9 +1282,9 @@ class EditDraftOrder extends Component {
                   minimumDate={finalOrderMinDate}
                 />
               </View>
-            </View>
+            </View> */}
             <View>
-              <View
+              {/* <View
                 style={{
                   marginTop: hp('3%'),
                 }}>
@@ -1056,7 +1350,7 @@ class EditDraftOrder extends Component {
                     />
                   </View>
                 </View>
-              </View>
+              </View> */}
               {/* <View
                 style={{
                   marginTop: hp('3%'),
@@ -1080,11 +1374,345 @@ class EditDraftOrder extends Component {
             </View>
           </View>
 
+          {buttonsLoader ? (
+            <ActivityIndicator size="small" color="grey" />
+          ) : (
+            <View
+              style={{
+                ...styles.subContainer,
+                alignItems: 'center',
+              }}>
+              <FlatList
+                data={departmentData}
+                renderItem={({item}) => (
+                  <View
+                    style={{
+                      width:
+                        Dimensions.get('window').width / numColumns - wp('3%'),
+                      height: hp('12%'),
+                      borderRadius: 50,
+                    }}>
+                    <TouchableOpacity
+                      onPress={() => this.onPressFun(item)}
+                      style={{
+                        backgroundColor:
+                          item.name === 'Kitchen'
+                            ? '#D448A7'
+                            : item.name === 'Bar'
+                            ? '#B2B4B8'
+                            : item.name === 'Retail'
+                            ? '#E1A72E'
+                            : '#7CBF31',
+                        flex: 1,
+                        margin: 10,
+                        borderRadius: 8,
+                        padding: 10,
+                        flexDirection: 'row',
+                      }}>
+                      <View
+                        style={{
+                          flex: 1.5,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Image
+                          source={
+                            item.name === 'Kitchen'
+                              ? img.stokeTakeIcon
+                              : item.name === 'Bar'
+                              ? img.CasualIcon
+                              : item.name === 'Retail'
+                              ? img.CasualIcon
+                              : img.miscIcon
+                          }
+                          style={{
+                            height: 20,
+                            width: 20,
+                            resizeMode: 'contain',
+                            tintColor: '#fff',
+                          }}
+                        />
+                      </View>
+                      <View style={{flex: 3}}>
+                        <View
+                          style={{
+                            flex: 1,
+                            justifyContent: 'flex-end',
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 13.5,
+                              fontFamily: 'Inter-Regular',
+                              fontWeight: 'bold',
+                              color: '#fff',
+                            }}
+                            numberOfLines={1}>
+                            {item.name}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            justifyContent: 'flex-start',
+                            marginTop: 5,
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 10,
+                              fontFamily: 'Inter-Regular',
+                              color: '#fff',
+                            }}
+                            numberOfLines={1}>
+                            {item.name === 'Kitchen'
+                              ? '1 Selected'
+                              : item.name === 'Bar'
+                              ? '2 Selected'
+                              : item.name === 'Retail'
+                              ? '3 Selected'
+                              : '4 Selected'}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                keyExtractor={item => item.id}
+                numColumns={2}
+              />
+            </View>
+          )}
+
           {recipeLoader ? (
             <ActivityIndicator size="small" color="#94C036" />
           ) : (
-            <View style={{marginTop: hp('4%')}}>
-              <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={{marginTop: hp('2%'), marginBottom: hp('2%')}}>
+              {inventoryData &&
+                inventoryData.map((item, index) => {
+                  console.log('item--11-1-1-1>', item);
+                  return (
+                    <View
+                      style={{
+                        marginHorizontal: wp('6%'),
+                      }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          borderTopWidth: 1,
+                          borderLeftWidth: 1,
+                          borderRightWidth: 1,
+                          borderColor: 'grey',
+                          borderTopLeftRadius: 6,
+                          borderTopRightRadius: 6,
+                          padding: 10,
+                          flex: 1,
+                        }}>
+                        <View
+                          style={{
+                            flex: 3,
+                          }}>
+                          <Text style={{fontSize: 14, fontWeight: 'bold'}}>
+                            {item.inventoryMapping &&
+                              item.inventoryMapping.inventoryName}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            alignItems: 'center',
+                          }}>
+                          <Image
+                            source={img.messageIcon}
+                            style={{
+                              width: 18,
+                              height: 18,
+                              resizeMode: 'contain',
+                              tintColor: 'black',
+                            }}
+                          />
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => this.deleteFunOrder(item, index)}
+                          style={{
+                            flex: 1,
+                            alignItems: 'flex-end',
+                          }}>
+                          <Image
+                            source={img.deleteIconNew}
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                              tintColor: 'red',
+                            }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          borderLeftWidth: 1,
+                          borderRightWidth: 1,
+                          borderBottomWidth: 1,
+                          borderColor: 'grey',
+                          padding: 10,
+                        }}>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text style={{}}>
+                            {item.inventoryMapping &&
+                              item.inventoryMapping.productName}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                          }}>
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.editQuantityFun(
+                                index,
+                                'quantity',
+                                '1',
+                                item,
+                                'minus',
+                              )
+                            }
+                            style={{
+                              width: wp('10%'),
+                              height: hp('5%'),
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 29,
+                                fontWeight: 'bold',
+                                color: '#5197C1',
+                              }}>
+                              -
+                            </Text>
+                          </TouchableOpacity>
+
+                          <TextInput
+                            value={String(item.quantity)}
+                            keyboardType="numeric"
+                            style={{
+                              borderRadius: 6,
+                              padding: 10,
+                              width: wp('15%'),
+                              backgroundColor: '#fff',
+                            }}
+                            onChangeText={value =>
+                              this.editQuantityFun(
+                                index,
+                                'quantity',
+                                value,
+                                item,
+                                'input',
+                              )
+                            }
+                          />
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.editQuantityFun(
+                                index,
+                                'quantity',
+                                '1',
+                                item,
+                                'add',
+                              )
+                            }
+                            style={{
+                              width: wp('10%'),
+                              height: hp('5%'),
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                color: '#5197C1',
+                                fontSize: 20,
+                                fontWeight: 'bold',
+                              }}>
+                              +
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          borderLeftWidth: 1,
+                          borderRightWidth: 1,
+                          borderBottomWidth: 1,
+                          borderColor: 'grey',
+                          borderBottomLeftRadius: 6,
+                          borderBottomRightRadius: 6,
+                          padding: 10,
+                        }}>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text style={{fontSize: 10}}>
+                            {translate('Price')}
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 10,
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                            }}>
+                            {item.inventoryMapping &&
+                              item.inventoryMapping.productPrice}{' '}
+                            Є/
+                            {item.inventoryMapping.productUnit}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text style={{fontSize: 10}}>
+                            {translate('Ordered Val')}.
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 10,
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                            }}>
+                            {item.value.toFixed(2)}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text style={{fontSize: 10}}>
+                            {translate('Ordered Qty')}.
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 10,
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                            }}>
+                            {item.calculatedQuantity}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
+
+              {/* <ScrollView showsVerticalScrollIndicator={false}>
                 {modalLoaderDrafts ? (
                   <ActivityIndicator size="large" color="grey" />
                 ) : (
@@ -1335,10 +1963,10 @@ class EditDraftOrder extends Component {
                     </ScrollView>
                   </View>
                 )}
-              </ScrollView>
+              </ScrollView> */}
             </View>
           )}
-          <View style={{marginVertical: hp('3%')}}>
+          {/* <View style={{marginVertical: hp('3%')}}>
             <FlatList
               data={buttons}
               renderItem={({item}) => (
@@ -1390,7 +2018,7 @@ class EditDraftOrder extends Component {
               keyExtractor={item => item.id}
               numColumns={3}
             />
-          </View>
+          </View> */}
           {/* <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => this.deleteOrderFun()}
@@ -1418,7 +2046,7 @@ class EditDraftOrder extends Component {
               </View>
             </TouchableOpacity>
           </View> */}
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          {/* <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => this.deleteDraftFun()}
               style={{
@@ -1470,31 +2098,148 @@ class EditDraftOrder extends Component {
                 </Text>
               </View>
             </TouchableOpacity>
+          </View> */}
+
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <TouchableOpacity
+              onPress={() => this.previewPDFFun()}
+              style={{
+                height: hp('5.5%'),
+                width: wp('80%'),
+                // backgroundColor: '#5197C1',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('2%'),
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: '#5197C1',
+              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#5197C1',
+                    marginLeft: 10,
+                    fontFamily: 'Inter-SemiBold',
+                  }}>
+                  {translate('Preview PDF')}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => this.sendFun()}
+              style={{
+                height: hp('6%'),
+                width: wp('80%'),
+                // backgroundColor: '#5197C1',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('3%'),
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: '#5197C1',
+              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#5197C1',
+                    marginLeft: 10,
+                    fontFamily: 'Inter-SemiBold',
+                  }}>
+                  {translate('Send')}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => this.updateBasketFun()}
+              style={{
+                height: hp('6%'),
+                width: wp('80%'),
+                backgroundColor: '#5197C1',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('3%'),
+                borderRadius: 10,
+              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: 'white',
+                    marginLeft: 10,
+                    fontFamily: 'Inter-SemiBold',
+                  }}>
+                  {translate('Save')}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => this.props.navigation.goBack()}
+              style={{
+                height: hp('6%'),
+                width: wp('80%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('1.5%'),
+                borderRadius: 10,
+                marginBottom: hp('3%'),
+              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#5197C1',
+                    marginLeft: 10,
+                    fontFamily: 'Inter-SemiBold',
+                  }}>
+                  {translate('Cancel')}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
           <Modal isVisible={mailModalVisible} backdropOpacity={0.35}>
             <View
               style={{
-                width: wp('80%'),
-                height: hp('65%'),
-                backgroundColor: '#F0F4FE',
+                width: wp('100%'),
+                height: hp('100%'),
                 alignSelf: 'center',
                 borderRadius: 6,
+                backgroundColor: '#F5F8FE',
               }}>
-              <View
-                style={{
-                  backgroundColor: '#87AF30',
-                  height: hp('6%'),
-                  flexDirection: 'row',
-                  borderTopRightRadius: 6,
-                  borderTopLeftRadius: 6,
-                }}>
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Text style={{fontSize: 16, color: '#fff'}}>Send Mail</Text>
+              <View style={{marginTop: hp('4%')}}>
+                <Header
+                  logoutFun={this.myProfileFun}
+                  logoFun={() => this.props.navigation.navigate('HomeScreen')}
+                />
+              </View>
+              <View style={{}}>
+                <View style={styles.subContainer}>
+                  <View style={styles.firstContainer}>
+                    <TouchableOpacity
+                      onPress={() => this.props.navigation.goBack()}
+                      style={styles.goBackContainer}>
+                      <Image
+                        source={img.backIcon}
+                        style={styles.tileImageBack}
+                      />
+                    </TouchableOpacity>
+                    <View style={styles.flex}>
+                      <Text style={styles.adminTextStyle}>
+                        {translate('Send Order')}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </View>
               <ScrollView showsVerticalScrollIndicator={false}>
@@ -1503,15 +2248,19 @@ class EditDraftOrder extends Component {
                     padding: hp('3%'),
                   }}>
                   <View style={{}}>
-                    <View style={{}}>
+                    <View
+                      style={{
+                        backgroundColor: '#fff',
+                        padding: 15,
+                        borderRadius: 8,
+                        marginBottom: hp('3%'),
+                      }}>
+                      <Text style={{fontSize: 11, marginBottom: 10}}>From</Text>
                       <TextInput
                         value={mailTitleValue}
-                        placeholder="Title"
+                        placeholder="From"
                         style={{
-                          padding: 15,
                           width: '100%',
-                          backgroundColor: '#fff',
-                          borderRadius: 5,
                         }}
                         onChangeText={value =>
                           this.setState({
@@ -1520,15 +2269,20 @@ class EditDraftOrder extends Component {
                         }
                       />
                     </View>
-                    <View style={{marginTop: hp('3%')}}>
+                    <View
+                      style={{
+                        backgroundColor: '#fff',
+                        padding: 15,
+                        borderRadius: 8,
+                        marginBottom: hp('3%'),
+                      }}>
+                      <Text style={{fontSize: 11, marginBottom: 10}}> To </Text>
                       <TextInput
                         value={toRecipientValue}
                         placeholder="To"
                         style={{
-                          padding: 15,
                           width: '100%',
-                          backgroundColor: '#fff',
-                          borderRadius: 5,
+                          fontWeight: 'bold',
                         }}
                         onChangeText={value =>
                           this.setState({
@@ -1537,15 +2291,20 @@ class EditDraftOrder extends Component {
                         }
                       />
                     </View>
-                    <View style={{marginTop: hp('3%')}}>
+                    <View
+                      style={{
+                        backgroundColor: '#fff',
+                        padding: 15,
+                        borderRadius: 8,
+                        marginBottom: hp('3%'),
+                      }}>
+                      <Text style={{fontSize: 11, marginBottom: 10}}> Cc </Text>
                       <TextInput
                         value={ccRecipientValue}
                         placeholder="CC"
                         style={{
-                          padding: 15,
                           width: '100%',
-                          backgroundColor: '#fff',
-                          borderRadius: 5,
+                          fontWeight: 'bold',
                         }}
                         onChangeText={value =>
                           this.setState({
@@ -1555,15 +2314,23 @@ class EditDraftOrder extends Component {
                       />
                     </View>
 
-                    <View style={{marginTop: hp('3%')}}>
+                    <View
+                      style={{
+                        backgroundColor: '#fff',
+                        padding: 15,
+                        borderRadius: 8,
+                        marginBottom: hp('3%'),
+                      }}>
+                      <Text style={{fontSize: 11, marginBottom: 10}}>
+                        Message
+                      </Text>
                       <TextInput
                         value={mailMessageValue}
-                        placeholder="Message"
+                        placeholder="Note"
                         style={{
-                          padding: 15,
                           width: '100%',
-                          backgroundColor: '#fff',
-                          borderRadius: 5,
+
+                          fontWeight: 'bold',
                         }}
                         onChangeText={value =>
                           this.setState({
@@ -1574,21 +2341,18 @@ class EditDraftOrder extends Component {
                     </View>
                     <View
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
                         justifyContent: 'center',
                         marginTop: hp('4%'),
                       }}>
                       <TouchableOpacity
                         onPress={() => this.sendMailFun()}
                         style={{
-                          width: wp('30%'),
+                          width: wp('87%'),
                           height: hp('5%'),
-                          alignSelf: 'flex-end',
-                          backgroundColor: '#94C036',
+                          backgroundColor: '#5197C1',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          borderRadius: 100,
+                          borderRadius: 8,
                         }}>
                         <Text
                           style={{
@@ -1596,25 +2360,22 @@ class EditDraftOrder extends Component {
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>
-                          {translate('Confirm')}
+                          {translate('Send')}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() => this.closeMailModal()}
                         style={{
-                          width: wp('30%'),
+                          width: wp('87%'),
                           height: hp('5%'),
-                          alignSelf: 'flex-end',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          marginLeft: wp('2%'),
-                          borderRadius: 100,
-                          borderColor: '#482813',
-                          borderWidth: 1,
+                          borderRadius: 8,
+                          marginTop: hp('2%'),
                         }}>
                         <Text
                           style={{
-                            color: '#482813',
+                            color: '#5197C1',
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>
@@ -1627,7 +2388,7 @@ class EditDraftOrder extends Component {
               </ScrollView>
             </View>
           </Modal>
-          <Modal isVisible={actionModalStatus} backdropOpacity={0.35}>
+          {/* <Modal isVisible={actionModalStatus} backdropOpacity={0.35}>
             <View
               style={{
                 width: wp('80%'),
@@ -1710,7 +2471,7 @@ class EditDraftOrder extends Component {
                 </View>
               </TouchableOpacity>
             </View>
-          </Modal>
+          </Modal> */}
         </ScrollView>
       </View>
     );

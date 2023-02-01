@@ -107,6 +107,7 @@ class AddItems extends Component {
       closeStatus: false,
       departmentId: '',
       finalData: '',
+      mainDepartId: '',
     };
   }
 
@@ -192,10 +193,18 @@ class AddItems extends Component {
   };
 
   createFirstData = () => {
-    const {supplierId} = this.state;
+    const {supplierId, mainDepartId} = this.state;
     getInventoryBySupplierIdApi(supplierId)
       .then(res => {
-        let finalArray = res.data.map((item, index) => {
+        console.log('res', res);
+
+        var filteredArray = res.data.filter(function (itm) {
+          return itm.departmentId === mainDepartId;
+        });
+
+        console.log('filteredArray', filteredArray);
+
+        let finalArray = filteredArray.map((item, index) => {
           return {
             title: item.name,
             content: item.id,
@@ -249,6 +258,7 @@ class AddItems extends Component {
           modalData: [],
           departmentId: departID,
           finalData,
+          mainDepartId: departID,
         },
         () => this.getManualLogsData(),
       );
@@ -285,9 +295,9 @@ class AddItems extends Component {
           borderRightWidth: 1,
           borderRightColor: '#F0F0F0',
           height: 60,
-          marginTop: hp('1.5%'),
+          // marginTop: hp('1.5%'),
           alignItems: 'center',
-          borderRadius: 6,
+          // borderRadius: 6,
           justifyContent: 'space-around',
         }}>
         <View
@@ -735,13 +745,18 @@ class AddItems extends Component {
               <View
                 style={{
                   paddingHorizontal: 10,
-                  marginBottom:
-                    index === section.content.length - 1 ? 30 : null,
+                  // marginBottom:
+                  //   index === section.content.length - 1 ? 30 : null,
                 }}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <View style={{width: wp('25%'), marginTop: 10}}>
                     <TouchableOpacity
-                      onPress={() => this.openModalFun(item)}
+                      // onPress={() => this.openModalFun(item)}
+                      onPress={() =>
+                        this.props.navigation.navigate('SelectQuantityScreen', {
+                          finalData: item,
+                        })
+                      }
                       style={{
                         width: wp('25%'),
                         marginLeft: wp('3%'),
@@ -1840,11 +1855,11 @@ class AddItems extends Component {
                   borderBottomWidth: 3,
                   paddingBottom: 5,
                   backgroundColor: inventoryStatus ? '#E6F3F3' : '#fff',
-                  padding: 5,
+                  padding: 8,
                 }}>
                 <Text
                   style={{
-                    fontSize: 18,
+                    fontSize: 14,
                     fontFamily: inventoryStatus
                       ? 'Inter-SemiBold'
                       : 'Inter-Regular',
@@ -1860,13 +1875,14 @@ class AddItems extends Component {
                   borderBottomColor: supplierStatus ? '#5197C1' : '#D8DCE6',
                   borderBottomWidth: 3,
                   paddingBottom: 5,
-                  padding: 5,
+                  padding: 8,
                   backgroundColor: supplierStatus ? '#E6F3F3' : '#fff',
+                  alignItems: 'center',
                 }}>
                 <Text
                   numberOfLines={1}
                   style={{
-                    fontSize: 18,
+                    fontSize: 14,
                     fontFamily: supplierStatus
                       ? 'Inter-SemiBold'
                       : 'Inter-Regular',
@@ -1956,89 +1972,6 @@ class AddItems extends Component {
                   }}
                 />
               </View>
-            </View>
-          ) : null} */}
-
-          <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
-            <ScrollView horizontal style={{}}>
-              {SECTIONS_HORIZONTAL.map((item, index) => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => this.onPressInventoryFun(item, index)}
-                    style={{
-                      borderRadius: 5,
-                      backgroundColor: index === listIndex ? '#5197C1' : '#fff',
-                      height: hp('5%'),
-                      marginRight: 10,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      paddingHorizontal: 15,
-                    }}>
-                    <Text
-                      style={{
-                        color: index === listIndex ? '#fff' : 'black',
-                        fontFamily: 'Inter-SemiBold',
-                        fontSize: 12,
-                      }}>
-                      {item.title}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-
-          {/* {SECTIONS.length > 0 || modalData.length > 0 ? (
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-              {basketLoader ? (
-                <View
-                  style={{
-                    height: hp('6%'),
-                    width: wp('80%'),
-                    backgroundColor: '#94C036',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: hp('3%'),
-                    borderRadius: 100,
-                    marginBottom: hp('2%'),
-                  }}>
-                  <View
-                    style={{
-                      alignItems: 'center',
-                    }}>
-                    <ActivityIndicator color="#fff" size="small" />
-                  </View>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => this.addToBasketFun()}
-                  style={{
-                    height: hp('6%'),
-                    width: wp('80%'),
-                    backgroundColor: '#94C036',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: hp('3%'),
-                    borderRadius: 100,
-                    marginBottom: hp('2%'),
-                  }}>
-                  <View
-                    style={{
-                      alignItems: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        color: 'white',
-                        marginLeft: 10,
-                        fontFamily: 'Inter-SemiBold',
-                      }}>
-                      {screenType === 'New'
-                        ? translate('Add to basket')
-                        : translate('Update basket')}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )}
             </View>
           ) : null} */}
 
@@ -2162,23 +2095,123 @@ class AddItems extends Component {
             </View>
           ) : null}
 
-          <View style={{}}>
-            <View style={{marginHorizontal: wp('5%')}}>
-              {modalLoader ? (
-                <ActivityIndicator size="large" color="#94C036" />
+          <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
+            <ScrollView style={{}}>
+              {SECTIONS_HORIZONTAL.map((item, index) => {
+                return (
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => this.onPressInventoryFun(item, index)}
+                      style={{
+                        borderRadius: 5,
+                        backgroundColor:
+                          index === listIndex ? '#F2F2F2' : '#fff',
+                        height: 60,
+                        marginRight: 10,
+                        paddingHorizontal: 15,
+                        marginVertical: 10,
+                        justifyContent: 'space-between',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        style={{
+                          // color: index === listIndex ? '#black' : 'black',
+                          fontFamily: 'Inter-SemiBold',
+                          fontSize: 12,
+                        }}>
+                        {item.title}
+                      </Text>
+                      <Image
+                        style={{
+                          height: 15,
+                          width: 15,
+                          resizeMode: 'contain',
+                          marginLeft: wp('3%'),
+                        }}
+                        source={img.arrowDownIcon}
+                      />
+                    </TouchableOpacity>
+                    <View>
+                      {index === listIndex ? (
+                        <View style={{}}>
+                          <View style={{}}>
+                            {modalLoader ? (
+                              <ActivityIndicator size="large" color="#94C036" />
+                            ) : (
+                              <Accordion
+                                expandMultiple
+                                underlayColor="#fff"
+                                sections={SECTIONS}
+                                activeSections={activeSections}
+                                renderHeader={this._renderHeader}
+                                renderContent={this._renderContent}
+                                onChange={this._updateSections}
+                              />
+                            )}
+                          </View>
+                        </View>
+                      ) : null}
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          {/* {SECTIONS.length > 0 || modalData.length > 0 ? (
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              {basketLoader ? (
+                <View
+                  style={{
+                    height: hp('6%'),
+                    width: wp('80%'),
+                    backgroundColor: '#94C036',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: hp('3%'),
+                    borderRadius: 100,
+                    marginBottom: hp('2%'),
+                  }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                    }}>
+                    <ActivityIndicator color="#fff" size="small" />
+                  </View>
+                </View>
               ) : (
-                <Accordion
-                  expandMultiple
-                  underlayColor="#fff"
-                  sections={SECTIONS}
-                  activeSections={activeSections}
-                  renderHeader={this._renderHeader}
-                  renderContent={this._renderContent}
-                  onChange={this._updateSections}
-                />
+                <TouchableOpacity
+                  onPress={() => this.addToBasketFun()}
+                  style={{
+                    height: hp('6%'),
+                    width: wp('80%'),
+                    backgroundColor: '#94C036',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: hp('3%'),
+                    borderRadius: 100,
+                    marginBottom: hp('2%'),
+                  }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        marginLeft: 10,
+                        fontFamily: 'Inter-SemiBold',
+                      }}>
+                      {screenType === 'New'
+                        ? translate('Add to basket')
+                        : translate('Update basket')}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               )}
             </View>
-          </View>
+          ) : null} */}
 
           <Modal isVisible={orderingThreeModal} backdropOpacity={0.35}>
             <View

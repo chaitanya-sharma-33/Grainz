@@ -85,10 +85,10 @@ class DraftOrder extends Component {
   };
 
   componentDidMount() {
-    // this.props.navigation.addListener('focus', () => {
-    this.getData();
-    this.getDraftOrderData();
-    // });
+    this.props.navigation.addListener('focus', () => {
+      this.getData();
+      this.getDraftOrderData();
+    });
   }
 
   getDraftOrderData = () => {
@@ -598,12 +598,14 @@ class DraftOrder extends Component {
                                 borderColor: 'grey',
                               }}>
                               <TouchableOpacity
+                                // onPress={() => console.log('item', item)}
                                 onPress={() =>
                                   this.props.navigation.navigate(
                                     'EditDraftOrderScreen',
                                     {
                                       productId: item.id,
                                       basketId: item.shopingBasketId,
+                                      finalData: item,
                                     },
                                   )
                                 }

@@ -66,4 +66,5 @@ export default {
   filterIcon: require('../assests/Images/filterIcon.png'),
   flagIcon: require('../assests/Images/flagIcon.png'),
   cameraIcon: require('../assests/Images/cameraIcon.png'),
+  messageIcon: require('../assests/Images/messageIcon.png'),
 };

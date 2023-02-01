@@ -256,53 +256,60 @@ class index extends Component {
                 </View>
               </TouchableOpacity>
             </View>
-            <FlatList
-              data={buttons}
-              renderItem={({item}) => (
-                <View style={styles.itemContainer}>
-                  <TouchableOpacity
-                    onPress={() => this.onPressFun(item)}
-                    style={{
-                      backgroundColor:
-                        item.id === 1
-                          ? '#CE428F'
-                          : item.id === 2
-                          ? '#B43B87'
-                          : item.id === 3
-                          ? '#963176'
-                          : '#6D2156',
-                      ...styles.tileContainer,
-                    }}>
-                    <View style={styles.tileImageContainer}>
-                      <Image
-                        source={item.icon}
-                        style={{
-                          ...styles.tileImageStyling,
-                        }}
-                      />
-                    </View>
-                    <View style={styles.tileTextContainer}>
-                      <Text style={styles.tileTextStyling} numberOfLines={1}>
-                        {item.name}
-                      </Text>
-                    </View>
-                    <View style={styles.tileTextContainerSec}>
-                      <Text style={styles.tileTextStylingSec} numberOfLines={1}>
-                        {item.id === 1
-                          ? countData.draftOrdersCount
-                          : item.id === 2
-                          ? countData.pendingOrdersCount
-                          : item.id === 3
-                          ? countData.deliveredOrdersCount
-                          : countData.historyOrdersCount}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              )}
-              keyExtractor={item => item.id}
-              numColumns={2}
-            />
+            <View
+              style={{
+                alignItems: 'center',
+              }}>
+              <FlatList
+                data={buttons}
+                renderItem={({item}) => (
+                  <View style={styles.itemContainer}>
+                    <TouchableOpacity
+                      onPress={() => this.onPressFun(item)}
+                      style={{
+                        backgroundColor:
+                          item.id === 1
+                            ? '#CE428F'
+                            : item.id === 2
+                            ? '#B43B87'
+                            : item.id === 3
+                            ? '#963176'
+                            : '#6D2156',
+                        ...styles.tileContainer,
+                      }}>
+                      <View style={styles.tileImageContainer}>
+                        <Image
+                          source={item.icon}
+                          style={{
+                            ...styles.tileImageStyling,
+                          }}
+                        />
+                      </View>
+                      <View style={styles.tileTextContainer}>
+                        <Text style={styles.tileTextStyling} numberOfLines={1}>
+                          {item.name}
+                        </Text>
+                      </View>
+                      <View style={styles.tileTextContainerSec}>
+                        <Text
+                          style={styles.tileTextStylingSec}
+                          numberOfLines={1}>
+                          {item.id === 1
+                            ? countData.draftOrdersCount
+                            : item.id === 2
+                            ? countData.pendingOrdersCount
+                            : item.id === 3
+                            ? countData.deliveredOrdersCount
+                            : countData.historyOrdersCount}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                keyExtractor={item => item.id}
+                numColumns={2}
+              />
+            </View>
             <TouchableOpacity
               onPress={() =>
                 this.props.navigation.navigate('NewOrderSecScreen', {

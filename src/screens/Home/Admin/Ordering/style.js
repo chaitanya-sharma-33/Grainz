@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   itemContainer: {
-    width: Dimensions.get('window').width / numColumns - wp('5%'),
+    width: Dimensions.get('window').width / numColumns - wp('3%'),
     height: hp('15%'),
     borderRadius: 50,
   },
