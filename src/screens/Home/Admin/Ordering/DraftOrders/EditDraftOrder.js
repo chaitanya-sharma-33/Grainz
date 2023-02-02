@@ -87,7 +87,7 @@ class EditDraftOrder extends Component {
   getDepartmentData() {
     lookupDepartmentsApi()
       .then(res => {
-        console.log('resss', res.data);
+        console.log('resssDepartData--->', res.data);
         let finalArray = res.data.map((item, index) => {
           return {
             id: item.id,
@@ -281,17 +281,17 @@ class EditDraftOrder extends Component {
     this.getDepartmentData();
     const {productId, basketId, finalData} =
       this.props.route && this.props.route.params;
-    // this.props.navigation.addListener('focus', () => {
-    this.setState(
-      {
-        productId,
-        basketId,
-        modalLoaderDrafts: true,
-        finalData,
-      },
-      () => this.getInventoryFun(),
-    );
-    // });
+    this.props.navigation.addListener('focus', () => {
+      this.setState(
+        {
+          productId,
+          basketId,
+          modalLoaderDrafts: true,
+          finalData,
+        },
+        () => this.getInventoryFun(),
+      );
+    });
   }
 
   getSupplierListData = () => {
@@ -872,6 +872,18 @@ class EditDraftOrder extends Component {
     );
   };
 
+  onPressFun = item => {
+    const {supplierValue, placedByValue, basketId} = this.state;
+    this.props.navigation.navigate('AddItemsOrderScreen', {
+      departID: item.id,
+      departName: item.name,
+      screen: 'Update',
+      navigateType: 'EditDraft',
+      basketId: basketId,
+      supplierValue,
+    });
+  };
+
   render() {
     const {
       buttonsSubHeader,
@@ -907,7 +919,7 @@ class EditDraftOrder extends Component {
       departmentData,
     } = this.state;
 
-    console.log('apiDeliveryDate', apiDeliveryDate);
+    console.log('finalData', finalData);
 
     return (
       <View style={styles.container}>
@@ -1389,7 +1401,7 @@ class EditDraftOrder extends Component {
                     style={{
                       width:
                         Dimensions.get('window').width / numColumns - wp('3%'),
-                      height: hp('12%'),
+                      height: hp('10%'),
                       borderRadius: 50,
                     }}>
                     <TouchableOpacity
@@ -2105,7 +2117,7 @@ class EditDraftOrder extends Component {
               onPress={() => this.previewPDFFun()}
               style={{
                 height: hp('5.5%'),
-                width: wp('80%'),
+                width: wp('87%'),
                 // backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -2132,7 +2144,7 @@ class EditDraftOrder extends Component {
               onPress={() => this.sendFun()}
               style={{
                 height: hp('6%'),
-                width: wp('80%'),
+                width: wp('87%'),
                 // backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -2160,7 +2172,7 @@ class EditDraftOrder extends Component {
               onPress={() => this.updateBasketFun()}
               style={{
                 height: hp('6%'),
-                width: wp('80%'),
+                width: wp('87%'),
                 backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',

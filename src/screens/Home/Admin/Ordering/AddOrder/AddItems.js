@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
@@ -39,8 +40,9 @@ import Modal from 'react-native-modal';
 import moment from 'moment';
 import CheckBox from '@react-native-community/checkbox';
 import {ARRAY} from '../../../../../constants/dummy';
-
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {translate} from '../../../../../utils/translations';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 class AddItems extends Component {
   constructor(props) {
@@ -108,6 +110,7 @@ class AddItems extends Component {
       departmentId: '',
       finalData: '',
       mainDepartId: '',
+      modalQuantity: '0',
     };
   }
 
@@ -194,9 +197,10 @@ class AddItems extends Component {
 
   createFirstData = () => {
     const {supplierId, mainDepartId} = this.state;
+    console.log('FIRST');
     getInventoryBySupplierIdApi(supplierId)
       .then(res => {
-        console.log('res', res);
+        console.log('resInventory-->', res);
 
         var filteredArray = res.data.filter(function (itm) {
           return itm.departmentId === mainDepartId;
@@ -230,39 +234,39 @@ class AddItems extends Component {
 
   componentDidMount() {
     this.getData();
-    this.props.navigation.addListener('focus', () => {
-      const {
-        supplierValue,
-        screen,
+    // this.props.navigation.addListener('focus', () => {
+    const {
+      supplierValue,
+      screen,
+      basketId,
+      navigateType,
+      supplierName,
+      departName,
+      departID,
+      finalData,
+    } = this.props.route && this.props.route.params;
+    this.setState(
+      {
+        supplierId: supplierValue,
+        supplierStatus: false,
+        inventoryStatus: true,
+        screenType: screen,
         basketId,
         navigateType,
+        departmentName: departName,
         supplierName,
-        departName,
-        departID,
+        searchItemInventory: '',
+        searchItemSupplier: '',
+        listIndex: '',
+        SECTIONS: [],
+        modalData: [],
+        departmentId: departID,
         finalData,
-      } = this.props.route && this.props.route.params;
-      this.setState(
-        {
-          supplierId: supplierValue,
-          supplierStatus: false,
-          inventoryStatus: true,
-          screenType: screen,
-          basketId,
-          navigateType,
-          departmentName: departName,
-          supplierName,
-          searchItemInventory: '',
-          searchItemSupplier: '',
-          listIndex: '',
-          SECTIONS: [],
-          modalData: [],
-          departmentId: departID,
-          finalData,
-          mainDepartId: departID,
-        },
-        () => this.getManualLogsData(),
-      );
-    });
+        mainDepartId: departID,
+      },
+      () => this.getManualLogsData(),
+    );
+    // });
   }
 
   myProfile = () => {
@@ -295,6 +299,7 @@ class AddItems extends Component {
           borderRightWidth: 1,
           borderRightColor: '#F0F0F0',
           height: 60,
+          width: wp('87%'),
           // marginTop: hp('1.5%'),
           alignItems: 'center',
           // borderRadius: 6,
@@ -304,28 +309,30 @@ class AddItems extends Component {
           style={{
             flex: 1,
             flexDirection: 'row',
-            alignItems: 'center',
+            justifyContent: 'space-between',
           }}>
-          <Image
-            style={{
-              height: 18,
-              width: 18,
-              resizeMode: 'contain',
-              marginLeft: wp('3%'),
-            }}
-            source={isActive ? img.upArrowIcon : img.arrowRightIcon}
-          />
           <Text
             style={{
               color: '#492813',
-              fontSize: 15,
+              fontSize: 14,
               marginLeft: wp('2%'),
               fontFamily: 'Inter-Regular',
             }}>
             {section.title}
           </Text>
+          <Image
+            style={{
+              height: 15,
+              width: 15,
+              resizeMode: 'contain',
+              marginRight: wp('3%'),
+              tintColor: 'black',
+            }}
+            source={img.arrowDownIcon}
+          />
         </View>
-        <View
+
+        {/* <View
           style={{
             flex: 1,
           }}>
@@ -352,8 +359,8 @@ class AddItems extends Component {
               Δ 0 {section.content[0] && section.content[0].unit}
             </Text>
           )}
-        </View>
-        <View
+        </View> */}
+        {/* <View
           style={{
             flex: 0.8,
           }}>
@@ -368,7 +375,7 @@ class AddItems extends Component {
             Q: {finalAmt}
             {section.content[0] && section.content[0].unit}
           </Text>
-        </View>
+        </View> */}
       </View>
     );
   };
@@ -739,7 +746,7 @@ class AddItems extends Component {
     // console.log('sec', section);
     return (
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View style={{backgroundColor: '#fff'}}>
+        <View style={{backgroundColor: '#fff', width: wp('87%')}}>
           {section.content.map((item, index) => {
             return (
               <View
@@ -748,31 +755,67 @@ class AddItems extends Component {
                   // marginBottom:
                   //   index === section.content.length - 1 ? 30 : null,
                 }}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <View style={{width: wp('25%'), marginTop: 10}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    flex: 1,
+                    marginVertical: 10,
+                  }}>
+                  <View style={{marginTop: 10, flex: 3}}>
                     <TouchableOpacity
-                      // onPress={() => this.openModalFun(item)}
-                      onPress={() =>
-                        this.props.navigation.navigate('SelectQuantityScreen', {
-                          finalData: item,
-                        })
-                      }
-                      style={{
-                        width: wp('25%'),
-                        marginLeft: wp('3%'),
-                      }}>
+                      onPress={() => this.openModalFun(item, section, index)}
+                      // onPress={() =>
+                      //   this.props.navigation.navigate('SelectQuantityScreen', {
+                      //     finalData: item,
+                      //   })
+                      // }
+                      style={{}}>
                       <Text>{item.productName}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                    }}>
+                    <View>
+                      {section.content[0] && section.content[0].deltaNew > 0 ? (
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            color: 'red',
+                            fontSize: 12,
+                            marginRight: wp('3%'),
+                            alignSelf: 'flex-end',
+                          }}>
+                          Δ{' '}
+                          {section.content[0] &&
+                            section.content[0].deltaNew.toFixed(2)}{' '}
+                          {section.content[0] && section.content[0].unit}
+                        </Text>
+                      ) : (
+                        <Text
+                          style={{
+                            color: 'black',
+                            marginRight: wp('3%'),
+                            fontSize: 12,
+                            alignSelf: 'flex-end',
+                          }}>
+                          Δ 0 {section.content[0] && section.content[0].unit}
+                        </Text>
+                      )}
                       <Text
                         numberOfLines={1}
                         style={{
                           marginTop: 10,
                           fontSize: 12,
                         }}>
-                        ( {item.volume} {item.unit} )
+                        Qty: {item.volume} {item.unit}
                       </Text>
-                    </TouchableOpacity>
+                    </View>
                   </View>
-                  <View
+                  {/* <View
                     style={{
                       width: wp('25%'),
                       justifyContent: 'center',
@@ -781,8 +824,8 @@ class AddItems extends Component {
                     <Text>
                       {item.comparePrice} / {item.compareUnit}
                     </Text>
-                  </View>
-                  <View
+                  </View> */}
+                  {/* <View
                     style={{
                       width: wp('30%'),
                       flexDirection: 'row',
@@ -843,11 +886,6 @@ class AddItems extends Component {
                           )
                         }
                       />
-                      {/* <Text style={{color: 'black', fontSize: 15}}>
-                        {item.quantityProduct > 0
-                          ? String(item.quantityProduct)
-                          : 0}
-                      </Text> */}
                     </View>
 
                     <TouchableOpacity
@@ -868,9 +906,9 @@ class AddItems extends Component {
                       }}>
                       <Text style={{color: 'black', fontSize: 15}}>+</Text>
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
                 </View>
-                <View>
+                {/* <View>
                   <Text
                     style={{
                       fontSize: 12,
@@ -879,9 +917,9 @@ class AddItems extends Component {
                       fontSize: 16,
                       color: 'grey',
                     }}>
-                    {item.notes}
+                    {item.notes}asdas
                   </Text>
-                </View>
+                </View> */}
               </View>
             );
           })}
@@ -979,7 +1017,7 @@ class AddItems extends Component {
     }
   };
 
-  openModalFun = item => {
+  openModalFun = (item, section, index) => {
     const priceFinal = item.productPrice * item.packSize;
     const finalDiscountVal = priceFinal * (item.discount / 100);
 
@@ -995,6 +1033,9 @@ class AddItems extends Component {
       userDefinedUnit: item.userDefinedUnit,
       privatePriceValue: item.privatePrice,
       discountPriceValue: item.discount,
+      sectionData: section,
+      sectionIndex: index,
+      modalQuantity: '0',
     });
   };
 
@@ -1632,6 +1673,8 @@ class AddItems extends Component {
       basketId,
       closeStatus,
       finalData,
+      mainDepartId,
+      departmentName,
     } = this.state;
     if (closeStatus) {
       this.props.navigation.navigate('BasketOrderScreen', {
@@ -1641,6 +1684,8 @@ class AddItems extends Component {
         productId,
         supplierName,
         finalDataSec: finalData,
+        departmentName,
+        mainDepartId,
       });
     }
   };
@@ -1774,6 +1819,171 @@ class AddItems extends Component {
     this.addToBasketFun();
   };
 
+  confirmQuantityFun = () => {
+    this.setState(
+      {
+        orderingThreeModal: false,
+      },
+      () => this.confirmQuantityFunSec(),
+    );
+  };
+
+  confirmQuantityFunSec = async () => {
+    const {
+      sectionIndex,
+      sectionData,
+      modalQuantity,
+      pageData,
+      screenType,
+      SECTIONS,
+      activeSections,
+    } = this.state;
+    console.log('sectIndex', sectionIndex);
+    console.log('sectionData', sectionData);
+    console.log('modalQuantity', modalQuantity);
+
+    // this.editQuantityFun(
+    //   sectionIndex,
+    //   'quantityProduct',
+    //   modalQuantity,
+    //   'input',
+    //   sectionData,
+    // );
+
+    const headerIndex = sectionData.headerIndex;
+
+    const valueType = 'input';
+
+    const valueMinus = Number(modalQuantity);
+    console.log('valueMinus', valueMinus);
+
+    const valueAdd = Number(modalQuantity);
+    console.log('valueAdd', valueAdd);
+
+    const value = valueType === 'input' ? valueAdd : valueMinus;
+    // console.log('Value', value);
+    const deltaOriginal = Number(pageData.delta);
+    const isSelectedValue =
+      modalQuantity !== '' && modalQuantity > 0 ? true : false;
+    const newDeltaVal =
+      value !== ''
+        ? Number(pageData.delta) -
+          Number(modalQuantity) * Number(pageData.volume)
+        : deltaOriginal;
+    const newAddTotalQuantity =
+      Number(pageData.volume) *
+      (pageData.quantityProduct === null ? 1 : modalQuantity);
+    // console.log('newAddTotalQuantity', newAddTotalQuantity);
+
+    // const newMinusTotalQuantity =
+    //   Number(data.volume) * (data.quantityProduct === null ? 1 : valueData);
+    // console.log('newMinusTotalQuantity', newMinusTotalQuantity);
+
+    const finalTotalQuantity = newAddTotalQuantity;
+    // valueType === 'input' ? newAddTotalQuantity : newMinusTotalQuantity;
+    // console.log('finalTotalQuantity', finalTotalQuantity);
+
+    let newArr = sectionData.content.map((item, i) =>
+      sectionIndex === i
+        ? {
+            ...item,
+            ['quantityProduct']: value,
+            ['isSelected']: isSelectedValue,
+            ['deltaNew']: newDeltaVal,
+            ['totalQuantity']: finalTotalQuantity,
+          }
+        : {
+            ...item,
+            ['deltaNew']: newDeltaVal,
+            // ['totalQuantity']: finalTotalQuantity,
+          },
+    );
+
+    let LastArr = SECTIONS.map((item, i) =>
+      headerIndex === i
+        ? {
+            ...item,
+            ['content']: newArr,
+          }
+        : {
+            ...item,
+          },
+    );
+
+    console.log('LastArr--> ', LastArr);
+
+    const finalArr = LastArr.map((item, index) => {
+      const firstArr = item.content.filter(function (itm) {
+        if (itm.quantityProduct !== '') {
+          return itm.isSelected === true;
+        }
+      });
+      return firstArr;
+    });
+
+    console.log('finAAA', finalArr);
+
+    var merged = [].concat.apply([], finalArr);
+    console.log('merged', merged);
+
+    const basketArr = [];
+    merged.map(item => {
+      basketArr.push({
+        id: item.orderItemId ? item.orderItemId : null,
+        inventoryId: item.id,
+        inventoryProductMappingId: item.inventoryProductMappingId,
+        unitPrice: item.productPrice,
+        quantity: Number(item.quantityProduct),
+        action:
+          screenType === 'New'
+            ? 'New'
+            : screenType === 'Update' && item.orderItemId !== null
+            ? 'Update'
+            : 'New',
+        value: Number(item.quantityProduct * item.productPrice * item.packSize),
+        headerIndex: headerIndex,
+      });
+    });
+
+    console.log('basketArr-->', basketArr);
+
+    this.setState({
+      SECTIONS: [...LastArr],
+      finalBasketData: [...basketArr],
+      draftStatus: false,
+    });
+  };
+
+  closeFun = () => {
+    this.setState({
+      orderingThreeModal: false,
+    });
+  };
+
+  editModalQuantityFun = (type, value) => {
+    const {modalQuantity} = this.state;
+    console.log('modalQuantity', modalQuantity);
+    console.log('value', value);
+
+    if (type === 'minus' && modalQuantity !== 0) {
+      const valFinal = parseInt(modalQuantity) - parseInt(value);
+      console.log('valFinal', valFinal);
+      this.setState({
+        modalQuantity: valFinal,
+      });
+    } else if (type === 'input') {
+      this.setState({
+        modalQuantity: value,
+      });
+    } else if (type === 'add') {
+      const valFinal = parseInt(modalQuantity) + parseInt(value);
+      console.log('valFinal', valFinal);
+      this.setState({
+        modalQuantity: valFinal,
+      });
+    }
+  };
+
   render() {
     const {
       recipeLoader,
@@ -1810,17 +2020,25 @@ class AddItems extends Component {
       innerIndex,
       draftStatus,
       SECTIONS_SEC_INVEN,
+      fromDate,
+      isDatePickerVisible,
+      toDate,
+      isDatePickerVisibleToDate,
+      finalData,
+      sectionData,
+      sectionIndex,
+      modalQuantity,
     } = this.state;
 
-    console.log('SECTIONS_SEC_INVEN', SECTIONS_SEC_INVEN);
-    console.log('SECTIONS', SECTIONS);
+    console.log('PAGE DATA', pageData);
+    console.log('modalLoooo', modalLoader);
 
     return (
       <View style={styles.container}>
-        <Header
+        {/* <Header
           logoutFun={this.myProfile}
           logoFun={() => this.props.navigation.navigate('HomeScreen')}
-        />
+        /> */}
 
         <ScrollView
           style={{marginBottom: hp('5%')}}
@@ -1843,7 +2061,6 @@ class AddItems extends Component {
                 flexDirection: 'row',
                 alignItems: 'center',
                 marginHorizontal: wp('8%'),
-                marginVertical: hp('2%'),
                 justifyContent: 'center',
               }}>
               <TouchableOpacity
@@ -1851,11 +2068,11 @@ class AddItems extends Component {
                 style={{
                   flex: 1,
                   alignItems: 'center',
+                  justifyContent: 'center',
                   borderBottomColor: inventoryStatus ? '#5197C1' : '#D8DCE6',
                   borderBottomWidth: 3,
-                  paddingBottom: 5,
                   backgroundColor: inventoryStatus ? '#E6F3F3' : '#fff',
-                  padding: 8,
+                  height: hp('5%'),
                 }}>
                 <Text
                   style={{
@@ -1874,10 +2091,10 @@ class AddItems extends Component {
                   flex: 1,
                   borderBottomColor: supplierStatus ? '#5197C1' : '#D8DCE6',
                   borderBottomWidth: 3,
-                  paddingBottom: 5,
-                  padding: 8,
                   backgroundColor: supplierStatus ? '#E6F3F3' : '#fff',
                   alignItems: 'center',
+                  justifyContent: 'center',
+                  height: hp('5%'),
                 }}>
                 <Text
                   numberOfLines={1}
@@ -2137,7 +2354,7 @@ class AddItems extends Component {
                         <View style={{}}>
                           <View style={{}}>
                             {modalLoader ? (
-                              <ActivityIndicator size="large" color="#94C036" />
+                              <ActivityIndicator size="large" color="#5297c1" />
                             ) : (
                               <Accordion
                                 expandMultiple
@@ -2213,7 +2430,7 @@ class AddItems extends Component {
             </View>
           ) : null} */}
 
-          <Modal isVisible={orderingThreeModal} backdropOpacity={0.35}>
+          {/* <Modal isVisible={orderingThreeModal} backdropOpacity={0.35}>
             <View
               style={{
                 width: wp('80%'),
@@ -2754,6 +2971,307 @@ class AddItems extends Component {
                   </View>
                 </View>
               </ScrollView>
+            </View>
+          </Modal> */}
+
+          <Modal isVisible={orderingThreeModal} backdropOpacity={0.35}>
+            <View
+              style={{
+                width: wp('100%'),
+                height: hp('100%'),
+                backgroundColor: '#F0F4FE',
+                alignSelf: 'center',
+              }}>
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: '#f2efef',
+                }}>
+                <KeyboardAwareScrollView
+                  keyboardShouldPersistTaps="always"
+                  showsVerticalScrollIndicator={false}
+                  enableOnAndroid>
+                  <View style={styles.secondContainer}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        height: hp('15%'),
+                        marginHorizontal: wp('6%'),
+                        marginTop: hp('2%'),
+                      }}>
+                      <View
+                        style={{
+                          flex: 4,
+                        }}>
+                        <Text style={styles.textStylingLogo}>
+                          {pageData.name}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.setState({
+                            orderingThreeModal: false,
+                          })
+                        }
+                        style={{
+                          backgroundColor: '#fff',
+                          borderRadius: 100,
+                          padding: 5,
+                        }}>
+                        <Image
+                          source={img.crossIcon}
+                          style={{
+                            height: 15,
+                            width: 15,
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <View>
+                      <View style={styles.insideContainer}>
+                        <View>
+                          <Text>{pageData.productName}</Text>
+                        </View>
+
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            flex: 1,
+                            marginTop: hp('2%'),
+                          }}>
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                color: 'red',
+                              }}>
+                              Delta Δ
+                            </Text>
+
+                            {pageData.deltaNew > 0 ? (
+                              <Text
+                                numberOfLines={1}
+                                style={{
+                                  color: 'red',
+                                  fontSize: 13,
+                                  fontWeight: 'bold',
+                                  marginTop: 10,
+                                }}>
+                                Δ {pageData.deltaNew.toFixed(2)} {pageData.unit}
+                              </Text>
+                            ) : (
+                              <Text
+                                style={{
+                                  color: 'black',
+                                  fontSize: 13,
+                                  fontWeight: 'bold',
+                                  marginTop: 10,
+                                }}>
+                                Δ 0 {pageData && pageData.unit}
+                              </Text>
+                            )}
+                          </View>
+                          <View
+                            style={{
+                              flex: 1,
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              {translate('Ordered Qty')}.
+                            </Text>
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              {pageData.grainzVolume}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 1,
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              {translate('Package size')}.
+                            </Text>
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              {pageData.packSize}
+                            </Text>
+                          </View>
+                        </View>
+
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            flex: 1,
+                            marginTop: hp('2%'),
+                          }}>
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              Price
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              {pageData.productPrice} €/{pageData.productUnit}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 1,
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              {translate('Ordered Val')}.
+                            </Text>
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              € {pageData.price}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 1,
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}></Text>
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}></Text>
+                          </View>
+                        </View>
+
+                        <View
+                          style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            marginTop: hp('3%'),
+                          }}>
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.editModalQuantityFun('minus', '1')
+                            }
+                            style={{
+                              width: wp('20%'),
+                              height: hp('5%'),
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 29,
+                                fontWeight: 'bold',
+                                color: '#5197C1',
+                              }}>
+                              -
+                            </Text>
+                          </TouchableOpacity>
+
+                          <TextInput
+                            value={String(modalQuantity)}
+                            keyboardType="numeric"
+                            style={{
+                              borderRadius: 6,
+                              padding: 10,
+                              width: wp('50%'),
+                              backgroundColor: '#fff',
+                            }}
+                            onChangeText={value =>
+                              this.editModalQuantityFun('input', value)
+                            }
+                          />
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.editModalQuantityFun('add', '1')
+                            }
+                            style={{
+                              width: wp('20%'),
+                              height: hp('5%'),
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                color: '#5197C1',
+                                fontSize: 20,
+                                fontWeight: 'bold',
+                              }}>
+                              +
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+
+                        <TouchableOpacity
+                          onPress={() => this.confirmQuantityFun()}
+                          style={styles.signInStyling}>
+                          <Text style={styles.signInStylingText}>
+                            {translate('Confirm Quantity')}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => this.closeFun()}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <ActivityIndicator color="#fff" size="small" />
+                          <Text style={{color: '#5297C1'}}>
+                            {translate('Close')}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                </KeyboardAwareScrollView>
+              </View>
             </View>
           </Modal>
 

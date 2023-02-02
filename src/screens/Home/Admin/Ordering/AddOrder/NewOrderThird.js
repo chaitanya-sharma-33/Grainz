@@ -421,8 +421,8 @@ class NewOrderThird extends Component {
                           style={{
                             width:
                               Dimensions.get('window').width / numColumns -
-                              wp('5%'),
-                            height: hp('12%'),
+                              wp('6%'),
+                            height: hp('10%'),
                             borderRadius: 50,
                           }}>
                           <TouchableOpacity
@@ -500,12 +500,12 @@ class NewOrderThird extends Component {
                                   }}
                                   numberOfLines={1}>
                                   {item.name === 'Kitchen'
-                                    ? '1 Selected'
+                                    ? '0 Selected'
                                     : item.name === 'Bar'
-                                    ? '2 Selected'
+                                    ? '0 Selected'
                                     : item.name === 'Retail'
-                                    ? '3 Selected'
-                                    : '4 Selected'}
+                                    ? '0 Selected'
+                                    : '0 Selected'}
                                 </Text>
                               </View>
                             </View>

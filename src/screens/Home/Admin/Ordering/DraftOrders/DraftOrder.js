@@ -570,6 +570,7 @@ class DraftOrder extends Component {
                     </View>
                     {draftsOrderData &&
                       draftsOrderData.map((item, index) => {
+                        console.log('item', item);
                         return (
                           <View style={{}}>
                             <View
@@ -821,7 +822,7 @@ class DraftOrder extends Component {
                 //   })
                 // }
                 onPress={() =>
-                  this.props.navigation.navigate('OrderCreationScreen', {
+                  this.props.navigation.navigate('NewOrderSecScreen', {
                     item: '',
                   })
                 }

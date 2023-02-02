@@ -11,6 +11,7 @@ import {
   FlatList,
   Platform,
   PermissionsAndroid,
+  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
@@ -34,6 +35,7 @@ import {
   downloadPDFApi,
   viewHTMLApi,
   updateDraftOrderNewApi,
+  lookupDepartmentsApi,
 } from '../../../../../connectivity/api';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from 'react-native-modal';
@@ -44,6 +46,8 @@ import {translate} from '../../../../../utils/translations';
 import moment from 'moment';
 import RNFetchBlob from 'rn-fetch-blob';
 import LoaderComp from '../../../../../components/Loader';
+
+const numColumns = 2;
 
 class Basket extends Component {
   constructor(props) {
@@ -88,7 +92,30 @@ class Basket extends Component {
       arrangeStatusName: 0,
       finalDataSec: '',
       showMoreStatus: false,
+      departmentData: [],
+      buttonsLoader: true,
+      supplierValue: '',
     };
+  }
+
+  getDepartmentData() {
+    lookupDepartmentsApi()
+      .then(res => {
+        console.log('resss', res.data);
+        let finalArray = res.data.map((item, index) => {
+          return {
+            id: item.id,
+            name: item.name,
+          };
+        });
+        this.setState({
+          departmentData: finalArray,
+          buttonsLoader: false,
+        });
+      })
+      .catch(error => {
+        console.log('err', error.response);
+      });
   }
 
   getData = async () => {
@@ -143,6 +170,7 @@ class Basket extends Component {
   componentDidMount() {
     this.getData();
     this.getUsersListData();
+    this.getDepartmentData();
     const {
       finalData,
       supplierId,
@@ -163,6 +191,7 @@ class Basket extends Component {
         productId,
         supplierName,
         finalDataSec,
+        supplierValue: supplierId,
       },
       () => this.getBasketDataFun(),
     );
@@ -259,21 +288,79 @@ class Basket extends Component {
     });
   };
 
-  editQuantityFun = (index, type, value) => {
+  // editQuantityFun = (index, type, value) => {
+  //   const {modalData} = this.state;
+
+  //   let newArr = modalData.map((item, i) =>
+  //     index === i
+  //       ? {
+  //           ...item,
+  //           [type]: value,
+  //           ['action']: 'Update',
+  //         }
+  //       : item,
+  //   );
+  //   this.setState({
+  //     modalData: [...newArr],
+  //   });
+  // };
+
+  editQuantityFun = (index, type, value, data, valueType) => {
     const {modalData} = this.state;
 
-    let newArr = modalData.map((item, i) =>
-      index === i
-        ? {
-            ...item,
-            [type]: value,
-            ['action']: 'Update',
-          }
-        : item,
-    );
-    this.setState({
-      modalData: [...newArr],
-    });
+    console.log('data', data);
+
+    const valueSec = data.quantity === '' ? Number(0) : Number(data.quantity);
+
+    const valueMinus = valueSec - Number(1);
+    console.log('valueMinus--> ', valueMinus);
+
+    const valueAdd = Number(1) + valueSec;
+    console.log('valueAdd--> ', valueAdd);
+
+    if (valueType === 'minus') {
+      let newArr = modalData.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: valueMinus,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+      this.setState({
+        modalData: [...newArr],
+        finalApiData: [...newArr],
+      });
+    } else if (valueType === 'input') {
+      let newArr = modalData.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: value,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+      this.setState({
+        modalData: [...newArr],
+        finalApiData: [...newArr],
+      });
+    } else if (valueType === 'add') {
+      let newArr = modalData.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: valueAdd,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+      this.setState({
+        modalData: [...newArr],
+        finalApiData: [...newArr],
+      });
+    }
   };
 
   sendFun = () => {
@@ -871,6 +958,18 @@ class Basket extends Component {
     );
   };
 
+  onPressFun = item => {
+    const {supplierValue, placedByValue, basketId} = this.state;
+    this.props.navigation.navigate('AddItemsOrderScreen', {
+      departID: item.id,
+      departName: item.name,
+      screen: 'Update',
+      navigateType: 'EditDraft',
+      basketId: basketId,
+      supplierValue,
+    });
+  };
+
   render() {
     const {
       buttonsSubHeader,
@@ -904,6 +1003,8 @@ class Basket extends Component {
       finalOrderMinDate,
       finalDataSec,
       showMoreStatus,
+      departmentData,
+      buttonsLoader,
     } = this.state;
 
     return (
@@ -1098,6 +1199,116 @@ class Basket extends Component {
                 </View>
               </View>
             ) : null}
+
+            {buttonsLoader ? (
+              <ActivityIndicator size="small" color="grey" />
+            ) : (
+              <View
+                style={{
+                  ...styles.subContainer,
+                  alignItems: 'center',
+                }}>
+                <FlatList
+                  data={departmentData}
+                  renderItem={({item}) => (
+                    <View
+                      style={{
+                        width:
+                          Dimensions.get('window').width / numColumns -
+                          wp('3%'),
+                        height: hp('10%'),
+                        borderRadius: 50,
+                      }}>
+                      <TouchableOpacity
+                        onPress={() => this.onPressFun(item)}
+                        style={{
+                          backgroundColor:
+                            item.name === 'Kitchen'
+                              ? '#D448A7'
+                              : item.name === 'Bar'
+                              ? '#B2B4B8'
+                              : item.name === 'Retail'
+                              ? '#E1A72E'
+                              : '#7CBF31',
+                          flex: 1,
+                          margin: 10,
+                          borderRadius: 8,
+                          padding: 10,
+                          flexDirection: 'row',
+                        }}>
+                        <View
+                          style={{
+                            flex: 1.5,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                          <Image
+                            source={
+                              item.name === 'Kitchen'
+                                ? img.stokeTakeIcon
+                                : item.name === 'Bar'
+                                ? img.CasualIcon
+                                : item.name === 'Retail'
+                                ? img.CasualIcon
+                                : img.miscIcon
+                            }
+                            style={{
+                              height: 20,
+                              width: 20,
+                              resizeMode: 'contain',
+                              tintColor: '#fff',
+                            }}
+                          />
+                        </View>
+                        <View style={{flex: 3}}>
+                          <View
+                            style={{
+                              flex: 1,
+                              justifyContent: 'flex-end',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 13.5,
+                                fontFamily: 'Inter-Regular',
+                                fontWeight: 'bold',
+                                color: '#fff',
+                              }}
+                              numberOfLines={1}>
+                              {item.name}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 1,
+                              justifyContent: 'flex-start',
+                              marginTop: 5,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 10,
+                                fontFamily: 'Inter-Regular',
+                                color: '#fff',
+                              }}
+                              numberOfLines={1}>
+                              {item.name === 'Kitchen'
+                                ? '1 Selected'
+                                : item.name === 'Bar'
+                                ? '2 Selected'
+                                : item.name === 'Retail'
+                                ? '3 Selected'
+                                : '4 Selected'}
+                            </Text>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                  keyExtractor={item => item.id}
+                  numColumns={2}
+                />
+              </View>
+            )}
+
             {/* <View
               style={{
                 marginTop: hp('3%'),
@@ -1273,6 +1484,491 @@ class Basket extends Component {
           {recipeLoader ? (
             <ActivityIndicator size="small" color="#94C036" />
           ) : (
+            <View style={{marginTop: hp('2%'), marginBottom: hp('2%')}}>
+              {modalData &&
+                modalData.map((item, index) => {
+                  console.log('item--11-1-1-1>', item);
+                  return (
+                    <View
+                      style={{
+                        marginHorizontal: wp('6%'),
+                      }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          borderTopWidth: 1,
+                          borderLeftWidth: 1,
+                          borderRightWidth: 1,
+                          borderColor: 'grey',
+                          borderTopLeftRadius: 6,
+                          borderTopRightRadius: 6,
+                          padding: 10,
+                          flex: 1,
+                        }}>
+                        <View
+                          style={{
+                            flex: 3,
+                          }}>
+                          <Text style={{fontSize: 14, fontWeight: 'bold'}}>
+                            {item.inventoryMapping &&
+                              item.inventoryMapping.inventoryName}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            alignItems: 'center',
+                          }}>
+                          <Image
+                            source={img.messageIcon}
+                            style={{
+                              width: 18,
+                              height: 18,
+                              resizeMode: 'contain',
+                              tintColor: 'black',
+                            }}
+                          />
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => this.deleteFun(item, index)}
+                          style={{
+                            flex: 1,
+                            alignItems: 'flex-end',
+                          }}>
+                          <Image
+                            source={img.deleteIconNew}
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                              tintColor: 'red',
+                            }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          borderLeftWidth: 1,
+                          borderRightWidth: 1,
+                          borderBottomWidth: 1,
+                          borderColor: 'grey',
+                          padding: 10,
+                        }}>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text style={{}}>
+                            {item.inventoryMapping &&
+                              item.inventoryMapping.productName}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                          }}>
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.editQuantityFun(
+                                index,
+                                'quantity',
+                                '1',
+                                item,
+                                'minus',
+                              )
+                            }
+                            style={{
+                              width: wp('10%'),
+                              height: hp('5%'),
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 29,
+                                fontWeight: 'bold',
+                                color: '#5197C1',
+                              }}>
+                              -
+                            </Text>
+                          </TouchableOpacity>
+
+                          <TextInput
+                            value={String(item.quantity)}
+                            keyboardType="numeric"
+                            style={{
+                              borderRadius: 6,
+                              padding: 10,
+                              width: wp('15%'),
+                              backgroundColor: '#fff',
+                            }}
+                            onChangeText={value =>
+                              this.editQuantityFun(
+                                index,
+                                'quantity',
+                                value,
+                                item,
+                                'input',
+                              )
+                            }
+                          />
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.editQuantityFun(
+                                index,
+                                'quantity',
+                                '1',
+                                item,
+                                'add',
+                              )
+                            }
+                            style={{
+                              width: wp('10%'),
+                              height: hp('5%'),
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                color: '#5197C1',
+                                fontSize: 20,
+                                fontWeight: 'bold',
+                              }}>
+                              +
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          borderLeftWidth: 1,
+                          borderRightWidth: 1,
+                          borderBottomWidth: 1,
+                          borderColor: 'grey',
+                          borderBottomLeftRadius: 6,
+                          borderBottomRightRadius: 6,
+                          padding: 10,
+                        }}>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text style={{fontSize: 10}}>
+                            {translate('Price')}
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 10,
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                            }}>
+                            {item.inventoryMapping &&
+                              item.inventoryMapping.productPrice}{' '}
+                            Є/
+                            {item.inventoryMapping.productUnit}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text style={{fontSize: 10}}>
+                            {translate('Ordered Val')}.
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 10,
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                            }}>
+                            {item.value.toFixed(2)}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text style={{fontSize: 10}}>
+                            {translate('Ordered Qty')}.
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 10,
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                            }}>
+                            {item.calculatedQuantity}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
+
+              {/* <ScrollView showsVerticalScrollIndicator={false}>
+                {modalLoaderDrafts ? (
+                  <ActivityIndicator size="large" color="grey" />
+                ) : (
+                  <View style={{marginHorizontal: wp('4%')}}>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}>
+                      <View>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            flex: 1,
+                            backgroundColor: '#EFFBCF',
+                            paddingVertical: hp('3%'),
+                            borderTopLeftRadius: 5,
+                            borderTopRightRadius: 5,
+                            paddingHorizontal: 20,
+                          }}>
+                          <View
+                            style={{
+                              width: wp('40%'),
+                            }}>
+                            <Text
+                              style={{
+                                color: '#161C27',
+                                fontFamily: 'Inter-SemiBold',
+                              }}>
+                              Inventory item
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              width: wp('30%'),
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                color: '#161C27',
+                                fontFamily: 'Inter-SemiBold',
+                              }}>
+                              {translate('Quantity')}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              width: wp('30%'),
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                color: '#161C27',
+                                fontFamily: 'Inter-SemiBold',
+                              }}>
+                              HTVA €
+                            </Text>
+                          </View>
+                          <View
+                            onPress={() => this.editFun()}
+                            style={{
+                              width: wp('20%'),
+                              justifyContent: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                color: '#161C27',
+                                fontFamily: 'Inter-SemiBold',
+                              }}>
+                              {translate('Action')}
+                            </Text>
+                          </View>
+                        </View>
+                        {inventoryData &&
+                          inventoryData.map((item, index) => {
+                            return (
+                              <View
+                                onLongPress={() => this.actionFun(item, index)}>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    flex: 1,
+                                    backgroundColor:
+                                      index % 2 === 0 ? '#FFFFFF' : '#F7F8F5',
+                                    paddingVertical: hp('3%'),
+                                    borderTopLeftRadius: 5,
+                                    borderTopRightRadius: 5,
+                                    paddingHorizontal: 20,
+                                  }}>
+                                  <View
+                                    style={{
+                                      width: wp('40%'),
+                                      justifyContent: 'center',
+                                    }}>
+                                    <Text
+                                      style={{
+                                        fontFamily: 'Inter-SemiBold',
+                                        marginBottom: 5,
+                                      }}>
+                                      {item.inventoryMapping &&
+                                        item.inventoryMapping.inventoryName}
+                                    </Text>
+                                    <Text style={{}}>
+                                      {item.inventoryMapping &&
+                                        item.inventoryMapping.productName}
+                                    </Text>
+                                  </View>
+                                  {editStatus ? (
+                                    <View
+                                      style={{
+                                        width: wp('30%'),
+                                        justifyContent: 'center',
+                                      }}>
+                                      <Text style={{marginBottom: 5}}>
+                                        {item.calculatedQuantity.toFixed(2)}{' '}
+                                        {item.unit}
+                                      </Text>
+
+                                      <View
+                                        style={{
+                                          flexDirection: 'row',
+                                          alignItems: 'center',
+                                        }}>
+                                        <TextInput
+                                          value={String(item.quantity)}
+                                          keyboardType="numeric"
+                                          style={{
+                                            borderWidth: 1,
+                                            borderRadius: 6,
+                                            padding: 10,
+                                            width: wp('10%'),
+                                          }}
+                                          onChangeText={value =>
+                                            this.editQuantityFun(
+                                              index,
+                                              'quantity',
+                                              value,
+                                              item,
+                                            )
+                                          }
+                                        />
+                                        <Text>
+                                          {' '}
+                                          X{' '}
+                                          {item.inventoryMapping &&
+                                            item.inventoryMapping.packSize}
+                                          /
+                                          {item.inventoryMapping &&
+                                            item.inventoryMapping.productUnit}
+                                        </Text>
+                                      </View>
+                                    </View>
+                                  ) : (
+                                    <View
+                                      style={{
+                                        width: wp('30%'),
+                                        justifyContent: 'center',
+                                      }}>
+                                      <Text style={{marginBottom: 5}}>
+                                        {item.calculatedQuantity.toFixed(2)}{' '}
+                                        {item.unit}
+                                      </Text>
+                                      <Text>{`${item.quantity} X ${
+                                        item.inventoryMapping &&
+                                        item.inventoryMapping.packSize
+                                      }/${
+                                        item.inventoryMapping &&
+                                        item.inventoryMapping.productUnit
+                                      }`}</Text>
+                                    </View>
+                                  )}
+                                  <View
+                                    style={{
+                                      width: wp('30%'),
+                                      justifyContent: 'center',
+                                    }}>
+                                    <Text>
+                                      € {Number(item.value).toFixed(2)}
+                                    </Text>
+                                  </View>
+                                  <TouchableOpacity
+                                    onPress={() => this.deleteFun(item, index)}
+                                    style={{
+                                      width: wp('20%'),
+                                      justifyContent: 'center',
+                                    }}>
+                                    <View
+                                      style={{
+                                        backgroundColor: 'red',
+                                        padding: 10,
+                                        alignItems: 'center',
+                                      }}>
+                                      <Image
+                                        source={img.deleteIconNew}
+                                        style={{
+                                          width: 18,
+                                          height: 18,
+                                          resizeMode: 'contain',
+                                          tintColor: '#fff',
+                                        }}
+                                      />
+                                    </View>
+                                  </TouchableOpacity>
+                                </View>
+                              </View>
+                            );
+                          })}
+
+                        <View>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              flex: 1,
+                              backgroundColor: '#FFFFFF',
+                              paddingVertical: hp('3%'),
+                              borderTopLeftRadius: 5,
+                              borderTopRightRadius: 5,
+                              paddingHorizontal: 20,
+                            }}>
+                            <View
+                              style={{
+                                width: wp('40%'),
+                                justifyContent: 'center',
+                              }}></View>
+                            <View
+                              style={{
+                                width: wp('30%'),
+                                justifyContent: 'center',
+                                marginLeft: wp('5%'),
+                              }}>
+                              <Text style={{}}>Total HTVA</Text>
+                            </View>
+                            <View
+                              style={{
+                                width: wp('30%'),
+                                justifyContent: 'center',
+                                marginLeft: wp('5%'),
+                              }}>
+                              <Text>
+                                €{' '}
+                                {Number(draftsOrderData.totalValue).toFixed(2)}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                    </ScrollView>
+                  </View>
+                )}
+              </ScrollView> */}
+            </View>
+          )}
+
+          {/* {recipeLoader ? (
+            <ActivityIndicator size="small" color="#94C036" />
+          ) : (
             <View style={{marginTop: hp('2%')}}>
               {modalLoader ? (
                 <ActivityIndicator size="large" color="grey" />
@@ -1297,8 +1993,7 @@ class Basket extends Component {
                             <View
                               style={{
                                 width: wp('25%'),
-                                // flexDirection: 'row',
-                                // alignItems: 'center',
+                             
                               }}>
                               <Text
                                 style={{
@@ -1306,18 +2001,7 @@ class Basket extends Component {
                                 }}>
                                 {translate('Inventory item')}
                               </Text>
-                              {/* <TouchableOpacity
-                                onPress={() => this.arrangeListFun('NAME')}>
-                                <Image
-                                  style={{
-                                    width: 13,
-                                    height: 13,
-                                    resizeMode: 'contain',
-                                    marginLeft: 5,
-                                  }}
-                                  source={img.doubleArrowIconNew}
-                                />
-                              </TouchableOpacity> */}
+                             
                             </View>
                             <View
                               style={{
@@ -1565,14 +2249,14 @@ class Basket extends Component {
                 </View>
               )}
             </View>
-          )}
+          )} */}
 
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => this.previewPDFFun()}
               style={{
                 height: hp('5.5%'),
-                width: wp('80%'),
+                width: wp('87%'),
                 backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -1597,7 +2281,7 @@ class Basket extends Component {
               onPress={() => this.sendFun()}
               style={{
                 height: hp('6%'),
-                width: wp('80%'),
+                width: wp('87%'),
                 backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -1623,7 +2307,7 @@ class Basket extends Component {
               onPress={() => this.saveDraftFunGreen()}
               style={{
                 height: hp('6%'),
-                width: wp('80%'),
+                width: wp('87%'),
                 backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',

@@ -213,6 +213,7 @@ class PendingDelivery extends Component {
         supplierName: item.supplierName,
         basketId: item.shopingBasketId,
         listId: 2,
+        finalData: item,
       });
     } else if (listId === 3) {
       this.props.navigation.navigate('ViewReviewOrderScreen', {
@@ -221,12 +222,14 @@ class PendingDelivery extends Component {
         supplierName: item.supplierName,
         basketId: item.shopingBasketId,
         listId: 3,
+        finalData: item,
       });
     } else if (listId === 4) {
       if (item.isTDC === true) {
         console.log('item', item);
         this.props.navigation.navigate('EditHistoryOrderScreen', {
           orderData: item,
+          finalData: item,
         });
       } else {
         this.props.navigation.navigate('ViewHistoryOrderScreen', {
@@ -235,6 +238,7 @@ class PendingDelivery extends Component {
           supplierName: item.supplierName,
           basketId: item.shopingBasketId,
           listId: 4,
+          finalData: item,
         });
       }
     }

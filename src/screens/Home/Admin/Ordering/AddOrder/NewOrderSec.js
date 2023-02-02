@@ -300,8 +300,8 @@ class NewOrderSec extends Component {
                     onPress={() => this.showDatePickerFunOrder()}
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 15 : 0,
-                      marginBottom: hp('3%'),
+                      padding: Platform.OS === 'ios' ? 12 : 0,
+                      marginBottom: hp('2%'),
                       borderRadius: 6,
                     }}>
                     <View style={{}}>
@@ -312,16 +312,21 @@ class NewOrderSec extends Component {
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         marginTop: 10,
+                        alignItems: 'center',
                       }}>
                       <TextInput
                         placeholder="DD/MM/YY"
                         value={finalOrderDate}
                         editable={false}
+                        style={{
+                          fontWeight: 'bold',
+                        }}
                       />
                       <Image
                         source={img.calenderIcon}
                         style={{
                           width: 20,
+                          tintColor: 'grey',
                           height: 20,
                           resizeMode: 'contain',
                           alignSelf:
@@ -345,8 +350,8 @@ class NewOrderSec extends Component {
                     onPress={() => this.showDatePickerFunDelivery()}
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 15 : 0,
-                      marginBottom: hp('3%'),
+                      padding: Platform.OS === 'ios' ? 12 : 0,
+                      marginBottom: hp('2%'),
                       borderRadius: 6,
                     }}>
                     <View style={{}}>
@@ -362,6 +367,9 @@ class NewOrderSec extends Component {
                         placeholder="DD/MM/YY"
                         value={finalDeliveryDate}
                         editable={false}
+                        style={{
+                          fontWeight: 'bold',
+                        }}
                       />
                       <Image
                         source={img.calenderIcon}
@@ -372,6 +380,7 @@ class NewOrderSec extends Component {
                           alignSelf:
                             Platform.OS === 'android' ? 'center' : null,
                           marginRight: Platform.OS === 'android' ? 10 : 0,
+                          tintColor: 'grey',
                         }}
                       />
                     </View>
@@ -390,35 +399,26 @@ class NewOrderSec extends Component {
                   //   }
                   style={{
                     backgroundColor: '#fff',
-                    borderRadius: 5,
-                    padding: Platform.OS === 'ios' ? 10 : 0,
-                    marginBottom: hp('3%'),
+                    borderRadius: 6,
+                    padding: Platform.OS === 'ios' ? 12 : 0,
+                    marginBottom: hp('2%'),
                   }}>
-                  <View
-                    style={{
-                      marginLeft: '5%',
-                      marginTop: '2.5%',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontFamily: 'Inter-Regular',
-                      }}>
-                      Placed By
-                    </Text>
+                  <View style={{}}>
+                    <Text style={{}}>Placed By</Text>
                   </View>
                   <View
                     style={{
                       flexDirection: 'row',
                       justifyContent: 'space-between',
+                      marginTop: 10,
+                      alignItems: 'center',
                     }}>
                     <Text
                       style={{
                         color: '#4A4C55',
-                        fontSize: 16,
+                        fontSize: 14,
                         fontFamily: 'Inter-Regular',
-                        marginLeft: '5%',
-                        marginTop: 10,
+                        fontWeight: 'bold',
                       }}>
                       {placedByData}
                     </Text>
@@ -431,7 +431,7 @@ class NewOrderSec extends Component {
                         tintColor: 'grey',
                         alignSelf: Platform.OS === 'android' ? 'center' : null,
                         marginRight: Platform.OS === 'android' ? 10 : 6,
-                        marginTop: 5,
+                        tintColor: 'grey',
                       }}
                     />
                   </View>
@@ -445,35 +445,24 @@ class NewOrderSec extends Component {
                   }
                   style={{
                     backgroundColor: '#fff',
-                    borderRadius: 5,
-                    padding: Platform.OS === 'ios' ? 10 : 0,
-                    // marginBottom: hp('3%'),
+                    borderRadius: 6,
+                    padding: Platform.OS === 'ios' ? 12 : 0,
                   }}>
-                  <View
-                    style={{
-                      marginLeft: '5%',
-                      marginTop: '2.5%',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontFamily: 'Inter-Regular',
-                      }}>
-                      {translate('Supplier')}
-                    </Text>
+                  <View style={{}}>
+                    <Text style={{}}>{translate('Supplier')}</Text>
                   </View>
                   <View
                     style={{
                       flexDirection: 'row',
                       justifyContent: 'space-between',
+                      marginTop: 10,
                     }}>
                     <Text
                       style={{
                         color: '#4A4C55',
-                        fontSize: 16,
+                        fontSize: 14,
                         fontFamily: 'Inter-Regular',
-                        marginLeft: '5%',
-                        marginTop: 10,
+                        fontWeight: 'bold',
                       }}>
                       {supplierName ? supplierName : selectedTextUser}
                     </Text>
@@ -486,7 +475,6 @@ class NewOrderSec extends Component {
                         tintColor: 'grey',
                         alignSelf: Platform.OS === 'android' ? 'center' : null,
                         marginRight: Platform.OS === 'android' ? 10 : 6,
-                        marginTop: 5,
                       }}
                     />
                   </View>

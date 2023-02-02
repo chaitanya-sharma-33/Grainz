@@ -864,7 +864,7 @@
   "About Your Business": "About Your Business",
   "Submit": "Submit",
   "Log in to your account": "Log in to your account",
-  "Forgoten Password?": "Forgoten Password?",
+  "Forgoten Password?": "Forgotten Password?",
   "New Purchase": "New Purchase",
   "New Casual Purchase": "New Casual Purchase",
   "Remember me": "Remember me",
@@ -886,5 +886,9 @@
   "Draft": "Draft",
   "Ordered Val": "Ordered Val",
   "Ordered Qty": "Ordered Qty",
-  "Send Order": "Send Order"
+  "Send Order": "Send Order",
+  "Package size": "Package size",
+  "Order No": "Order No",
+  "Request credit note": "Request credit note",
+  "Delivery checklist": "Delivery checklist"
 }

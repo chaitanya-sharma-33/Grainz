@@ -80,7 +80,6 @@ import AddManualLogScreen from '../screens/ManualLog/AddManualLog';
 import EditManualLogScreen from '../screens/ManualLog/EditManualLog';
 import FilterPurchaseScreen from '../screens/CasualPurchase/FilterPurchase';
 import OrderCreationScreen from '../screens/Home/Admin/Ordering/AddOrder/OrderCreationScreen';
-import SelectQuantityScreen from '../screens/Home/Admin/Ordering/AddOrder/SelectQuantity';
 
 const AppNav = createStackNavigator();
 
@@ -92,10 +91,6 @@ export default function AppNavFun() {
       <AppNav.Screen
         name="AddNewOrderLineScreen"
         component={AddNewOrderLineScreen}
-      />
-      <AppNav.Screen
-        name="SelectQuantityScreen"
-        component={SelectQuantityScreen}
       />
       <AppNav.Screen
         name="EditManualLogScreen"
