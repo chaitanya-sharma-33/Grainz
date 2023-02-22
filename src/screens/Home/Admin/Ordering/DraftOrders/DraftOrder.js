@@ -23,6 +23,7 @@ import {
   getMyProfileApi,
   draftOrderingApi,
   deleteOrderApi,
+  duplicateApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -86,16 +87,36 @@ class DraftOrder extends Component {
 
   componentDidMount() {
     this.props.navigation.addListener('focus', () => {
+      const {route} = this.props;
+      const filterData = route.params.filterData;
+
+      if (filterData) {
+        this.setState(
+          {
+            casualListLoader: true,
+          },
+          () => this.filterDataFun(filterData),
+        );
+      } else {
+        this.getDraftOrderData();
+      }
       this.getData();
-      this.getDraftOrderData();
     });
   }
+
+  filterDataFun = filterData => {
+    this.setState({
+      draftsOrderData: filterData,
+      modalLoaderDrafts: false,
+      draftsOrderDataBackup: filterData,
+    });
+  };
 
   getDraftOrderData = () => {
     draftOrderingApi()
       .then(res => {
         this.setState({
-          draftsOrderData: res.data,
+          draftsOrderData: res.data.reverse(),
           draftsOrderDataBackup: res.data,
           modalLoaderDrafts: false,
         });
@@ -310,9 +331,34 @@ class DraftOrder extends Component {
   };
 
   duplicateModalFunSec = () => {
-    this.setState({
-      duplicateModalStatus: false,
-    });
+    // shopingBasketId = param.shopingBasketId
+    // this.setState({
+    //   duplicateModalStatus: false,
+    // });
+
+    const {param} = this.state;
+    this.setState(
+      {
+        recipeLoader: true,
+        duplicateModalStatus: false,
+      },
+      () =>
+        duplicateApi(param.id)
+          .then(res => {
+            this.setState(
+              {
+                recipeLoader: false,
+              },
+              () => this.getDraftOrderData(),
+            );
+          })
+          .catch(error => {
+            this.setState({
+              deleteLoader: false,
+            });
+            console.warn('Duplicateerror', error.response);
+          }),
+    );
   };
 
   deleteModalFun = () => {
@@ -332,6 +378,7 @@ class DraftOrder extends Component {
   };
 
   pickerFun = item => {
+    // console.log('item', item);
     this.setState({
       pickerModalStatus: true,
       param: item,
@@ -417,7 +464,10 @@ class DraftOrder extends Component {
                 borderRadius: 5,
               }}
               onPress={() =>
-                this.props.navigation.navigate('FilterPurchaseScreen')
+                this.props.navigation.navigate('FilterOrderScreen', {
+                  item: '',
+                  screenType: 'Draft',
+                })
               }>
               <View>
                 <Image
@@ -570,7 +620,7 @@ class DraftOrder extends Component {
                     </View>
                     {draftsOrderData &&
                       draftsOrderData.map((item, index) => {
-                        console.log('item', item);
+                        console.log('item------->', item);
                         return (
                           <View style={{}}>
                             <View

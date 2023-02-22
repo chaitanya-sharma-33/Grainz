@@ -145,18 +145,6 @@ class NewOrderSec extends Component {
     this.props.navigation.navigate('MyProfile');
   };
 
-  onPressFun = item => {
-    console.log('item', item);
-    const {supplierId} = this.state;
-    this.props.navigation.navigate('DepartmentPurchaseScreen', {
-      departID: item.id,
-      departName: item.name,
-      //   supplierValue: supplierId,
-      screen: 'New',
-      supplierName: item.name,
-    });
-  };
-
   handleConfirmOrder = date => {
     let newdate = moment(date).format('DD/MM/YYYY');
     this.setState({
@@ -300,7 +288,7 @@ class NewOrderSec extends Component {
                     onPress={() => this.showDatePickerFunOrder()}
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 12 : 0,
+                      padding: 12,
                       marginBottom: hp('2%'),
                       borderRadius: 6,
                     }}>
@@ -320,6 +308,7 @@ class NewOrderSec extends Component {
                         editable={false}
                         style={{
                           fontWeight: 'bold',
+                          color: 'black',
                         }}
                       />
                       <Image
@@ -329,9 +318,7 @@ class NewOrderSec extends Component {
                           tintColor: 'grey',
                           height: 20,
                           resizeMode: 'contain',
-                          alignSelf:
-                            Platform.OS === 'android' ? 'center' : null,
-                          marginRight: Platform.OS === 'android' ? 10 : 0,
+                          marginRight: 10,
                         }}
                       />
                     </View>
@@ -350,7 +337,7 @@ class NewOrderSec extends Component {
                     onPress={() => this.showDatePickerFunDelivery()}
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 12 : 0,
+                      padding: 12,
                       marginBottom: hp('2%'),
                       borderRadius: 6,
                     }}>
@@ -369,6 +356,7 @@ class NewOrderSec extends Component {
                         editable={false}
                         style={{
                           fontWeight: 'bold',
+                          color: 'black',
                         }}
                       />
                       <Image
@@ -377,9 +365,7 @@ class NewOrderSec extends Component {
                           width: 20,
                           height: 20,
                           resizeMode: 'contain',
-                          alignSelf:
-                            Platform.OS === 'android' ? 'center' : null,
-                          marginRight: Platform.OS === 'android' ? 10 : 0,
+                          marginRight: 10,
                           tintColor: 'grey',
                         }}
                       />
@@ -400,7 +386,7 @@ class NewOrderSec extends Component {
                   style={{
                     backgroundColor: '#fff',
                     borderRadius: 6,
-                    padding: Platform.OS === 'ios' ? 12 : 0,
+                    padding: 12,
                     marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
@@ -429,8 +415,7 @@ class NewOrderSec extends Component {
                         width: 20,
                         resizeMode: 'contain',
                         tintColor: 'grey',
-                        alignSelf: Platform.OS === 'android' ? 'center' : null,
-                        marginRight: Platform.OS === 'android' ? 10 : 6,
+                        marginRight: 10,
                         tintColor: 'grey',
                       }}
                     />
@@ -446,7 +431,7 @@ class NewOrderSec extends Component {
                   style={{
                     backgroundColor: '#fff',
                     borderRadius: 6,
-                    padding: Platform.OS === 'ios' ? 12 : 0,
+                    padding: 12,
                   }}>
                   <View style={{}}>
                     <Text style={{}}>{translate('Supplier')}</Text>
@@ -473,8 +458,7 @@ class NewOrderSec extends Component {
                         width: 20,
                         resizeMode: 'contain',
                         tintColor: 'grey',
-                        alignSelf: Platform.OS === 'android' ? 'center' : null,
-                        marginRight: Platform.OS === 'android' ? 10 : 6,
+                        marginRight: 10,
                       }}
                     />
                   </View>
@@ -495,7 +479,7 @@ class NewOrderSec extends Component {
               onPress={() => this.createOrder()}
               style={{
                 width: wp('90%'),
-                height: hp('5%'),
+                height: hp('7%'),
                 backgroundColor: supplierId ? '#5297c1' : '#DCDCDC',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -519,7 +503,7 @@ class NewOrderSec extends Component {
               onPress={() => this.props.navigation.goBack()}
               style={{
                 width: wp('90%'),
-                height: hp('5%'),
+                height: hp('7%'),
                 justifyContent: 'center',
                 alignItems: 'center',
                 borderRadius: 10,

@@ -48,7 +48,9 @@ export default {
   restaurantIcon: require('../assests/Images/restaurantIcon.png'),
   retailIcon: require('../assests/Images/retailIcon.png'),
   otherIcon: require('../assests/Images/otherIcon.png'),
+  retailIcon: require('../assests/Images/retailIcon.png'),
   beakerIcon: require('../assests/Images/beakerIcon.png'),
+  kitchenIcon: require('../assests/Images/kitchenIcon.png'),
   editIconGreen: require('../assests/Images/editIconGreen.png'),
   viewInventoryIcon: require('../assests/Images/viewInventoryIcon.png'),
   doubleArrowIconNew: require('../assests/Images/doubleArrowIcon.png'),
@@ -67,4 +69,5 @@ export default {
   flagIcon: require('../assests/Images/flagIcon.png'),
   cameraIcon: require('../assests/Images/cameraIcon.png'),
   messageIcon: require('../assests/Images/messageIcon.png'),
+  listIcon: require('../assests/Images/listIcon.png'),
 };

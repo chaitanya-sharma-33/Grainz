@@ -12,6 +12,7 @@ import {
   Switch,
   FlatList,
   Platform,
+  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
@@ -28,7 +29,6 @@ import {
 import {UserTokenAction} from '../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
-  getSupplierListApi,
   addOrderApi,
   getInventoryListApi,
   getCasualListNewApi,
@@ -41,9 +41,9 @@ import ImagePicker from 'react-native-image-crop-picker';
 import Modal from 'react-native-modal';
 import styles from './style';
 import RNPickerSelect from 'react-native-picker-select';
-import ModalPicker from '../../components/ModalPicker';
 import TreeSelect from 'react-native-tree-select';
 
+const numColumns = 2;
 var minTime = new Date();
 minTime.setHours(0);
 minTime.setMinutes(0);
@@ -59,12 +59,10 @@ class index extends Component {
       token: '',
       isDatePickerVisible: false,
       finalDate: todayDate,
-      placeHolderTextDept: 'Select Supplier',
       productionDate: todayDateProd,
       htvaIsSelected: true,
       auditIsSelected: false,
       note: '',
-      dataListLoader: false,
       supplierList: [],
       object: {
         date: '',
@@ -192,46 +190,24 @@ class index extends Component {
       });
   };
 
-  // getSupplierListData() {
-  //   this.setState(
-  //     {
-  //       // supplierListLoader: true,
-  //       dataListLoader: true,
-  //     },
-  //     () =>
-  //       getSupplierListApi()
-  //         .then(res => {
-  //           const finalArr = [];
-  //           res.data.map(item => {
-  //             finalArr.push({
-  //               name: item.name,
-  //               id: item.id,
-  //             });
-  //           });
-  //           this.setState({
-  //             supplierList: [...finalArr],
-  //             // supplierListLoader: false,
-  //             dataListLoader: false,
-  //           });
-  //         })
-  //         .catch(error => {
-  //           console.log('err', error);
-  //           // this.setState({supplierListLoader: false});
-  //         }),
-  //   );
-  // }
-
   async componentDidMount() {
     this.props.navigation.addListener('focus', () => {
       const {route} = this.props;
       const item = route.params.item;
+      const orderData = route.params.orderData;
       console.log('itemmmm', item);
+      console.log('orderData', orderData);
       this.clearData();
       this.getDepartmentData();
       // this.getSupplierListData();
       this.getNewCasualListFun();
       if (item) {
         this.selectUserNameFun(item);
+      }
+      if (orderData) {
+        this.setState({
+          orderItemsFinal: orderData,
+        });
       }
     });
     this.getProfileDataFun();
@@ -310,12 +286,21 @@ class index extends Component {
   onPressFun = item => {
     console.log('item', item);
     const {supplierId} = this.state;
-    this.props.navigation.navigate('DepartmentPurchaseScreen', {
+    // this.props.navigation.navigate('DepartmentPurchaseScreen', {
+    //   departID: item.id,
+    //   departName: item.name,
+    //   supplierValue: supplierId,
+    //   screen: 'New',
+    //   supplierName: item.name,
+    // });
+
+    this.props.navigation.navigate('DepartmentPurchaseSecScreen', {
       departID: item.id,
       departName: item.name,
-      supplierValue: supplierId,
       screen: 'New',
-      supplierName: item.name,
+      navigateType: 'EditDraft',
+      basketId: '',
+      supplierValue: supplierId,
     });
   };
 
@@ -937,208 +922,324 @@ class index extends Component {
   //   );
   // };
 
-  addDataFun = (
-    index,
-    type,
-    value,
-    rollingAveragePrice,
-    quantityOrdered,
-    isRollingAverageUsed,
-    key,
-    item,
-    indexUnits,
-  ) => {
+  // addDataFun = (
+  //   index,
+  //   type,
+  //   value,
+  //   rollingAveragePrice,
+  //   quantityOrdered,
+  //   isRollingAverageUsed,
+  //   key,
+  //   item,
+  //   indexUnits,
+  // ) => {
+  //   const {orderItemsFinal} = this.state;
+  //   if (type === 'isRollingAverageUsed' && key === 'all') {
+  //     console.log('1---->');
+  //     const finalVal = value;
+  //     console.log('finalVal', finalVal);
+  //     console.log('type', type);
+  //     console.log('key', key);
+
+  //     let newArr = orderItemsFinal.map((item, i) =>
+  //       index === i
+  //         ? {
+  //             ...item,
+  //             [type]: finalVal,
+  //             ['unitPrice']:
+  //               value === true
+  //                 ? (item.rollingAveragePrice * item.quantityOrdered).toFixed(2)
+  //                 : '',
+  //           }
+  //         : {
+  //             ...item,
+  //             [type]: finalVal,
+  //             ['unitPrice']:
+  //               value === true
+  //                 ? (item.rollingAveragePrice * item.quantityOrdered).toFixed(2)
+  //                 : '',
+  //           },
+  //     );
+
+  //     console.log('NEWA--ALLITEMS', newArr);
+  //     const orderTotal = newArr.reduce(
+  //       (n, {unitPrice}) => n + Number(unitPrice),
+  //       0,
+  //     );
+
+  //     console.log('orderTotal--ALLITEMS', orderTotal);
+
+  //     this.setState({
+  //       orderItemsFinal: [...newArr],
+  //       orderTotal: value === true ? orderTotal : 0.0,
+  //       switchValue: finalVal,
+  //     });
+  //   } else {
+  //     console.log('2');
+  //     if (type === 'isRollingAverageUsed') {
+  //       console.log('3');
+
+  //       console.log('rollingAveragePrice', rollingAveragePrice);
+  //       const finalQuantity = quantityOrdered === '' ? 0 : quantityOrdered;
+  //       console.log('finalQuantity', finalQuantity);
+
+  //       console.log('valueee', value);
+  //       var indexUnitsSec = item.units.findIndex(p => p.value == item.unitId);
+  //       const converter = item.units[indexUnitsSec].converter;
+
+  //       console.log('converter', converter);
+
+  //       const finalPrice = rollingAveragePrice * finalQuantity * converter;
+  //       console.log('finalPrice', finalPrice);
+
+  //       console.log('indexUnitsSec', indexUnitsSec);
+
+  //       let newArr = orderItemsFinal.map((item, i) =>
+  //         index === i
+  //           ? {
+  //               ...item,
+  //               [type]: value,
+  //               ['unitPrice']: value === true ? finalPrice.toFixed(2) : '',
+  //             }
+  //           : item,
+  //       );
+
+  //       console.log('NEWA', newArr);
+  //       const orderTotal = newArr.reduce(
+  //         (n, {unitPrice}) => n + Number(unitPrice),
+  //         0,
+  //       );
+
+  //       this.setState({
+  //         orderItemsFinal: [...newArr],
+  //         orderTotal,
+  //       });
+  //     } else {
+  //       console.log('4');
+  //       if (type === 'quantityOrdered' && isRollingAverageUsed === true) {
+  //         console.log('5');
+  //         console.log('rollingAveragePrice', rollingAveragePrice);
+  //         const finalQuantity = value ? value : 0;
+  //         console.log('finalQuantity', finalQuantity);
+
+  //         var indexUnitsSec = item.units.findIndex(p => p.value == item.unitId);
+  //         const converter = item.units[indexUnitsSec].converter;
+
+  //         console.log('converter', converter);
+
+  //         const finalPrice = rollingAveragePrice * finalQuantity * converter;
+  //         console.log('finalPrice', finalPrice);
+  //         let newArr = orderItemsFinal.map((item, i) =>
+  //           index === i
+  //             ? {
+  //                 ...item,
+  //                 [type]: value,
+  //                 ['unitPrice']: finalPrice.toFixed(2),
+  //               }
+  //             : item,
+  //         );
+  //         console.log('NEWA', newArr);
+  //         const orderTotal = newArr.reduce(
+  //           (n, {unitPrice}) => n + Number(unitPrice),
+  //           0,
+  //         );
+
+  //         this.setState({
+  //           orderItemsFinal: [...newArr],
+  //           orderTotal,
+  //           // selectedItems: finalValue,
+  //         });
+  //       } else {
+  //         console.log('6');
+  //         if (isRollingAverageUsed === true && value !== null) {
+  //           console.log('7');
+  //           console.log('va-->', item.value);
+  //           console.log('UNITS-->', item.units);
+  //           console.log('indexUnits-->', indexUnits);
+  //           const finalUnit = indexUnits - 1;
+  //           const isDefault = item.units[finalUnit].isDefault;
+  //           const converter = item.units[finalUnit].converter;
+
+  //           console.log('isDefault-->', isDefault);
+
+  //           console.log('rollingAveragePrice', rollingAveragePrice);
+  //           const finalQuantity = item.quantityOrdered
+  //             ? item.quantityOrdered
+  //             : 0;
+  //           console.log('finalQuantity', finalQuantity);
+  //           const finalPrice = rollingAveragePrice * finalQuantity;
+  //           const finalPriceSec =
+  //             rollingAveragePrice * finalQuantity * converter;
+  //           const lastPrice =
+  //             isDefault === true ? finalPriceSec : finalPriceSec;
+  //           // const lastPrice = isDefault === true ? finalPrice : finalPriceSec;
+  //           console.log('finalPrice', finalPrice);
+  //           console.log('valueee', value);
+
+  //           let newArr = orderItemsFinal.map((item, i) =>
+  //             index === i
+  //               ? {
+  //                   ...item,
+  //                   [type]: value,
+  //                   ['unitPrice']: lastPrice.toFixed(2),
+  //                   // ['unitId']: finalUnitId,
+  //                   // ['position']: index,
+  //                 }
+  //               : item,
+  //           );
+  //           console.log('NEWA', newArr);
+  //           const orderTotal = newArr.reduce(
+  //             (n, {unitPrice}) => n + Number(unitPrice),
+  //             0,
+  //           );
+
+  //           this.setState({
+  //             orderItemsFinal: [...newArr],
+  //             orderTotal,
+  //             // selectedItems: finalValue,
+  //           });
+  //         } else {
+  //           console.log('8');
+  //           let newArr = orderItemsFinal.map((item, i) =>
+  //             index === i
+  //               ? {
+  //                   ...item,
+  //                   [type]: value,
+  //                   // ['unitId']: finalUnitId,
+  //                   // ['position']: index,
+  //                 }
+  //               : item,
+  //           );
+  //           console.log('NEWA', newArr);
+  //           const orderTotal = newArr.reduce(
+  //             (n, {unitPrice}) => n + Number(unitPrice),
+  //             0,
+  //           );
+
+  //           this.setState({
+  //             orderItemsFinal: [...newArr],
+  //             orderTotal,
+  //             // selectedItems: finalValue,
+  //           });
+  //         }
+  //       }
+  //     }
+  //   }
+  // };
+
+  addDataFun = (index, type, value, key, item, indexUnits) => {
+    console.log('item', item);
     const {orderItemsFinal} = this.state;
-    if (type === 'isRollingAverageUsed' && key === 'all') {
-      console.log('1---->');
-      const finalVal = value;
-      console.log('finalVal', finalVal);
-      console.log('type', type);
-      console.log('key', key);
+    if (key === 'sub') {
+      const valFinal =
+        item.quantityOrdered && item.quantityOrdered > 0
+          ? parseInt(item.quantityOrdered) - parseInt(value)
+          : '';
+      const finalUnit = indexUnits - 1;
+      const converter = item.units[finalUnit].converter;
+      const finalQuantity = item.quantityOrdered ? item.quantityOrdered : 0;
+      const finalPriceSec = finalQuantity * converter;
 
       let newArr = orderItemsFinal.map((item, i) =>
         index === i
           ? {
               ...item,
-              [type]: finalVal,
-              ['unitPrice']:
-                value === true
-                  ? (item.rollingAveragePrice * item.quantityOrdered).toFixed(2)
-                  : '',
+              [type]: valFinal.toString(),
+              ['unitPrice']: lastPrice.toFixed(2),
             }
           : {
               ...item,
-              [type]: finalVal,
-              ['unitPrice']:
-                value === true
-                  ? (item.rollingAveragePrice * item.quantityOrdered).toFixed(2)
-                  : '',
+              [type]: valFinal.toString(),
+              ['unitPrice']: lastPrice.toFixed(2),
             },
       );
 
-      console.log('NEWA--ALLITEMS', newArr);
+      console.log('NEWA', newArr);
       const orderTotal = newArr.reduce(
         (n, {unitPrice}) => n + Number(unitPrice),
         0,
       );
 
-      console.log('orderTotal--ALLITEMS', orderTotal);
+      this.setState({
+        orderItemsFinal: [...newArr],
+        orderTotal,
+      });
+    } else if (key === 'input') {
+      const valFinal = value;
+
+      let newArr = orderItemsFinal.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: valFinal.toString(),
+            }
+          : {
+              ...item,
+              [type]: valFinal.toString(),
+            },
+      );
 
       this.setState({
         orderItemsFinal: [...newArr],
-        orderTotal: value === true ? orderTotal : 0.0,
-        switchValue: finalVal,
       });
-    } else {
-      console.log('2');
-      if (type === 'isRollingAverageUsed') {
-        console.log('3');
+    } else if (key === 'add') {
+      const valFinal =
+        item.quantityOrdered === ''
+          ? parseInt(value)
+          : parseInt(item.quantityOrdered) + parseInt(value);
 
-        console.log('rollingAveragePrice', rollingAveragePrice);
-        const finalQuantity = quantityOrdered === '' ? 0 : quantityOrdered;
-        console.log('finalQuantity', finalQuantity);
+      let newArr = orderItemsFinal.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: valFinal.toString(),
+            }
+          : {
+              ...item,
+              [type]: valFinal.toString(),
+            },
+      );
 
-        console.log('valueee', value);
-        var indexUnitsSec = item.units.findIndex(p => p.value == item.unitId);
-        const converter = item.units[indexUnitsSec].converter;
+      this.setState({
+        orderItemsFinal: [...newArr],
+      });
+    } else if (key === 'price') {
+      const valFinal = value;
 
-        console.log('converter', converter);
+      let newArr = orderItemsFinal.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: valFinal,
+            }
+          : {
+              ...item,
+              [type]: valFinal,
+            },
+      );
 
-        const finalPrice = rollingAveragePrice * finalQuantity * converter;
-        console.log('finalPrice', finalPrice);
+      this.setState({
+        orderItemsFinal: [...newArr],
+      });
+    } else if (key === 'unitSelect') {
+      const valFinal = value;
 
-        console.log('indexUnitsSec', indexUnitsSec);
+      let newArr = orderItemsFinal.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: valFinal,
+            }
+          : {
+              ...item,
+              [type]: valFinal,
+            },
+      );
 
-        let newArr = orderItemsFinal.map((item, i) =>
-          index === i
-            ? {
-                ...item,
-                [type]: value,
-                ['unitPrice']: value === true ? finalPrice.toFixed(2) : '',
-              }
-            : item,
-        );
-
-        console.log('NEWA', newArr);
-        const orderTotal = newArr.reduce(
-          (n, {unitPrice}) => n + Number(unitPrice),
-          0,
-        );
-
-        this.setState({
-          orderItemsFinal: [...newArr],
-          orderTotal,
-        });
-      } else {
-        console.log('4');
-        if (type === 'quantityOrdered' && isRollingAverageUsed === true) {
-          console.log('5');
-          console.log('rollingAveragePrice', rollingAveragePrice);
-          const finalQuantity = value ? value : 0;
-          console.log('finalQuantity', finalQuantity);
-
-          var indexUnitsSec = item.units.findIndex(p => p.value == item.unitId);
-          const converter = item.units[indexUnitsSec].converter;
-
-          console.log('converter', converter);
-
-          const finalPrice = rollingAveragePrice * finalQuantity * converter;
-          console.log('finalPrice', finalPrice);
-          let newArr = orderItemsFinal.map((item, i) =>
-            index === i
-              ? {
-                  ...item,
-                  [type]: value,
-                  ['unitPrice']: finalPrice.toFixed(2),
-                }
-              : item,
-          );
-          console.log('NEWA', newArr);
-          const orderTotal = newArr.reduce(
-            (n, {unitPrice}) => n + Number(unitPrice),
-            0,
-          );
-
-          this.setState({
-            orderItemsFinal: [...newArr],
-            orderTotal,
-            // selectedItems: finalValue,
-          });
-        } else {
-          console.log('6');
-          if (isRollingAverageUsed === true && value !== null) {
-            console.log('7');
-            console.log('va-->', item.value);
-            console.log('UNITS-->', item.units);
-            console.log('indexUnits-->', indexUnits);
-            const finalUnit = indexUnits - 1;
-            const isDefault = item.units[finalUnit].isDefault;
-            const converter = item.units[finalUnit].converter;
-
-            console.log('isDefault-->', isDefault);
-
-            console.log('rollingAveragePrice', rollingAveragePrice);
-            const finalQuantity = item.quantityOrdered
-              ? item.quantityOrdered
-              : 0;
-            console.log('finalQuantity', finalQuantity);
-            const finalPrice = rollingAveragePrice * finalQuantity;
-            const finalPriceSec =
-              rollingAveragePrice * finalQuantity * converter;
-            const lastPrice =
-              isDefault === true ? finalPriceSec : finalPriceSec;
-            // const lastPrice = isDefault === true ? finalPrice : finalPriceSec;
-            console.log('finalPrice', finalPrice);
-            console.log('valueee', value);
-
-            let newArr = orderItemsFinal.map((item, i) =>
-              index === i
-                ? {
-                    ...item,
-                    [type]: value,
-                    ['unitPrice']: lastPrice.toFixed(2),
-                    // ['unitId']: finalUnitId,
-                    // ['position']: index,
-                  }
-                : item,
-            );
-            console.log('NEWA', newArr);
-            const orderTotal = newArr.reduce(
-              (n, {unitPrice}) => n + Number(unitPrice),
-              0,
-            );
-
-            this.setState({
-              orderItemsFinal: [...newArr],
-              orderTotal,
-              // selectedItems: finalValue,
-            });
-          } else {
-            console.log('8');
-            let newArr = orderItemsFinal.map((item, i) =>
-              index === i
-                ? {
-                    ...item,
-                    [type]: value,
-                    // ['unitId']: finalUnitId,
-                    // ['position']: index,
-                  }
-                : item,
-            );
-            console.log('NEWA', newArr);
-            const orderTotal = newArr.reduce(
-              (n, {unitPrice}) => n + Number(unitPrice),
-              0,
-            );
-
-            this.setState({
-              orderItemsFinal: [...newArr],
-              orderTotal,
-              // selectedItems: finalValue,
-            });
-          }
-        }
-      }
+      this.setState({
+        orderItemsFinal: [...newArr],
+      });
+    } else if (key === 'flagSelect') {
     }
   };
 
@@ -1169,7 +1270,6 @@ class index extends Component {
       auditIsSelected,
       note,
       showSuppliers,
-      supplierList,
       supplierListLoader,
       supplier,
       items,
@@ -1185,8 +1285,6 @@ class index extends Component {
       imageShow,
       buttonsSubHeader,
       recipeLoader,
-      dataListLoader,
-      placeHolderTextDept,
       selectedTextUser,
       supplierId,
       productionDate,
@@ -1244,16 +1342,13 @@ class index extends Component {
               </View>
             </View>
             <View style={{marginHorizontal: wp('6%'), marginTop: hp('2%')}}>
-              {/* {supplierListLoader ? (
-                <ActivityIndicator color="grey" size="large" />
-              ) : ( */}
               <View>
                 <View style={{}}>
                   <TouchableOpacity
                     onPress={() => this.showDatePickerFun()}
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      padding: 15,
                       marginBottom: hp('3%'),
                       borderRadius: 6,
                     }}>
@@ -1262,16 +1357,18 @@ class index extends Component {
                     </View>
                     <View
                       style={{
-                        // marginBottom: hp('3%'),
                         flexDirection: 'row',
                         justifyContent: 'space-between',
-
                         marginTop: 10,
                       }}>
                       <TextInput
-                        placeholder="dd-mm-yy"
+                        placeholder="DD-MM-YY"
                         value={finalDate}
                         editable={false}
+                        style={{
+                          fontWeight: 'bold',
+                          color: 'black',
+                        }}
                       />
                       <Image
                         source={img.calenderIcon}
@@ -1279,9 +1376,7 @@ class index extends Component {
                           width: 20,
                           height: 20,
                           resizeMode: 'contain',
-                          alignSelf:
-                            Platform.OS === 'android' ? 'center' : null,
-                          marginRight: Platform.OS === 'android' ? 10 : 0,
+                          tintColor: 'grey',
                         }}
                       />
                     </View>
@@ -1294,29 +1389,18 @@ class index extends Component {
                   onCancel={this.hideDatePicker}
                   // minimumDate={minTime}
                 />
-                {/* <ModalPicker
-                      dataListLoader={dataListLoader}
-                      placeHolderLabel={placeHolderTextDept}
-                      placeHolderLabelColor="grey"
-                      dataSource={supplierList}
-                      selectedLabel={selectedTextUser}
-                      onSelectFun={item => this.selectUserNameFun(item)}
-                    /> */}
                 <TouchableOpacity
                   onPress={() =>
-                    this.props.navigation.navigate('SupplierListScreen')
+                    this.props.navigation.navigate('SupplierListScreen', {
+                      screenType: 'Add',
+                    })
                   }
                   style={{
                     backgroundColor: '#fff',
                     borderRadius: 5,
-                    padding: Platform.OS === 'ios' ? 10 : 0,
-                    // marginBottom: hp('3%'),
+                    padding: 15,
                   }}>
-                  <View
-                    style={{
-                      marginLeft: '5%',
-                      marginTop: '2.5%',
-                    }}>
+                  <View style={{}}>
                     <Text
                       style={{
                         fontSize: 14,
@@ -1329,14 +1413,14 @@ class index extends Component {
                     style={{
                       flexDirection: 'row',
                       justifyContent: 'space-between',
+                      marginTop: 10,
                     }}>
                     <Text
                       style={{
-                        color: '#4A4C55',
-                        fontSize: 16,
+                        color: 'black',
+                        fontSize: 15,
                         fontFamily: 'Inter-Regular',
-                        marginLeft: '5%',
-                        marginTop: 10,
+                        fontWeight: 'bold',
                       }}>
                       {selectedTextUser}
                     </Text>
@@ -1347,9 +1431,6 @@ class index extends Component {
                         width: 20,
                         resizeMode: 'contain',
                         tintColor: 'grey',
-                        alignSelf: Platform.OS === 'android' ? 'center' : null,
-                        marginRight: Platform.OS === 'android' ? 10 : 6,
-                        marginTop: 5,
                       }}
                     />
                   </View>
@@ -1392,21 +1473,36 @@ class index extends Component {
                     <FlatList
                       data={buttons}
                       renderItem={({item}) => (
-                        <View style={styles.itemContainer}>
+                        <View
+                          style={{
+                            width:
+                              Dimensions.get('window').width / numColumns -
+                              wp('5%'),
+                            borderRadius: 50,
+                          }}>
                           <TouchableOpacity
                             onPress={() => this.onPressFun(item)}
                             style={{
                               backgroundColor:
                                 item.name === 'Kitchen'
-                                  ? '#C7408A'
+                                  ? '#D448A7'
                                   : item.name === 'Bar'
-                                  ? '#81A91D'
+                                  ? '#B2B4B8'
                                   : item.name === 'Retail'
-                                  ? '#7662A9'
-                                  : '#DCDCDC',
-                              ...styles.tileContainer,
+                                  ? '#E1A72E'
+                                  : '#7CBF31',
+                              flex: 1,
+                              margin: 10,
+                              borderRadius: 8,
+                              padding: 10,
+                              flexDirection: 'row',
                             }}>
-                            <View style={styles.tileImageContainer}>
+                            <View
+                              style={{
+                                flex: 1.5,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
                               <Image
                                 source={
                                   item.name === 'Kitchen'
@@ -1418,29 +1514,52 @@ class index extends Component {
                                     : img.miscIcon
                                 }
                                 style={{
-                                  ...styles.tileImageStyling,
+                                  height: 20,
+                                  width: 20,
+                                  resizeMode: 'contain',
+                                  tintColor: '#fff',
                                 }}
                               />
                             </View>
-                            <View style={styles.tileTextContainer}>
-                              <Text
-                                style={styles.tileTextStyling}
-                                numberOfLines={1}>
-                                {item.name}
-                              </Text>
-                            </View>
-                            <View style={styles.tileTextContainerSec}>
-                              <Text
-                                style={styles.tileTextStylingSec}
-                                numberOfLines={1}>
-                                {item.name === 'Kitchen'
-                                  ? '1 Selected'
-                                  : item.name === 'Bar'
-                                  ? '2 Selected'
-                                  : item.name === 'Retail'
-                                  ? '3 Selected'
-                                  : '4 Selected'}
-                              </Text>
+                            <View style={{flex: 3}}>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  justifyContent: 'flex-end',
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 13.5,
+                                    fontFamily: 'Inter-Regular',
+                                    fontWeight: 'bold',
+                                    color: '#fff',
+                                  }}
+                                  numberOfLines={1}>
+                                  {item.name}
+                                </Text>
+                              </View>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  justifyContent: 'flex-start',
+                                  marginTop: 5,
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 10,
+                                    fontFamily: 'Inter-Regular',
+                                    color: '#fff',
+                                  }}
+                                  numberOfLines={1}>
+                                  {item.name === 'Kitchen'
+                                    ? '1 Selected'
+                                    : item.name === 'Bar'
+                                    ? '2 Selected'
+                                    : item.name === 'Retail'
+                                    ? '3 Selected'
+                                    : '4 Selected'}
+                                </Text>
+                              </View>
                             </View>
                           </TouchableOpacity>
                         </View>
@@ -1453,7 +1572,7 @@ class index extends Component {
                       onPress={() => this.createOrder()}
                       style={{
                         width: wp('90%'),
-                        height: hp('5%'),
+                        height: hp('7%'),
                         justifyContent: 'center',
                         alignItems: 'center',
                         borderRadius: 10,
@@ -1481,7 +1600,7 @@ class index extends Component {
                       </Text>
                     </TouchableOpacity>
 
-                    <View
+                    {/* <View
                       style={{
                         marginBottom: 15,
                       }}>
@@ -1524,7 +1643,7 @@ class index extends Component {
                           ),
                         }}
                       />
-                    </View>
+                    </View> */}
                   </View>
                 )}
                 {/* 
@@ -1728,7 +1847,7 @@ class index extends Component {
                 <View>
                   {orderItemsFinal.length > 0 &&
                     orderItemsFinal.map((item, indexOrder) => {
-                      console.log('item--->ORDERSS', item);
+                      console.log('item--->ORDERSS----->', item);
                       // let finaUnitVal =
                       //   item &&
                       //   item.units.map((subItem, subIndex) => {
@@ -1742,178 +1861,33 @@ class index extends Component {
                         <View
                           style={{
                             marginBottom: 10,
-                            borderWidth: 1,
-                            padding: 10,
+                            borderWidth: 0.5,
+                            padding: 8,
                             borderColor: 'grey',
-                            borderRadius: 10,
+                            borderRadius: 8,
+                            marginTop: hp('3%'),
                           }}>
+                          <View
+                            style={{
+                              position: 'absolute',
+                              zIndex: 10,
+                              left: wp('3%'),
+                              bottom: '103%',
+                            }}>
+                            <Image
+                              source={img.CasualIcon}
+                              style={{
+                                width: 25,
+                                height: 25,
+                                resizeMode: 'contain',
+                                tintColor: 'red',
+                              }}
+                            />
+                          </View>
                           <View style={{}}>
                             <View>
                               <View style={{}}>
                                 <View>
-                                  {/* <View
-                                    style={{
-                                      marginBottom: hp('3%'),
-                                      width: wp('70%'),
-                                      flexDirection: 'row',
-                                      alignItems: 'center',
-                                    }}>
-                                    <View
-                                      style={{
-                                        flexDirection: 'row',
-                                        borderRadius: 5,
-                                        backgroundColor: '#fff',
-                                      }}>
-                                      <View
-                                        style={{
-                                          alignSelf: 'center',
-                                          justifyContent: 'center',
-                                          width:
-                                            index > 0 ? wp('60%') : wp('80%'),
-                                        }}>
-                                        <RNPickerSelect
-                                          placeholder={{
-                                            label: 'Select Department*',
-                                            value: null,
-                                            color: 'black',
-                                          }}
-                                          placeholderTextColor="red"
-                                          onValueChange={value => {
-                                            this.selectDepartementNameFun(
-                                              value,
-                                            );
-                                          }}
-                                          style={{
-                                            inputIOS: {
-                                              fontSize: 14,
-                                              paddingHorizontal: '3%',
-                                              color: '#161C27',
-                                              width: '100%',
-                                              alignSelf: 'center',
-                                              paddingVertical: 15,
-                                            },
-                                            inputAndroid: {
-                                              fontSize: 14,
-                                              paddingHorizontal: '3%',
-                                              color: '#161C27',
-                                              width: '100%',
-                                              alignSelf: 'center',
-                                            },
-                                            iconContainer: {
-                                              top: '40%',
-                                            },
-                                          }}
-                                          items={[
-                                            {
-                                              label: 'Bar',
-                                              value: 'Bar',
-                                            },
-                                            {
-                                              label: 'Kitchen',
-                                              value: 'Kitchen',
-                                            },
-                                            {
-                                              label: 'Retail',
-                                              value: 'Retail',
-                                            },
-                                            {
-                                              label: 'Other',
-                                              value: 'Other',
-                                            },
-                                          ]}
-                                          value={item.supplierValue}
-                                          useNativeAndroidPickerStyle={false}
-                                        />
-                                      </View>
-                                      <View style={{marginRight: wp('5%')}}>
-                                        <Image
-                                          source={img.arrowDownIcon}
-                                          resizeMode="contain"
-                                          style={{
-                                            height: 18,
-                                            width: 18,
-                                            resizeMode: 'contain',
-                                            marginTop:
-                                              Platform.OS === 'ios' ? 15 : 15,
-                                          }}
-                                        />
-                                      </View>
-                                    </View>
-                                    {index > 0 ? (
-                                      <TouchableOpacity
-                                        onPress={() =>
-                                          this.deletePurchaseLine(index)
-                                        }
-                                        style={{marginLeft: wp('5%')}}>
-                                        <Text
-                                          style={{
-                                            fontFamily: 'Inter-Regular',
-                                            color: '#FF0303',
-                                            fontSize: 16,
-                                            textDecorationLine: 'underline',
-                                          }}>
-                                          {translate('Remove')}
-                                        </Text>
-                                      </TouchableOpacity>
-                                    ) : null}
-                                  </View> */}
-                                  {/* <SectionedMultiSelect
-                                    styles={{
-                                      container: {
-                                        paddingTop: hp('2%'),
-                                        marginTop: hp('7%'),
-                                      },
-                                      selectToggle: {
-                                        backgroundColor: '#fff',
-                                        paddingVertical: 15,
-                                        paddingHorizontal: 5,
-                                        borderRadius: 6,
-                                      },
-                                    }}
-                                    loadingComponent={
-                                      <View
-                                        style={{
-                                          flex: 1,
-                                          justifyContent: 'center',
-                                          alignItems: 'center',
-                                        }}>
-                                        <ActivityIndicator
-                                          size="large"
-                                          color="#94C036"
-                                        />
-                                      </View>
-                                    }
-                                    loading={loading}
-                                    // hideSearch={true}
-                                    // single={true}
-                                    items={items}
-                                    IconRenderer={Icon}
-                                    uniqueKey="id"
-                                    subKey="children"
-                                    showDropDowns={true}
-                                    readOnlyHeadings={true}
-                                    onSelectedItemObjectsChange={value =>
-                                      this.onSelectedItemObjectsChange(
-                                        index,
-                                        'inventoryId',
-                                        value[0],
-                                        value,
-                                      )
-                                    }
-                                    // onSelectedItemsChange={value =>
-                                    //   this.addDataFun(
-                                    //     index,
-                                    //     'inventoryId',
-                                    //     value[0],
-                                    //     value,
-                                    //   )
-                                    // }
-                                    onSelectedItemsChange={
-                                      this.onSelectedItemsChange
-                                    }
-                                    selectedItems={this.state.selectedItems}
-                                    // selectedItems={[item.inventoryId]}
-                                  /> */}
                                   <View
                                     style={{
                                       flexDirection: 'row',
@@ -1934,7 +1908,6 @@ class index extends Component {
                                       </Text>
                                     </View>
                                     <TouchableOpacity
-                                      // disabled={editDisabled}
                                       onPress={() =>
                                         this.deletePurchaseLine(
                                           indexOrder,
@@ -1958,6 +1931,116 @@ class index extends Component {
                                       alignItems: 'center',
                                       flex: 1,
                                     }}>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                        alignItems: 'center',
+                                      }}>
+                                      <View
+                                        style={{
+                                          width: wp('30%'),
+                                          flexDirection: 'row',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          height: hp('5%'),
+                                        }}>
+                                        <TouchableOpacity
+                                          onPress={() =>
+                                            this.addDataFun(
+                                              indexOrder,
+                                              'quantityOrdered',
+                                              '1',
+                                              'sub',
+                                              item,
+                                            )
+                                          }
+                                          style={{
+                                            width: wp('10%'),
+                                            height: hp('5%'),
+                                            alignItems: 'center',
+                                          }}>
+                                          <Text
+                                            style={{
+                                              color: '#5297c1',
+                                              fontWeight: 'bold',
+                                              fontSize: 20,
+                                            }}>
+                                            -
+                                          </Text>
+                                        </TouchableOpacity>
+                                        <View
+                                          style={{
+                                            width: wp('20%'),
+                                            height: hp('8%'),
+                                            backgroundColor: '#fff',
+                                            borderRadius: 8,
+                                            padding: 5,
+                                          }}>
+                                          <Text
+                                            style={{
+                                              fontSize: 12,
+                                              color: 'black',
+                                            }}>
+                                            Qty.
+                                          </Text>
+                                          <TextInput
+                                            placeholder="0"
+                                            keyboardType="number-pad"
+                                            value={item.quantityOrdered}
+                                            style={{
+                                              width: wp('10%'),
+                                              height: hp('4%'),
+                                              alignSelf: 'center',
+                                              marginTop: 5,
+                                            }}
+                                            onChangeText={value =>
+                                              this.addDataFun(
+                                                indexOrder,
+                                                'quantityOrdered',
+                                                value,
+                                                'input',
+                                                item,
+                                                // item.rollingAveragePrice,
+                                                // item.quantityOrdered,
+                                                // item.isRollingAverageUsed,
+                                                // 'quanOrdered',
+                                                // item,
+                                              )
+                                            }
+                                          />
+                                        </View>
+
+                                        <TouchableOpacity
+                                          onPress={() =>
+                                            this.addDataFun(
+                                              indexOrder,
+                                              'quantityOrdered',
+                                              '1',
+                                              'add',
+                                              item,
+                                            )
+                                          }
+                                          style={{
+                                            width: wp('10%'),
+                                            height: hp('5%'),
+                                            alignItems: 'center',
+                                          }}>
+                                          <Text
+                                            style={{
+                                              color: '#5297c1',
+                                              fontWeight: 'bold',
+                                              fontSize: 20,
+                                            }}>
+                                            +
+                                          </Text>
+                                        </TouchableOpacity>
+                                      </View>
+                                    </View>
+                                    <View
+                                      style={{
+                                        flex: 0.2,
+                                      }}></View>
+
                                     <View
                                       style={{
                                         flexDirection: 'row',
@@ -1995,30 +2078,26 @@ class index extends Component {
                                         style={{
                                           flexDirection: 'row',
                                           alignItems: 'center',
+                                          backgroundColor: '#fff',
+                                          borderRadius: 8,
                                         }}>
                                         <View
                                           style={{
-                                            flexDirection: 'row',
-                                            borderRadius: 10,
-                                            borderWidth: 0.1,
-                                            borderColor: 'grey',
                                             padding: 5,
-                                            backgroundColor: '#fff',
-
-                                            // backgroundColor: '#68AFFF',
                                           }}>
                                           <View
                                             style={{
-                                              alignSelf: 'center',
                                               justifyContent: 'center',
-                                              width: wp('30%'),
+                                              width: wp('25%'),
                                             }}>
-                                            <View>
+                                            <View
+                                              style={{
+                                                padding: 3,
+                                              }}>
                                               <Text
                                                 style={{
                                                   fontSize: 12,
-                                                  color: 'grey',
-                                                  marginLeft: 10,
+                                                  color: 'black',
                                                 }}>
                                                 Unit
                                               </Text>
@@ -2034,32 +2113,35 @@ class index extends Component {
                                                   indexOrder,
                                                   'unitId',
                                                   value,
-                                                  item.rollingAveragePrice,
-                                                  item.quantityOrdered,
-                                                  item.isRollingAverageUsed,
-                                                  'key',
+                                                  'unitSelect',
                                                   item,
                                                   index,
+                                                  // item.rollingAveragePrice,
+                                                  // item.quantityOrdered,
+                                                  // item.isRollingAverageUsed,
+                                                  // 'key',
+                                                  // item,
+                                                  // index,
                                                 );
                                               }}
                                               style={{
                                                 inputIOS: {
                                                   fontSize: 14,
                                                   paddingHorizontal: '3%',
-                                                  color: '#fff',
+                                                  color: 'black',
                                                   width: '100%',
                                                   alignSelf: 'center',
-                                                  paddingVertical: 10,
-                                                  marginLeft: 10,
+                                                  paddingVertical: 5,
+                                                  fontWeight: 'bold',
                                                 },
                                                 inputAndroid: {
                                                   fontSize: 14,
                                                   paddingHorizontal: '3%',
-                                                  color: '#fff',
+                                                  color: 'black',
                                                   width: '100%',
                                                   alignSelf: 'center',
-                                                  paddingVertical: 10,
-                                                  marginLeft: 10,
+                                                  paddingVertical: 5,
+                                                  fontWeight: 'bold',
                                                 },
                                                 iconContainer: {
                                                   top: '40%',
@@ -2073,164 +2155,22 @@ class index extends Component {
                                               }
                                             />
                                           </View>
-                                          <View style={{marginRight: wp('4%')}}>
-                                            <Image
-                                              source={img.arrowDownIcon}
-                                              resizeMode="contain"
-                                              style={{
-                                                height: 15,
-                                                width: 15,
-                                                resizeMode: 'contain',
-                                                tintColor: 'grey',
-                                                marginTop:
-                                                  Platform.OS === 'ios'
-                                                    ? 25
-                                                    : 15,
-                                              }}
-                                            />
-                                          </View>
+                                        </View>
+                                        <View style={{marginRight: wp('4%')}}>
+                                          <Image
+                                            source={img.arrowDownIcon}
+                                            resizeMode="contain"
+                                            style={{
+                                              height: 15,
+                                              width: 15,
+                                              resizeMode: 'contain',
+                                              tintColor: 'grey',
+                                            }}
+                                          />
                                         </View>
                                       </View>
                                     </View>
 
-                                    {/* <View
-                                      style={{
-                                        flex: 1,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        borderRadius: 6,
-                                        backgroundColor: '#fff',
-                                      }}>
-                                      <TextInput
-                                        placeholder="Quantity"
-                                        style={{
-                                          padding: 15,
-                                        }}
-                                        value={item.quantityOrdered}
-                                        onChangeText={value =>
-                                          this.addDataFun(
-                                            index,
-                                            'quantityOrdered',
-                                            value,
-                                          )
-                                        }
-                                      />
-                                      <Text
-                                        style={{
-                                          textAlign: 'center',
-                                          backgroundColor: '#F7F8F5',
-                                        }}>
-                                        {translate('Unit')}
-                                      </Text>
-                                    </View> */}
-                                    {/* {switchValue === false ? ( */}
-                                    <View
-                                      style={{
-                                        flex: 0.2,
-                                      }}></View>
-                                    <View
-                                      style={{
-                                        flex: 1,
-                                        backgroundColor: '#fff',
-                                        borderRadius: 6,
-                                      }}>
-                                      <Text
-                                        style={{
-                                          color: 'grey',
-                                          marginLeft: 10,
-                                          marginTop: 5,
-                                          fontSize: 12,
-                                        }}>
-                                        Price
-                                      </Text>
-                                      <TextInput
-                                        // placeholder="Price"
-                                        editable={
-                                          item.isRollingAverageUsed
-                                            ? false
-                                            : true
-                                        }
-                                        style={{
-                                          padding: 12,
-                                          width: wp('30%'),
-                                        }}
-                                        onChangeText={value =>
-                                          this.addDataFun(
-                                            indexOrder,
-                                            'unitPrice',
-                                            value,
-                                          )
-                                        }
-                                        value={String(item.unitPrice)}
-                                      />
-                                    </View>
-                                    {/* ) : null} */}
-                                    {/* <View
-                                        style={{
-                                          flex: 1,
-                                          flexDirection: 'row',
-                                          alignItems: 'center',
-                                          marginLeft: 10,
-                                        }}>
-                                        <Text
-                                          style={{
-                                            marginRight: 10,
-                                            fontSize: 10,
-                                          }}>
-                                          Use average price
-                                        </Text>
-                                        <View
-                                          style={{
-                                            backgroundColor: '#fff',
-                                            borderRadius: 6,
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            paddingHorizontal: 10,
-                                          }}>
-                                          <TextInput
-                                            placeholder="Average Price"
-                                            editable={false}
-                                            style={{
-                                              padding: 15,
-                                              width: wp('25%'),
-                                            }}
-                                            // onChangeText={value =>
-                                            //   this.addDataFun(
-                                            //     indexOrder,
-                                            //     'unitPrice',
-                                            //     value,
-                                            //   )
-                                            // }
-                                            value={`€ ${Number(
-                                              item.rollingAveragePrice.toFixed(
-                                                2,
-                                              ),
-                                            )}`}
-                                          />
-                                          <View>
-                                            <CheckBox
-                                              value={item.isRollingAverageUsed}
-                                              onValueChange={val =>
-                                                this.addDataFun(
-                                                  indexOrder,
-                                                  'isRollingAverageUsed',
-                                                  val,
-                                                  item.rollingAveragePrice,
-                                                  item.quantityOrdered,
-                                                  item.isRollingAverageUsed,
-                                                  'singleRolling',
-                                                  item,
-                                                )
-                                              }
-                                              style={{
-                                                height: 20,
-                                                width: 20,
-                                              }}
-                                            />
-                                        
-                                          </View>
-                                        </View>
-                                      </View> */}
                                     {/* <View
                                         style={{
                                           flex: 1,
@@ -2278,7 +2218,16 @@ class index extends Component {
                                       flex: 1,
                                       marginVertical: 10,
                                     }}>
-                                    <View
+                                    <TouchableOpacity
+                                      onPress={() =>
+                                        this.addDataFun(
+                                          indexOrder,
+                                          'isFlag',
+                                          true,
+                                          'flagSelect',
+                                          item,
+                                        )
+                                      }
                                       style={{
                                         flexDirection: 'row',
                                         alignItems: 'center',
@@ -2312,7 +2261,7 @@ class index extends Component {
                                           </View>
                                         </View>
                                       </View>
-                                    </View>
+                                    </TouchableOpacity>
 
                                     <View
                                       style={{
@@ -2321,124 +2270,44 @@ class index extends Component {
                                     <View
                                       style={{
                                         flex: 1,
-                                        alignItems: 'center',
+                                        backgroundColor: '#fff',
+                                        borderRadius: 8,
+                                        width: wp('25%'),
+                                        height: hp('8%'),
                                       }}>
                                       <View
                                         style={{
-                                          width: wp('30%'),
-                                          flexDirection: 'row',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          height: hp('5%'),
+                                          paddingTop: 5,
+                                          paddingLeft: 10,
+                                          paddingBottom: 5,
                                         }}>
-                                        <TouchableOpacity
-                                          // onPress={() =>
-                                          //   this.addDataFun(
-                                          //     index,
-                                          //     'quantityOrdered',
-                                          //     value,
-                                          //   )
-                                          // }
+                                        <Text
                                           style={{
-                                            width: wp('10%'),
-                                            height: hp('5%'),
-                                            justifyContent: 'center',
+                                            color: 'black',
+                                            fontSize: 12,
                                           }}>
-                                          <Text
-                                            style={{
-                                              color: '#5297c1',
-                                              fontWeight: 'bold',
-                                              fontSize: 20,
-                                            }}>
-                                            -
-                                          </Text>
-                                        </TouchableOpacity>
-                                        <View
-                                          style={{
-                                            width: wp('10%'),
-                                            height: hp('5%'),
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                          }}>
-                                          <TextInput
-                                            placeholder="0"
-                                            keyboardType="number-pad"
-                                            value={item.quantityOrdered}
-                                            style={{
-                                              width: wp('20%'),
-                                              height: hp('4%'),
-                                              backgroundColor: '#fff',
-                                              padding: 5,
-                                              borderRadius: 8,
-                                            }}
-                                            onChangeText={value =>
-                                              this.addDataFun(
-                                                indexOrder,
-                                                'quantityOrdered',
-                                                value,
-                                                item.rollingAveragePrice,
-                                                item.quantityOrdered,
-                                                item.isRollingAverageUsed,
-                                                'quanOrdered',
-                                                item,
-                                              )
-                                            }
-                                          />
-                                        </View>
-
-                                        <TouchableOpacity
-                                          // onPress={() =>
-                                          //   this.addDataFun(
-                                          //     index,
-                                          //     'quantityOrdered',
-                                          //     value,
-                                          //   )
-                                          // }
-                                          style={{
-                                            width: wp('10%'),
-                                            height: hp('5%'),
-                                            alignItems: 'flex-end',
-                                            justifyContent: 'center',
-                                          }}>
-                                          <Text
-                                            style={{
-                                              color: '#5297c1',
-                                              fontWeight: 'bold',
-                                              fontSize: 20,
-                                            }}>
-                                            +
-                                          </Text>
-                                        </TouchableOpacity>
+                                          Price
+                                        </Text>
                                       </View>
-                                      {/* <Text
-                                        style={{
-                                          color: 'grey',
-                                          marginLeft: 10,
-                                          marginTop: 5,
-                                          fontSize: 12,
-                                        }}>
-                                        Price
-                                      </Text>
                                       <TextInput
-                                        // placeholder="Price"
-                                        editable={
-                                          item.isRollingAverageUsed
-                                            ? false
-                                            : true
-                                        }
                                         style={{
-                                          padding: 13,
-                                          width: wp('30%'),
+                                          width: wp('25%'),
+                                          fontWeight: 'bold',
+                                          color: 'black',
+                                          paddingLeft: 10,
+                                          paddingBottom: 5,
                                         }}
                                         onChangeText={value =>
                                           this.addDataFun(
                                             indexOrder,
                                             'unitPrice',
                                             value,
+                                            'price',
+                                            item,
                                           )
                                         }
                                         value={String(item.unitPrice)}
-                                      /> */}
+                                      />
                                     </View>
                                     {/* ) : null} */}
                                     {/* <View
@@ -3130,7 +2999,7 @@ class index extends Component {
                 onPress={() => this.createOrder()}
                 style={{
                   width: wp('90%'),
-                  height: hp('5%'),
+                  height: hp('7%'),
                   backgroundColor: '#5297c1',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -3156,7 +3025,7 @@ class index extends Component {
                 onPress={() => this.props.navigation.goBack()}
                 style={{
                   width: wp('90%'),
-                  height: hp('5%'),
+                  height: hp('7%'),
                   justifyContent: 'center',
                   alignItems: 'center',
                   borderRadius: 10,

@@ -947,7 +947,7 @@ class ViewReviewOrder extends Component {
                     <View
                       style={{
                         backgroundColor: '#fff',
-                        padding: Platform.OS === 'ios' ? 15 : 0,
+                        padding: 15,
                         borderTopLeftRadius: 6,
                       }}>
                       <View style={{}}>
@@ -968,6 +968,7 @@ class ViewReviewOrder extends Component {
                           style={{
                             fontSize: 14,
                             fontWeight: 'bold',
+                            color: 'black',
                           }}
                         />
                       </View>
@@ -991,7 +992,7 @@ class ViewReviewOrder extends Component {
                     <View
                       style={{
                         backgroundColor: '#fff',
-                        padding: Platform.OS === 'ios' ? 15 : 0,
+                        padding: 15,
                         borderTopRightRadius: 6,
                       }}>
                       <View
@@ -1021,6 +1022,7 @@ class ViewReviewOrder extends Component {
                           style={{
                             fontSize: 14,
                             fontWeight: 'bold',
+                            color: 'black',
                           }}
                         />
                       </View>
@@ -2436,14 +2438,8 @@ class ViewReviewOrder extends Component {
                                                     width: 15,
                                                     height: 15,
                                                     resizeMode: 'contain',
-                                                    marginTop:
-                                                      Platform.OS === 'android'
-                                                        ? 15
-                                                        : 0,
-                                                    marginRight:
-                                                      Platform.OS === 'android'
-                                                        ? 15
-                                                        : 0,
+                                                    marginTop: 15,
+                                                    marginRight: 15,
                                                   }}
                                                 />
                                               </TouchableOpacity>
@@ -3268,10 +3264,8 @@ class ViewReviewOrder extends Component {
                                         width: 15,
                                         height: 15,
                                         resizeMode: 'contain',
-                                        marginTop:
-                                          Platform.OS === 'android' ? 15 : 0,
-                                        marginRight:
-                                          Platform.OS === 'android' ? 15 : 0,
+                                        marginTop: 15,
+                                        marginRight: 15,
                                       }}
                                     />
                                   </TouchableOpacity>

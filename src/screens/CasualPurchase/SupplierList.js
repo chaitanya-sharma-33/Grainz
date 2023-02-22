@@ -36,6 +36,7 @@ class SupplierList extends Component {
       priceError: '',
       clickPhoto: false,
       searchItem: '',
+      screenType: '',
     };
   }
 
@@ -100,13 +101,46 @@ class SupplierList extends Component {
 
   async componentDidMount() {
     this.props.navigation.addListener('focus', () => {
+      const {route} = this.props;
+      const screenType = route.params.screenType;
+      const orderData = route.params.orderData;
+      if (orderData) {
+        this.setState({
+          orderData,
+        });
+      } else {
+        this.setState({
+          orderData: '',
+        });
+      }
+      console.log('screenType', screenType);
       this.getSupplierListData();
+      if (screenType) {
+        this.setState({
+          screenType,
+        });
+      }
     });
   }
 
   selectUserNameFun = item => {
+    const {screenType, orderData} = this.state;
     console.log('item', item);
-    this.props.navigation.navigate('AddPurchaseScreen', {item: item});
+    if (screenType === 'Add') {
+      this.props.navigation.navigate('AddPurchaseScreen', {item: item});
+    } else if (screenType === 'Filter') {
+      this.props.navigation.navigate('FilterPurchaseScreen', {item: item});
+    } else if (screenType === 'Edit') {
+      this.props.navigation.navigate('EditPurchase', {
+        item: item,
+        orderData: orderData,
+      });
+    } else if (screenType === 'FilterOrder') {
+      this.props.navigation.navigate('FilterOrderScreen', {
+        item: item,
+        orderData: orderData,
+      });
+    }
   };
 
   searchFun = txt => {
@@ -131,8 +165,9 @@ class SupplierList extends Component {
   };
 
   render() {
-    const {supplierList, dataListLoader, searchItem} = this.state;
+    const {supplierList, dataListLoader, searchItem, screenType} = this.state;
     console.log('supplier List', supplierList);
+    console.log('screenType', screenType);
 
     return (
       <View

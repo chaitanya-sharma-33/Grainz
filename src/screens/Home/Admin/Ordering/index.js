@@ -36,7 +36,7 @@ class index extends Component {
       token: '',
       buttonsSubHeader: [],
       loader: false,
-      selectedTextUser: 'All Supplier',
+      selectedTextUser: 'All Suppliers',
       countData: '',
       supplierData: '',
     };
@@ -211,7 +211,8 @@ class index extends Component {
                 style={{
                   backgroundColor: '#fff',
                   borderRadius: 5,
-                  padding: Platform.OS === 'ios' ? 6 : 0,
+                  height: hp('10%'),
+                  justifyContent: 'center',
                 }}>
                 <View
                   style={{
@@ -221,6 +222,7 @@ class index extends Component {
                     style={{
                       fontSize: 13,
                       fontFamily: 'Inter-Regular',
+                      color: 'black',
                     }}>
                     {translate('Supplier')}
                   </Text>
@@ -232,7 +234,6 @@ class index extends Component {
                   }}>
                   <Text
                     style={{
-                      // color: '#4A4C55',
                       fontSize: 14,
                       fontFamily: 'Inter-Regular',
                       marginLeft: '3%',
@@ -242,15 +243,14 @@ class index extends Component {
                     {supplierData ? supplierData.name : selectedTextUser}
                   </Text>
                   <Image
-                    source={img.calenderIcon}
+                    source={img.listIcon}
                     style={{
                       height: 20,
                       width: 20,
                       resizeMode: 'contain',
                       tintColor: 'grey',
-                      alignSelf: Platform.OS === 'android' ? 'center' : null,
-                      marginRight: Platform.OS === 'android' ? 10 : 6,
-                      marginTop: 5,
+                      marginRight: 10,
+                      marginTop: 10,
                     }}
                   />
                 </View>
@@ -290,7 +290,8 @@ class index extends Component {
                           {item.name}
                         </Text>
                       </View>
-                      <View style={styles.tileTextContainerSec}>
+                      <View
+                        style={{...styles.tileTextContainerSec, marginTop: 2}}>
                         <Text
                           style={styles.tileTextStylingSec}
                           numberOfLines={1}>
@@ -327,15 +328,18 @@ class index extends Component {
                 top: hp('65%'),
                 flexDirection: 'row',
                 backgroundColor: '#5297c1',
-                padding: 15,
                 borderRadius: 5,
+                height: hp('7%'),
+                width: wp('40%'),
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
               <View>
                 <Image
                   style={{
                     tintColor: '#fff',
-                    width: 15,
-                    height: 15,
+                    width: 18,
+                    height: 18,
                     resizeMode: 'contain',
                     marginLeft: 5,
                   }}
@@ -344,9 +348,8 @@ class index extends Component {
               </View>
               <Text
                 style={{
-                  fontSize: 12,
+                  fontSize: 15,
                   fontFamily: 'Inter-SemiBold',
-                  color: 'black',
                   marginLeft: 5,
                   color: '#fff',
                   fontWeight: 'bold',

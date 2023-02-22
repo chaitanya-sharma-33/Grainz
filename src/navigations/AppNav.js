@@ -58,6 +58,7 @@ import AddPurchaseScreen from '../screens/CasualPurchase/AddPurchase';
 import DepartmentPurchaseScreen from '../screens/CasualPurchase/DepartmentPurchase';
 import SupplierListScreen from '../screens/CasualPurchase/SupplierList';
 import ViewPurchaseScreen from '../screens/CasualPurchase/ViewPurchase';
+import DepartmentPurchaseSecScreen from '../screens/CasualPurchase/DepartmentPurchaseSec';
 import AddItemsOrderScreen from '../screens/Home/Admin/Ordering/AddOrder/AddItems';
 import InventoryListOrderScreen from '../screens/Home/Admin/Ordering/AddOrder/InventoryList';
 import SupplierlistOrderScreen from '../screens/Home/Admin/Ordering/AddOrder/Supplierlist';
@@ -80,6 +81,7 @@ import AddManualLogScreen from '../screens/ManualLog/AddManualLog';
 import EditManualLogScreen from '../screens/ManualLog/EditManualLog';
 import FilterPurchaseScreen from '../screens/CasualPurchase/FilterPurchase';
 import OrderCreationScreen from '../screens/Home/Admin/Ordering/AddOrder/OrderCreationScreen';
+import FilterOrderScreen from '../screens/Home/Admin/Ordering/FilterOrder';
 
 const AppNav = createStackNavigator();
 
@@ -92,6 +94,7 @@ export default function AppNavFun() {
         name="AddNewOrderLineScreen"
         component={AddNewOrderLineScreen}
       />
+      <AppNav.Screen name="FilterOrderScreen" component={FilterOrderScreen} />
       <AppNav.Screen
         name="EditManualLogScreen"
         component={EditManualLogScreen}
@@ -143,6 +146,12 @@ export default function AppNavFun() {
         name="CasualPurchaseScreen"
         component={CasualPurchaseScreen}
       />
+
+      <AppNav.Screen
+        name="DepartmentPurchaseSecScreen"
+        component={DepartmentPurchaseSecScreen}
+      />
+
       <AppNav.Screen
         name="EditDraftOrderScreen"
         component={EditDraftOrderScreen}

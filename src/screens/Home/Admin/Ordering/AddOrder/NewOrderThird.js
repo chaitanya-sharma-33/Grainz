@@ -222,6 +222,11 @@ class NewOrderThird extends Component {
                     {translate('Items of New order')}
                   </Text>
                 </View>
+                <TouchableOpacity
+                  onPress={() => this.props.navigation.goBack()}
+                  style={{}}>
+                  <Image source={img.deleteIcon} style={styles.tileImageBack} />
+                </TouchableOpacity>
               </View>
             </View>
             <View style={{marginHorizontal: wp('6%'), marginTop: hp('2%')}}>
@@ -242,7 +247,7 @@ class NewOrderThird extends Component {
                     <View
                       style={{
                         backgroundColor: '#fff',
-                        padding: Platform.OS === 'ios' ? 15 : 0,
+                        padding: 15,
                         borderTopLeftRadius: 6,
                       }}>
                       <View style={{}}>
@@ -263,6 +268,7 @@ class NewOrderThird extends Component {
                           style={{
                             fontSize: 14,
                             fontWeight: 'bold',
+                            color: 'black',
                           }}
                         />
                       </View>
@@ -272,7 +278,7 @@ class NewOrderThird extends Component {
                     <View
                       style={{
                         backgroundColor: '#fff',
-                        padding: Platform.OS === 'ios' ? 15 : 0,
+                        padding: 15,
                         borderTopRightRadius: 6,
                       }}>
                       <View
@@ -293,12 +299,10 @@ class NewOrderThird extends Component {
                               : img.upArrowIcon
                           }
                           style={{
-                            width: 15,
-                            height: 15,
+                            width: 18,
+                            height: 18,
                             resizeMode: 'contain',
-                            alignSelf:
-                              Platform.OS === 'android' ? 'center' : null,
-                            marginRight: Platform.OS === 'android' ? 10 : 0,
+                            marginRight: 10,
                           }}
                         />
                       </View>
@@ -314,6 +318,7 @@ class NewOrderThird extends Component {
                           style={{
                             fontSize: 14,
                             fontWeight: 'bold',
+                            color: 'black',
                           }}
                         />
                       </View>
@@ -332,7 +337,7 @@ class NewOrderThird extends Component {
                       <View
                         style={{
                           backgroundColor: '#fff',
-                          padding: Platform.OS === 'ios' ? 15 : 0,
+                          padding: 15,
                           marginBottom: hp('3%'),
                           borderBottomLeftRadius: 6,
                         }}>
@@ -351,6 +356,7 @@ class NewOrderThird extends Component {
                             style={{
                               fontSize: 14,
                               fontWeight: 'bold',
+                              color: 'black',
                             }}
                           />
                           <TouchableOpacity
@@ -374,7 +380,7 @@ class NewOrderThird extends Component {
                       <View
                         style={{
                           backgroundColor: '#fff',
-                          padding: Platform.OS === 'ios' ? 18 : 0,
+                          padding: 15,
                           marginBottom: hp('3%'),
                           borderBottomRightRadius: 6,
                         }}>
@@ -393,12 +399,13 @@ class NewOrderThird extends Component {
                             style={{
                               fontSize: 14,
                               fontWeight: 'bold',
+                              color: 'black',
                             }}
                           />
                         </View>
                         <TouchableOpacity
                           style={{
-                            marginTop: 10,
+                            marginTop: 15,
                           }}>
                           <Text
                             style={{
@@ -421,8 +428,7 @@ class NewOrderThird extends Component {
                           style={{
                             width:
                               Dimensions.get('window').width / numColumns -
-                              wp('6%'),
-                            height: hp('10%'),
+                              wp('5%'),
                             borderRadius: 50,
                           }}>
                           <TouchableOpacity
@@ -437,9 +443,9 @@ class NewOrderThird extends Component {
                                   ? '#E1A72E'
                                   : '#7CBF31',
                               flex: 1,
-                              margin: 10,
+                              margin: 8,
                               borderRadius: 8,
-                              padding: 10,
+                              padding: 15,
                               flexDirection: 'row',
                             }}>
                             <View
@@ -451,18 +457,17 @@ class NewOrderThird extends Component {
                               <Image
                                 source={
                                   item.name === 'Kitchen'
-                                    ? img.stokeTakeIcon
+                                    ? img.kitchenIcon
                                     : item.name === 'Bar'
-                                    ? img.CasualIcon
+                                    ? img.barIcon
                                     : item.name === 'Retail'
-                                    ? img.CasualIcon
-                                    : img.miscIcon
+                                    ? img.retailIcon
+                                    : img.otherIcon
                                 }
                                 style={{
                                   height: 20,
                                   width: 20,
                                   resizeMode: 'contain',
-                                  tintColor: '#fff',
                                 }}
                               />
                             </View>

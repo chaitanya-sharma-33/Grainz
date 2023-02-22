@@ -60,7 +60,7 @@ class index extends Component {
           <View
             style={{
               width: wp('80%'),
-              height: this.props.extraButton ? hp('40%') : hp('32%'),
+              height: this.props.extraButton ? hp('45%') : hp('42%'),
               backgroundColor: '#fff',
               alignSelf: 'center',
               borderRadius: 6,

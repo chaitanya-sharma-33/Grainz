@@ -995,7 +995,7 @@ class EditDraftOrder extends Component {
                 <View
                   style={{
                     backgroundColor: '#fff',
-                    padding: Platform.OS === 'ios' ? 15 : 0,
+                    padding: 15,
                     borderTopLeftRadius: 6,
                   }}>
                   <View style={{}}>
@@ -1016,6 +1016,7 @@ class EditDraftOrder extends Component {
                       style={{
                         fontSize: 14,
                         fontWeight: 'bold',
+                        color: 'black',
                       }}
                     />
                   </View>
@@ -1025,7 +1026,7 @@ class EditDraftOrder extends Component {
                 <View
                   style={{
                     backgroundColor: '#fff',
-                    padding: Platform.OS === 'ios' ? 15 : 0,
+                    padding: 15,
                     borderTopRightRadius: 6,
                   }}>
                   <View
@@ -1049,8 +1050,7 @@ class EditDraftOrder extends Component {
                         width: 15,
                         height: 15,
                         resizeMode: 'contain',
-                        alignSelf: Platform.OS === 'android' ? 'center' : null,
-                        marginRight: Platform.OS === 'android' ? 10 : 0,
+                        marginRight: 10,
                       }}
                     />
                   </View>
@@ -1068,6 +1068,7 @@ class EditDraftOrder extends Component {
                       style={{
                         fontSize: 14,
                         fontWeight: 'bold',
+                        color: 'black',
                       }}
                     />
                   </View>
@@ -1086,7 +1087,7 @@ class EditDraftOrder extends Component {
                   <View
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      padding: 15,
                       marginBottom: hp('3%'),
                       borderBottomLeftRadius: 6,
                     }}>
@@ -1105,6 +1106,7 @@ class EditDraftOrder extends Component {
                         style={{
                           fontSize: 14,
                           fontWeight: 'bold',
+                          color: 'black',
                         }}
                       />
                       {/* <TouchableOpacity
@@ -1128,7 +1130,7 @@ class EditDraftOrder extends Component {
                   <View
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      padding: 15,
                       marginBottom: hp('3%'),
                       borderBottomRightRadius: 6,
                     }}>
@@ -1147,6 +1149,7 @@ class EditDraftOrder extends Component {
                         style={{
                           fontSize: 14,
                           fontWeight: 'bold',
+                          color: 'black',
                         }}
                       />
                     </View>
@@ -1168,7 +1171,7 @@ class EditDraftOrder extends Component {
                 flexDirection: 'row',
                 width: wp('90%'),
                 backgroundColor: '#fff',
-                paddingVertical: Platform.OS === 'ios' ? 15 : 5,
+                paddingVertical: 15,
                 borderRadius: 5,
                 justifyContent: 'space-between',
               }}>
@@ -1225,7 +1228,7 @@ class EditDraftOrder extends Component {
                   onPress={() => this.showDatePickerOrderDate()}
                   style={{
                     width: wp('90%'),
-                    padding: Platform.OS === 'ios' ? 15 : 5,
+                    padding:  15,
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     backgroundColor: '#fff',
@@ -1242,8 +1245,8 @@ class EditDraftOrder extends Component {
                       width: 20,
                       height: 20,
                       resizeMode: 'contain',
-                      marginTop: Platform.OS === 'android' ? 15 : 0,
-                      marginRight: Platform.OS === 'android' ? 15 : 0,
+                      marginTop:  15,
+                      marginRight: 15 ,
                     }}
                   />
                 </TouchableOpacity>
@@ -1264,7 +1267,7 @@ class EditDraftOrder extends Component {
                   onPress={() => this.showDatePickerDeliveryDate()}
                   style={{
                     width: wp('90%'),
-                    padding: Platform.OS === 'ios' ? 15 : 5,
+                    padding: 15,
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     backgroundColor: '#fff',
@@ -1281,8 +1284,8 @@ class EditDraftOrder extends Component {
                       width: 20,
                       height: 20,
                       resizeMode: 'contain',
-                      marginTop: Platform.OS === 'android' ? 15 : 0,
-                      marginRight: Platform.OS === 'android' ? 15 : 0,
+                      marginTop: 15 ,
+                      marginRight: 15,
                     }}
                   />
                 </TouchableOpacity>
@@ -1305,7 +1308,7 @@ class EditDraftOrder extends Component {
                     flexDirection: 'row',
                     width: wp('90%'),
                     backgroundColor: '#fff',
-                    paddingVertical: Platform.OS === 'ios' ? 15 : 5,
+                    paddingVertical: 15,
                     borderRadius: 5,
                     justifyContent: 'space-between',
                   }}>
@@ -1357,7 +1360,7 @@ class EditDraftOrder extends Component {
                       style={{
                         height: 20,
                         width: 20,
-                        marginTop: Platform.OS === 'ios' ? 0 : 15,
+                        marginTop:  15,
                       }}
                     />
                   </View>
@@ -1401,7 +1404,6 @@ class EditDraftOrder extends Component {
                     style={{
                       width:
                         Dimensions.get('window').width / numColumns - wp('3%'),
-                      height: hp('10%'),
                       borderRadius: 50,
                     }}>
                     <TouchableOpacity
@@ -1430,12 +1432,12 @@ class EditDraftOrder extends Component {
                         <Image
                           source={
                             item.name === 'Kitchen'
-                              ? img.stokeTakeIcon
+                              ? img.kitchenIcon
                               : item.name === 'Bar'
-                              ? img.CasualIcon
+                              ? img.barIcon
                               : item.name === 'Retail'
-                              ? img.CasualIcon
-                              : img.miscIcon
+                              ? img.retailIcon
+                              : img.otherIcon
                           }
                           style={{
                             height: 20,
@@ -1504,7 +1506,7 @@ class EditDraftOrder extends Component {
                   return (
                     <View
                       style={{
-                        marginHorizontal: wp('6%'),
+                        marginHorizontal: wp('7%'),
                       }}>
                       <View
                         style={{
@@ -1610,25 +1612,32 @@ class EditDraftOrder extends Component {
                             </Text>
                           </TouchableOpacity>
 
-                          <TextInput
-                            value={String(item.quantity)}
-                            keyboardType="numeric"
+                          <View
                             style={{
-                              borderRadius: 6,
-                              padding: 10,
                               width: wp('15%'),
                               backgroundColor: '#fff',
-                            }}
-                            onChangeText={value =>
-                              this.editQuantityFun(
-                                index,
-                                'quantity',
-                                value,
-                                item,
-                                'input',
-                              )
-                            }
-                          />
+                              alignItems: 'center',
+                            }}>
+                            <TextInput
+                              value={String(item.quantity)}
+                              keyboardType="numeric"
+                              style={{
+                                borderRadius: 6,
+                                padding: 10,
+                                width: wp('8%'),
+                                color: 'black',
+                              }}
+                              onChangeText={value =>
+                                this.editQuantityFun(
+                                  index,
+                                  'quantity',
+                                  value,
+                                  item,
+                                  'input',
+                                )
+                              }
+                            />
+                          </View>
                           <TouchableOpacity
                             onPress={() =>
                               this.editQuantityFun(
@@ -2116,7 +2125,7 @@ class EditDraftOrder extends Component {
             <TouchableOpacity
               onPress={() => this.previewPDFFun()}
               style={{
-                height: hp('5.5%'),
+                height: hp('7%'),
                 width: wp('87%'),
                 // backgroundColor: '#5197C1',
                 justifyContent: 'center',
@@ -2143,7 +2152,7 @@ class EditDraftOrder extends Component {
             <TouchableOpacity
               onPress={() => this.sendFun()}
               style={{
-                height: hp('6%'),
+                height: hp('7%'),
                 width: wp('87%'),
                 // backgroundColor: '#5197C1',
                 justifyContent: 'center',
@@ -2171,7 +2180,7 @@ class EditDraftOrder extends Component {
             <TouchableOpacity
               onPress={() => this.updateBasketFun()}
               style={{
-                height: hp('6%'),
+                height: hp('7%'),
                 width: wp('87%'),
                 backgroundColor: '#5197C1',
                 justifyContent: 'center',
@@ -2197,7 +2206,7 @@ class EditDraftOrder extends Component {
             <TouchableOpacity
               onPress={() => this.props.navigation.goBack()}
               style={{
-                height: hp('6%'),
+                height: hp('7%'),
                 width: wp('80%'),
                 justifyContent: 'center',
                 alignItems: 'center',

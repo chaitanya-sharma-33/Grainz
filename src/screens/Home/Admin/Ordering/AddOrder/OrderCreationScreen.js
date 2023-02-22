@@ -1300,7 +1300,9 @@ class OrderCreationScreen extends Component {
                     /> */}
                 <TouchableOpacity
                   onPress={() =>
-                    this.props.navigation.navigate('SupplierListScreen')
+                    this.props.navigation.navigate('SupplierListScreen', {
+                      screenType: 'Order',
+                    })
                   }
                   style={{
                     backgroundColor: '#fff',

@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
   },
   signInStyling: {
-    height: hp('6%'),
+    height: hp('7%'),
     backgroundColor: '#5297C1',
     justifyContent: 'center',
     alignItems: 'center',

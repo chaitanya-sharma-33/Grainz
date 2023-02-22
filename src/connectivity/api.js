@@ -3,21 +3,21 @@ import url from './Environment.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // let baseURL = url['STAGING'].BaseURL;
-let baseURL = url['STAGING_TWO'].BaseURL;
-// let baseURL = url['DEV'].BaseURL;
+// let baseURL = url['STAGING_TWO'].BaseURL;
+let baseURL = url['DEV'].BaseURL;
 
-// export const loginApi = payload => {
-//   return axios.post(
-//     'https://grainzwebapid.azurewebsites.net/connect/token',
-//     payload,
-//     {
-//       headers: {
-//         Accept: '*/*',
-//         'Content-Type': 'application/x-www-form-urlencoded',
-//       },
-//     },
-//   );
-// };
+export const loginApi = payload => {
+  return axios.post(
+    'https://grainzwebapid.azurewebsites.net/connect/token',
+    payload,
+    {
+      headers: {
+        Accept: '*/*',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    },
+  );
+};
 
 // export const loginApi = payload => {
 //   return axios.post(
@@ -32,16 +32,16 @@ let baseURL = url['STAGING_TWO'].BaseURL;
 //   );
 // };
 
-export const loginApi = payload => {
-  const url = 'https://grainzwebapia.azurewebsites.net/connect/token';
-  console.log('URL', url);
-  return axios.post(url, payload, {
-    headers: {
-      Accept: '*/*',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
-};
+// export const loginApi = payload => {
+//   const url = 'https://grainzwebapia.azurewebsites.net/connect/token';
+//   console.log('URL', url);
+//   return axios.post(url, payload, {
+//     headers: {
+//       Accept: '*/*',
+//       'Content-Type': 'application/x-www-form-urlencoded',
+//     },
+//   });
+// };
 
 export async function getMyProfileApi() {
   const token = await AsyncStorage.getItem('@appToken');
@@ -221,6 +221,50 @@ export async function getCasualPurchasesApi() {
     },
   });
 }
+
+export const getCasualPurchasesByPageApi = async (pageNumber, pageSize) => {
+  console.log(pageNumber, pageSize);
+  let url =
+    baseURL +
+    `/CasulPurchase/getlistbypage?PageNumber=${pageNumber}&PageSize=${pageSize}`;
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getSearchDataApi = async (criteria, pageNumber, pageSize) => {
+  console.log(pageNumber, pageSize);
+  let url =
+    baseURL +
+    `/CasulPurchase/search?Criteria=${criteria}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getfilteredDataApi = async payload => {
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(baseURL + '/CasulPurchase/get list by filter', payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getfilteredOrderDataApi = async payload => {
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(baseURL + '/Order/filter orders', payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 
 export const addOrderApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
@@ -1125,4 +1169,30 @@ export const getListByDepartment = async DepartmentId => {
       },
     },
   );
+};
+
+export const duplicateApi = async id => {
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(
+    baseURL + `/Order/duplicate order?Id=${id}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};
+
+export const getOrdersByStatusApi = async (pageNumber, pageSize) => {
+  console.log(pageNumber, pageSize);
+  let url =
+    baseURL +
+    `/CasulPurchase/getlistbypage?PageNumber=${pageNumber}&PageSize=${pageSize}`;
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };

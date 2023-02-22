@@ -110,7 +110,7 @@ class index extends Component {
             {
               id: 0,
               name: translate('Ordering'),
-              icon: img.stokeTakeIcon,
+              icon: img.orderingIcon,
               screen: 'OrderingAdminScreen',
             },
             {
@@ -122,20 +122,20 @@ class index extends Component {
             {
               id: 2,
               name: translate('Suppliers'),
-              icon: img.CasualIcon,
+              icon: img.supplierIcon,
               screen: 'SupplierAdminScreen',
             },
             {
               id: 3,
               name: translate('Reporting'),
-              icon: img.miscIcon,
+              icon: img.reportsIcon,
               screen: 'ReportingAdminScreen',
             },
 
             {
               id: 4,
               name: translate('Stock Take'),
-              icon: img.orderingIcon,
+              icon: img.stokeTakeIcon,
               screen: 'StockTakeScreen',
             },
           ],
@@ -190,7 +190,7 @@ class index extends Component {
   };
 
   render() {
-    const {buttons, buttonsSubHeader, loader} = this.state;
+    const {buttons, loader} = this.state;
 
     return (
       <View style={styles.container}>
@@ -198,11 +198,6 @@ class index extends Component {
           logoutFun={this.myProfile}
           logoFun={() => this.props.navigation.navigate('HomeScreen')}
         />
-        {/* {loader ? (
-          <ActivityIndicator size="large" color="grey" />
-        ) : (
-          <SubHeader {...this.props} buttons={buttonsSubHeader} />
-        )} */}
         {loader ? (
           <ActivityIndicator size="large" color="grey" />
         ) : (

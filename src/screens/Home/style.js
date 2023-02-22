@@ -12,23 +12,23 @@ const styles = StyleSheet.create({
   },
   subContainer: {
     marginTop: hp('2%'),
+    flex: 1,
   },
   itemContainer: {
     width: Dimensions.get('window').width / numColumns,
     height: hp('15%'),
-    borderRadius: 50,
+    marginBottom: 10,
   },
   tileContainer: {
-    flex: 1,
     margin: 10,
     borderRadius: 8,
     padding: 10,
     alignItems: 'flex-start',
+    height: hp('15%'),
   },
   tileImageContainer: {
-    flex: 3,
+    flex: 2,
     alignItems: 'center',
-    marginTop: 5,
   },
   tileImageStyling: {
     height: 20,

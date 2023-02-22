@@ -1056,7 +1056,7 @@ class ViewPendingDelivery extends Component {
                     <View
                       style={{
                         backgroundColor: '#fff',
-                        padding: Platform.OS === 'ios' ? 15 : 0,
+                        padding: 15,
                         borderTopLeftRadius: 6,
                       }}>
                       <View style={{}}>
@@ -1077,6 +1077,7 @@ class ViewPendingDelivery extends Component {
                           style={{
                             fontSize: 14,
                             fontWeight: 'bold',
+                            color: 'black',
                           }}
                         />
                       </View>
@@ -1100,7 +1101,7 @@ class ViewPendingDelivery extends Component {
                     <View
                       style={{
                         backgroundColor: '#fff',
-                        padding: Platform.OS === 'ios' ? 15 : 0,
+                        padding: 15,
                         borderTopRightRadius: 6,
                       }}>
                       <View
@@ -1130,6 +1131,7 @@ class ViewPendingDelivery extends Component {
                           style={{
                             fontSize: 14,
                             fontWeight: 'bold',
+                            color: 'black',
                           }}
                         />
                       </View>
@@ -1151,7 +1153,7 @@ class ViewPendingDelivery extends Component {
                 <TouchableOpacity
                   // onPress={() => this.previewPDFFun()}
                   style={{
-                    height: hp('5.5%'),
+                    height: hp('7%'),
                     width: wp('87%'),
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -2569,14 +2571,8 @@ class ViewPendingDelivery extends Component {
                                                     width: 15,
                                                     height: 15,
                                                     resizeMode: 'contain',
-                                                    marginTop:
-                                                      Platform.OS === 'android'
-                                                        ? 15
-                                                        : 0,
-                                                    marginRight:
-                                                      Platform.OS === 'android'
-                                                        ? 15
-                                                        : 0,
+                                                    marginTop: 15,
+                                                    marginRight: 15,
                                                   }}
                                                 />
                                               </TouchableOpacity>

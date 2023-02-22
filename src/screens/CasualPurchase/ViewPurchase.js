@@ -15,7 +15,12 @@ import SubHeader from '../../components/SubHeader';
 import Header from '../../components/Header';
 import moment from 'moment';
 import {UserTokenAction} from '../../redux/actions/UserTokenAction';
-import {getMyProfileApi, getCasualPurchasesApi} from '../../connectivity/api';
+import {
+  getMyProfileApi,
+  getCasualPurchasesApi,
+  getCasualPurchasesByPageApi,
+  getSearchDataApi,
+} from '../../connectivity/api';
 import {translate} from '../../utils/translations';
 import styles from './style';
 import {
@@ -37,6 +42,10 @@ class ViewPurchase extends Component {
       arrangeStatusHTVA: 0,
       searchItem: '',
       casualPurchasesBackup: [],
+      pageSize: '15',
+      pageNumber: '1',
+      loadMoreStatus: false,
+      searchStatus: false,
     };
   }
 
@@ -74,18 +83,37 @@ class ViewPurchase extends Component {
   };
 
   getCasualPurchasesData() {
+    const {
+      pageSize,
+      pageNumber,
+      casualPurchases,
+      loadMoreStatus,
+      searchStatus,
+    } = this.state;
     this.setState(
       {
         casualListLoader: true,
       },
       () =>
-        getCasualPurchasesApi()
+        getCasualPurchasesByPageApi(pageNumber, pageSize)
           .then(res => {
-            this.setState({
-              casualPurchases: res.data,
-              casualListLoader: false,
-              casualPurchasesBackup: res.data,
-            });
+            if (searchStatus === true) {
+              console.log('filterrr--> true');
+              this.setState({
+                casualPurchases: res.data,
+                casualListLoader: false,
+                casualPurchasesBackup: res.data,
+              });
+            } else {
+              console.log('filterrr--> FALSEEE');
+
+              const finalArr = [...casualPurchases, ...res.data];
+              this.setState({
+                casualPurchases: loadMoreStatus ? finalArr : res.data,
+                casualListLoader: false,
+                casualPurchasesBackup: res.data,
+              });
+            }
           })
           .catch(err => {
             this.setState({casualListLoader: false});
@@ -96,10 +124,30 @@ class ViewPurchase extends Component {
 
   componentDidMount() {
     this.props.navigation.addListener('focus', () => {
-      this.getCasualPurchasesData();
+      const {route} = this.props;
+      const filterData = route.params.filterData;
+      console.log('filterData', filterData);
+      if (filterData) {
+        this.setState(
+          {
+            casualListLoader: true,
+          },
+          () => this.filterDataFun(filterData),
+        );
+      } else {
+        this.getCasualPurchasesData();
+      }
     });
     this.getProfileDataFun();
   }
+
+  filterDataFun = filterData => {
+    this.setState({
+      casualPurchases: filterData,
+      casualListLoader: false,
+      casualPurchasesBackup: filterData,
+    });
+  };
 
   myProfileFun = () => {
     this.props.navigation.navigate('MyProfile');
@@ -227,27 +275,78 @@ class ViewPurchase extends Component {
       {
         searchItem: txt,
       },
-      () => this.filterData(txt),
+      () =>
+        setTimeout(() => {
+          if (txt.length > 0) {
+            this.searchDataFun(txt);
+          } else {
+            console.log('elsee-->');
+            this.setState(
+              {
+                searchStatus: false,
+                loadMoreStatus: false,
+              },
+              () => this.getCasualPurchasesData(),
+            );
+          }
+        }, 100),
     );
   };
 
-  filterData = text => {
-    console.log('casualPurchases', this.state.casualPurchases);
-    // passing the inserted text in textinput
-    const newData = this.state.casualPurchasesBackup.filter(function (item) {
-      //applying filter for the inserted text in search bar
-      const itemData = item.supplierName
-        ? item.supplierName.toUpperCase()
-        : ''.toUpperCase();
-      const textData = text.toUpperCase();
-      return itemData.indexOf(textData) > -1;
-    });
-    this.setState({
-      //setting the filtered newData on datasource
-      //After setting the data it will automatically re-render the view
-      casualPurchases: newData,
-      searchItem: text,
-    });
+  searchDataFun = text => {
+    const {
+      pageSize,
+      pageNumber,
+      casualPurchases,
+      loadMoreStatus,
+      searchStatus,
+    } = this.state;
+
+    this.setState(
+      {
+        casualListLoader: true,
+        loadMoreStatus: false,
+        pageSize: '15',
+        pageNumber: '1',
+      },
+      () =>
+        getSearchDataApi(text, pageNumber, pageSize)
+          .then(res => {
+            console.log('res', res);
+            const finalArr = [...casualPurchases, ...res.data];
+            this.setState({
+              casualPurchases: loadMoreStatus ? finalArr : res.data,
+              searchStatus: true,
+              casualListLoader: false,
+            });
+          })
+          .catch(err => {
+            this.setState({casualListLoader: false});
+            console.warn('errR', err);
+          }),
+    );
+  };
+
+  loadMoreDataFun = () => {
+    const {pageNumber, searchStatus, searchItem} = this.state;
+    const newPageNumber = parseInt(pageNumber) + 10;
+    if (searchStatus === true) {
+      this.setState(
+        {
+          pageNumber: newPageNumber,
+          loadMoreStatus: true,
+        },
+        () => this.searchDataFun(searchItem),
+      );
+    } else {
+      this.setState(
+        {
+          pageNumber: newPageNumber,
+          loadMoreStatus: true,
+        },
+        () => this.getCasualPurchasesData(),
+      );
+    }
   };
 
   render() {
@@ -257,7 +356,10 @@ class ViewPurchase extends Component {
       buttonsSubHeader,
       recipeLoader,
       searchItem,
+      searchStatus,
     } = this.state;
+    console.log('casualPurchases', casualPurchases);
+    console.log('searchStatus', searchStatus);
     return (
       <View style={styles.container}>
         <Header
@@ -286,14 +388,6 @@ class ViewPurchase extends Component {
                   {translate('Casual purchase')}
                 </Text>
               </View>
-              {/* <TouchableOpacity
-                  onPress={() => this.props.navigation.goBack()}
-                  style={styles.goBackContainer}>
-                  <Text style={styles.goBackTextStyle}>
-                    {' '}
-                    {translate('Go Back')}
-                  </Text>
-                </TouchableOpacity> */}
             </View>
           </View>
         </View>
@@ -341,7 +435,7 @@ class ViewPurchase extends Component {
               borderRadius: 5,
             }}
             onPress={() =>
-              this.props.navigation.navigate('FilterPurchaseScreen')
+              this.props.navigation.navigate('FilterPurchaseScreen', {item: ''})
             }>
             <View>
               <Image
@@ -364,15 +458,6 @@ class ViewPurchase extends Component {
                 Filter
               </Text>
             </View>
-            {/* <TextInput
-              placeholder="Filter"
-              style={{
-                backgroundColor: '#fff',
-                padding: 12,
-                borderRadius: 5,
-              }}
-              editable={false}
-            /> */}
           </TouchableOpacity>
         </View>
         <View style={{marginTop: '5%'}}>
@@ -414,10 +499,12 @@ class ViewPurchase extends Component {
                 />
               </View>
             </TouchableOpacity>
-            {/* <View style={styles.listSubHeading}></View> */}
           </View>
 
-          <ScrollView>
+          <ScrollView
+            style={{
+              height: hp('50%'),
+            }}>
             {casualListLoader ? (
               <ActivityIndicator color="grey" size="large" />
             ) : (
@@ -455,7 +542,7 @@ class ViewPurchase extends Component {
                           {item.supplierName}
                         </Text>
                         <View>
-                          {item.hasWarning ? (
+                          {item.isRed ? (
                             <View style={styles.listDataContainer}>
                               <Image
                                 style={{
@@ -515,6 +602,26 @@ class ViewPurchase extends Component {
               })
             )}
           </ScrollView>
+          {casualPurchases.length > 0 && (
+            <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 15,
+              }}
+              onPress={() => this.loadMoreDataFun()}>
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: 'Inter-SemiBold',
+                  color: '#5297c1',
+                  textDecorationLine: 'underline',
+                  textDecorationColor: '#5297c1',
+                }}>
+                {translate('Load more')}
+              </Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             onPress={() =>
               this.props.navigation.navigate('AddPurchaseScreen', {
@@ -524,7 +631,7 @@ class ViewPurchase extends Component {
             style={{
               position: 'absolute',
               right: 20,
-              top: hp('50%'),
+              top: hp('45%'),
               flexDirection: 'row',
               backgroundColor: '#5297c1',
               padding: 15,

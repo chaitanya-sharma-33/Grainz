@@ -244,41 +244,41 @@ class index extends Component {
     // console.log('switchValueRemember', switchValueRemember);
     return (
       <View style={styles.container}>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#fff',
-          }}>
-          <TouchableOpacity
-            onPress={this.props.logoFun}
-            style={{
-              flex: 2,
-              marginLeft: 20,
-            }}>
-            <Image
-              source={img.appLogo}
-              style={{
-                height: 100,
-                width: 150,
-                resizeMode: 'contain',
-              }}
-            />
-          </TouchableOpacity>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}></View>
-        </View>
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
           enableOnAndroid>
           <Loader loaderComp={loader} />
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#fff',
+            }}>
+            <TouchableOpacity
+              onPress={this.props.logoFun}
+              style={{
+                flex: 2,
+                marginLeft: 20,
+              }}>
+              <Image
+                source={img.appLogo}
+                style={{
+                  height: 100,
+                  width: 150,
+                  resizeMode: 'contain',
+                }}
+              />
+            </TouchableOpacity>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}></View>
+          </View>
           <View style={styles.secondContainer}>
             <View style={styles.imageContainer}>
               {/* <Image source={img.appLogo} style={styles.logoStyling} /> */}
@@ -334,12 +334,10 @@ class index extends Component {
                     </Text>
                   </View>
                   <View
-                    style={
-                      {
-                        // flexDirection: 'row',
-                        // alignItems: 'center',
-                      }
-                    }>
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
                     <TextInput
                       value={this.state.password}
                       secureTextEntry={passStatus}
@@ -352,27 +350,22 @@ class index extends Component {
                       // placeholder={translate('Password')}
                       style={styles.textInputStyling}
                     />
-                    {/* <TouchableOpacity
+                    <TouchableOpacity
                       onPress={() =>
                         this.setState({
                           passStatus: !passStatus,
                         })
                       }
-                      style={{
-                        borderBottomColor: 'grey',
-                        borderBottomWidth: 1,
-                        paddingVertical: 7.9,
-                      }}>
+                      style={{}}>
                       <Image
                         source={passStatus ? img.eyeCloseIcon : img.eyeOpenIcon}
                         style={{
                           width: 25,
                           height: 25,
                           resizeMode: 'contain',
-                          marginTop: 10,
                         }}
                       />
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                   </View>
                 </View>
                 {this.state.passwordError ? (
@@ -437,10 +430,6 @@ class index extends Component {
                   {this.state.buttonLoader ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (
-                    // <Text style={styles.signInStylingText}>
-                    //   {' '}
-                    //   {translate('Sign in')}
-                    // </Text>
                     <Text style={styles.signInStylingText}>
                       {translate('Login')}
                     </Text>

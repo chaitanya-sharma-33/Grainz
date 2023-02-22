@@ -23,6 +23,7 @@ import {
   deliveryPendingApi,
   reviewOrderApi,
   historyOrderApi,
+  duplicateApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -98,15 +99,26 @@ class PendingDelivery extends Component {
 
   componentDidMount() {
     this.getData();
-    const {listId} = this.props.route && this.props.route.params;
+
     this.props.navigation.addListener('focus', () => {
-      this.setState(
-        {
-          listId,
-          modalLoaderDrafts: true,
-        },
-        () => this.getFinalData(),
-      );
+      const {listId} = this.props.route && this.props.route.params;
+      const {filterData} = this.props.route && this.props.route.params;
+      console.log('filterData', filterData);
+      if (filterData) {
+        this.setState({
+          deliveryPendingData: filterData,
+          deliveryPendingDataBackup: filterData,
+          modalLoaderDrafts: false,
+        });
+      } else {
+        this.setState(
+          {
+            listId,
+            modalLoaderDrafts: true,
+          },
+          () => this.getFinalData(),
+        );
+      }
     });
   }
 
@@ -427,9 +439,30 @@ class PendingDelivery extends Component {
   };
 
   duplicateModalFunSec = () => {
-    this.setState({
-      duplicateModalStatus: false,
-    });
+    // this.setState({
+    //   duplicateModalStatus: false,
+    // });
+
+    const {param} = this.state;
+    this.setState(
+      {
+        recipeLoader: true,
+        duplicateModalStatus: false,
+      },
+      () =>
+        duplicateApi(param.id)
+          .then(res => {
+            this.setState({
+              recipeLoader: false,
+            });
+          })
+          .catch(error => {
+            this.setState({
+              deleteLoader: false,
+            });
+            console.warn('Duplicateerror', error.response);
+          }),
+    );
   };
 
   render() {
@@ -554,7 +587,10 @@ class PendingDelivery extends Component {
                 borderRadius: 5,
               }}
               onPress={() =>
-                this.props.navigation.navigate('FilterPurchaseScreen')
+                this.props.navigation.navigate('FilterOrderScreen', {
+                  item: '',
+                  screenType: 'Pending',
+                })
               }>
               <View>
                 <Image
@@ -1116,16 +1152,16 @@ class PendingDelivery extends Component {
                 yesStatus
               />
               <TouchableOpacity
-                // onPress={() =>
-                //   this.props.navigation.navigate('NewOrderScreen', {
-                //     ScreenType: '',
-                //   })
-                // }
                 onPress={() =>
-                  this.props.navigation.navigate('OrderCreationScreen', {
-                    item: '',
+                  this.props.navigation.navigate('NewOrderSecScreen', {
+                    ScreenType: '',
                   })
                 }
+                // onPress={() =>
+                //   this.props.navigation.navigate('OrderCreationScreen', {
+                //     item: '',
+                //   })
+                // }
                 style={{
                   position: 'absolute',
                   right: 20,

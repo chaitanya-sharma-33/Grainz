@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     paddingVertical: hp('1%'),
     marginLeft: '5%',
     marginTop: '1%',
+    width: wp('70%'),
   },
   errorContainer: {
     height: hp('5%'),
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
     marginTop: hp('3%'),
   },
   signInStylingText: {
-    fontSize: 20,
+    fontSize: 18,
     color: '#fff',
     fontFamily: 'Inter-SemiBold',
   },

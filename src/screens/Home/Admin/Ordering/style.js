@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     width: Dimensions.get('window').width / numColumns - wp('3%'),
-    height: hp('15%'),
+    height: hp('21%'),
     borderRadius: 50,
   },
   tileContainer: {

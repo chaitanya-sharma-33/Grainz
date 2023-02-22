@@ -233,9 +233,10 @@ class index extends Component {
           logoutFun={this.myProfile}
           logoFun={() => this.props.navigation.navigate('HomeScreen')}
         />
-        {/* <Loader loaderComp={loader} /> */}
 
-        <ScrollView style={styles.subContainer}>
+        <ScrollView
+          style={styles.subContainer}
+          showsVerticalScrollIndicator={false}>
           {pageLoader ? (
             <ActivityIndicator color="#94C036" size="large" />
           ) : (
@@ -252,13 +253,6 @@ class index extends Component {
                       {translate('Profile')}
                     </Text>
                   </View>
-                  {/* <TouchableOpacity
-                  onPress={() => this.props.navigation.goBack()}
-                  style={styles.goBackContainer}>
-                  <Text style={styles.goBackTextStyle}>
-                    {translate('Go Back')}
-                  </Text>
-                </TouchableOpacity> */}
                 </View>
               </View>
 
@@ -283,7 +277,11 @@ class index extends Component {
                   <TextInput
                     value={firstName}
                     placeholder={translate('First name')}
-                    style={{paddingVertical: 10, fontWeight: 'bold'}}
+                    style={{
+                      paddingVertical: 10,
+                      fontWeight: 'bold',
+                      color: 'black',
+                    }}
                     editable={false}
                   />
                 </View>
@@ -302,7 +300,11 @@ class index extends Component {
                   <TextInput
                     value={lastName}
                     placeholder={translate('Last name')}
-                    style={{paddingVertical: 10, fontWeight: 'bold'}}
+                    style={{
+                      paddingVertical: 10,
+                      fontWeight: 'bold',
+                      color: 'black',
+                    }}
                     editable={false}
                   />
                 </View>
@@ -324,14 +326,18 @@ class index extends Component {
                 <TextInput
                   value={email}
                   placeholder={translate('Email')}
-                  style={{paddingVertical: 10, fontWeight: 'bold'}}
+                  style={{
+                    paddingVertical: 10,
+                    fontWeight: 'bold',
+                    color: 'black',
+                  }}
                   editable={false}
                 />
               </View>
 
               <View
                 style={{
-                  padding: 5,
+                  padding: 6,
                   borderRadius: 6,
                   flex: 1,
                   marginHorizontal: wp('7%'),
@@ -347,14 +353,18 @@ class index extends Component {
                 <TextInput
                   value={jobTitle}
                   placeholder={translate('job')}
-                  style={{paddingVertical: 8, fontWeight: 'bold'}}
+                  style={{
+                    paddingVertical: 8,
+                    fontWeight: 'bold',
+                    color: 'black',
+                  }}
                   editable={false}
                 />
               </View>
 
               <View
                 style={{
-                  padding: 5,
+                  padding: 6,
                   borderRadius: 6,
                   flex: 1,
                   marginHorizontal: wp('6%'),
@@ -370,14 +380,18 @@ class index extends Component {
                 <TextInput
                   value={phoneNumber}
                   placeholder={translate('Mobile phone')}
-                  style={{paddingVertical: 10, fontWeight: 'bold'}}
+                  style={{
+                    paddingVertical: 10,
+                    fontWeight: 'bold',
+                    color: 'black',
+                  }}
                   editable={false}
                 />
               </View>
 
               <View
                 style={{
-                  padding: 5,
+                  padding: 6,
                   borderRadius: 6,
                   flex: 1,
                   marginHorizontal: wp('6%'),
@@ -410,23 +424,24 @@ class index extends Component {
                         value: null,
                         color: 'black',
                       }}
-                      placeholderTextColor="red"
                       onValueChange={value => {
                         this.setLocationFun(value);
                       }}
                       style={{
                         inputIOS: {
                           fontSize: 14,
-                          color: '#161C27',
+                          color: 'black',
                           width: '100%',
                           alignSelf: 'center',
+                          fontWeight: 'bold',
                         },
                         inputAndroid: {
                           fontSize: 14,
-                          color: '#161C27',
+                          color: 'black',
                           width: '100%',
                           alignSelf: 'center',
                           paddingVertical: 6,
+                          fontWeight: 'bold',
                         },
                         iconContainer: {
                           top: '40%',
@@ -442,8 +457,8 @@ class index extends Component {
                       source={img.arrowDownIcon}
                       resizeMode="contain"
                       style={{
-                        height: 15,
-                        width: 15,
+                        height: 16,
+                        width: 16,
                         resizeMode: 'contain',
                         marginTop: Platform.OS === 'ios' ? 13 : 13,
                       }}
@@ -454,12 +469,11 @@ class index extends Component {
 
               <View
                 style={{
-                  padding: 5,
+                  padding: 6,
                   borderRadius: 6,
                   flex: 1,
                   marginHorizontal: wp('6%'),
                   backgroundColor: '#fff',
-                  marginBottom: hp('2%'),
                 }}>
                 <Text
                   style={{
@@ -494,16 +508,18 @@ class index extends Component {
                       style={{
                         inputIOS: {
                           fontSize: 14,
-                          color: '#161C27',
+                          color: 'black',
                           width: '100%',
                           alignSelf: 'center',
+                          fontWeight: 'bold',
                         },
                         inputAndroid: {
                           fontSize: 14,
-                          color: '#161C27',
+                          color: 'black',
                           width: '100%',
                           alignSelf: 'center',
                           paddingVertical: 6,
+                          fontWeight: 'bold',
                         },
                         iconContainer: {
                           top: '40%',
@@ -519,8 +535,8 @@ class index extends Component {
                       source={img.arrowDownIcon}
                       resizeMode="contain"
                       style={{
-                        height: 15,
-                        width: 15,
+                        height: 16,
+                        width: 16,
                         resizeMode: 'contain',
                         marginTop: Platform.OS === 'ios' ? 13 : 13,
                       }}
@@ -549,7 +565,7 @@ class index extends Component {
                   </View>
                 </View>
               </View> */}
-              {/* <View style={styles.dataContainer}>
+              <View style={styles.dataContainer}>
                 <View style={styles.dataSecondContainer}></View>
                 <TouchableOpacity
                   onPress={() => this.removeToken()}
@@ -564,12 +580,12 @@ class index extends Component {
                     style={styles.logOutIconStyling}
                   />
                 </TouchableOpacity>
-              </View> */}
+              </View>
               <TouchableOpacity
                 onPress={() => this.createOrder()}
                 style={{
                   width: wp('90%'),
-                  height: hp('5%'),
+                  height: hp('7%'),
                   backgroundColor: '#5297c1',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -581,7 +597,7 @@ class index extends Component {
                 <Text
                   style={{
                     color: '#fff',
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: 'bold',
                   }}>
                   {translate('Save')}
@@ -595,7 +611,7 @@ class index extends Component {
                 }
                 style={{
                   width: wp('90%'),
-                  height: hp('5%'),
+                  height: hp('7%'),
                   justifyContent: 'center',
                   alignItems: 'center',
                   borderRadius: 10,
@@ -605,7 +621,7 @@ class index extends Component {
                 <Text
                   style={{
                     color: '#5297c1',
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: 'bold',
                   }}>
                   {translate('Cancel')}

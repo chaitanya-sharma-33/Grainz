@@ -12,19 +12,19 @@ import {
   Platform,
 } from 'react-native';
 import styles from './style';
-import img from '../../constants/images';
+import img from '../../../../constants/images';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {getfilteredDataApi} from '../../connectivity/api';
+import {getfilteredOrderDataApi} from '../../../../connectivity/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
-import {UserTokenAction} from '../../redux/actions/UserTokenAction';
-import {translate, setI18nConfig} from '../../utils/translations';
-import Loader from '../../components/Loader';
-import Header from '../../components/Header';
+import {UserTokenAction} from '../../../../redux/actions/UserTokenAction';
+import {translate, setI18nConfig} from '../../../../utils/translations';
+import Loader from '../../../../components/Loader';
+import Header from '../../../../components/Header';
 import CheckBox from '@react-native-community/checkbox';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
@@ -36,7 +36,7 @@ minTime.setMilliseconds(0);
 
 var querystring = require('querystring');
 
-class FilterScreen extends Component {
+class FilterOrder extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -61,6 +61,7 @@ class FilterScreen extends Component {
       flagStatus: false,
       selectedPage: '1',
       pageSize: '15',
+      screenType: '',
     };
   }
 
@@ -68,9 +69,19 @@ class FilterScreen extends Component {
     this.props.navigation.addListener('focus', () => {
       const {route} = this.props;
       const item = route.params.item;
+      const screenType = route.params.screenType;
       console.log('itemmmmFilter', item);
       if (item) {
         this.selectUserNameFun(item);
+      }
+      if (screenType) {
+        this.setState({
+          screenType,
+        });
+      } else {
+        this.setState({
+          screenType: '',
+        });
       }
     });
   }
@@ -108,6 +119,7 @@ class FilterScreen extends Component {
       flagStatus,
       selectedPage,
       pageSize,
+      screenType,
     } = this.state;
     let payload = {
       suppliers: supplierId ? [supplierId] : [],
@@ -116,15 +128,39 @@ class FilterScreen extends Component {
       flagged: flagStatus,
       selectedPage: selectedPage,
       pageSize: pageSize,
+      status:
+        screenType === 'Draft'
+          ? 'Draft'
+          : screenType === 'Pending'
+          ? 'Pending'
+          : screenType === 'Review'
+          ? 'Review'
+          : screenType === 'History'
+          ? 'History'
+          : '',
     };
     console.log('payload', payload);
 
-    getfilteredDataApi(payload)
+    getfilteredOrderDataApi(payload)
       .then(res => {
         console.log('res', res);
-        this.props.navigation.navigate('ViewPurchaseScreen', {
-          filterData: res.data,
-        });
+        if (screenType === 'Draft') {
+          this.props.navigation.navigate('DraftOrderAdminScreen', {
+            filterData: res.data,
+          });
+        } else if (screenType === 'Pending') {
+          this.props.navigation.navigate('PendingDeliveryAdminScreen', {
+            filterData: res.data,
+          });
+        } else if (screenType === 'Review') {
+          this.props.navigation.navigate('PendingDeliveryAdminScreen', {
+            filterData: res.data,
+          });
+        } else if (screenType === 'History') {
+          this.props.navigation.navigate('PendingDeliveryAdminScreen', {
+            filterData: res.data,
+          });
+        }
       })
       .catch(err => {
         Alert.alert(
@@ -391,7 +427,7 @@ class FilterScreen extends Component {
                 <TouchableOpacity
                   onPress={() =>
                     this.props.navigation.navigate('SupplierListScreen', {
-                      screenType: 'Filter',
+                      screenType: 'FilterOrder',
                     })
                   }
                   style={{
@@ -492,4 +528,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, {UserTokenAction})(FilterScreen);
+export default connect(mapStateToProps, {UserTokenAction})(FilterOrder);

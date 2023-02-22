@@ -439,10 +439,11 @@ class Basket extends Component {
     });
   };
 
-  deleteInventoryFun = () => {
+  deleteInventoryFun = data => {
     this.setState(
       {
         actionModalStatus: false,
+        finalArrData: data,
       },
       () =>
         setTimeout(() => {
@@ -462,6 +463,7 @@ class Basket extends Component {
 
   hitDeleteApiFun = () => {
     const {supplierId, basketId, finalArrData} = this.state;
+    console.log(supplierId, basketId, finalArrData);
     let payload = {
       supplierId: supplierId,
       shopingBasketItemList: [
@@ -1054,7 +1056,7 @@ class Basket extends Component {
                 <View
                   style={{
                     backgroundColor: '#fff',
-                    padding: Platform.OS === 'ios' ? 15 : 0,
+                    padding: 15,
                     borderTopLeftRadius: 6,
                     borderBottomLeftRadius: 6,
                   }}>
@@ -1076,6 +1078,7 @@ class Basket extends Component {
                       style={{
                         fontSize: 14,
                         fontWeight: 'bold',
+                        color: 'black',
                       }}
                     />
                   </View>
@@ -1085,7 +1088,7 @@ class Basket extends Component {
                 <View
                   style={{
                     backgroundColor: '#fff',
-                    padding: Platform.OS === 'ios' ? 15 : 0,
+                    padding: 15,
                     borderTopLeftRadius: 6,
                     borderBottomLeftRadius: 6,
                   }}>
@@ -1110,8 +1113,7 @@ class Basket extends Component {
                         width: 15,
                         height: 15,
                         resizeMode: 'contain',
-                        alignSelf: Platform.OS === 'android' ? 'center' : null,
-                        marginRight: Platform.OS === 'android' ? 10 : 0,
+                        marginRight: 10,
                       }}
                     />
                   </View>
@@ -1127,6 +1129,7 @@ class Basket extends Component {
                       style={{
                         fontSize: 14,
                         fontWeight: 'bold',
+                        color: 'black',
                       }}
                     />
                   </View>
@@ -1145,7 +1148,7 @@ class Basket extends Component {
                   <View
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      padding: 15,
                       borderTopLeftRadius: 6,
                       borderBottomLeftRadius: 6,
                     }}>
@@ -1164,6 +1167,7 @@ class Basket extends Component {
                         style={{
                           fontSize: 14,
                           fontWeight: 'bold',
+                          color: 'black',
                         }}
                       />
                     </View>
@@ -1173,7 +1177,7 @@ class Basket extends Component {
                   <View
                     style={{
                       backgroundColor: '#fff',
-                      padding: Platform.OS === 'ios' ? 15 : 0,
+                      padding: 15,
                       borderTopLeftRadius: 6,
                       borderBottomLeftRadius: 6,
                     }}>
@@ -1192,6 +1196,7 @@ class Basket extends Component {
                         style={{
                           fontSize: 14,
                           fontWeight: 'bold',
+                          color: 'black',
                         }}
                       />
                     </View>
@@ -1216,7 +1221,6 @@ class Basket extends Component {
                         width:
                           Dimensions.get('window').width / numColumns -
                           wp('3%'),
-                        height: hp('10%'),
                         borderRadius: 50,
                       }}>
                       <TouchableOpacity
@@ -1245,12 +1249,12 @@ class Basket extends Component {
                           <Image
                             source={
                               item.name === 'Kitchen'
-                                ? img.stokeTakeIcon
+                                ? img.kitchenIcon
                                 : item.name === 'Bar'
-                                ? img.CasualIcon
+                                ? img.barIcon
                                 : item.name === 'Retail'
-                                ? img.CasualIcon
-                                : img.miscIcon
+                                ? img.retailIcon
+                                : img.otherIcon
                             }
                             style={{
                               height: 20,
@@ -1530,7 +1534,7 @@ class Basket extends Component {
                           />
                         </View>
                         <TouchableOpacity
-                          onPress={() => this.deleteFun(item, index)}
+                          onPress={() => this.deleteInventoryFun(item, index)}
                           style={{
                             flex: 1,
                             alignItems: 'flex-end',
@@ -2255,7 +2259,7 @@ class Basket extends Component {
             <TouchableOpacity
               onPress={() => this.previewPDFFun()}
               style={{
-                height: hp('5.5%'),
+                height: hp('7%'),
                 width: wp('87%'),
                 backgroundColor: '#5197C1',
                 justifyContent: 'center',
@@ -2280,7 +2284,7 @@ class Basket extends Component {
             <TouchableOpacity
               onPress={() => this.sendFun()}
               style={{
-                height: hp('6%'),
+                height: hp('7%'),
                 width: wp('87%'),
                 backgroundColor: '#5197C1',
                 justifyContent: 'center',
@@ -2306,7 +2310,7 @@ class Basket extends Component {
             <TouchableOpacity
               onPress={() => this.saveDraftFunGreen()}
               style={{
-                height: hp('6%'),
+                height: hp('7%'),
                 width: wp('87%'),
                 backgroundColor: '#5197C1',
                 justifyContent: 'center',
@@ -2334,7 +2338,7 @@ class Basket extends Component {
                 this.props.navigation.navigate('OrderingAdminScreen')
               }
               style={{
-                height: hp('6%'),
+                height: hp('7%'),
                 width: wp('80%'),
                 justifyContent: 'center',
                 alignItems: 'center',
