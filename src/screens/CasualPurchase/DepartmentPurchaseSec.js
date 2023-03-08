@@ -23,6 +23,7 @@ import {UserTokenAction} from '../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
   getInventoryBySupplierIdApi,
+  getInventoryByDepartApi,
   getSupplierCatalogApi,
   getInsideInventoryNewApi,
   searchInventoryItemLApi,
@@ -51,7 +52,7 @@ class DepartmentPurchaseSec extends Component {
       token: '',
       modalVisible: false,
       firstName: '',
-      activeSections: ARRAY,
+      activeSections: [],
       SECTIONS: [],
       SECTIONS_HORIZONTAL: [],
       recipeLoader: true,
@@ -196,30 +197,38 @@ class DepartmentPurchaseSec extends Component {
   };
 
   createFirstData = () => {
-    const {supplierId, mainDepartId} = this.state;
-    console.log('FIRST');
-    getInventoryBySupplierIdApi(supplierId)
+    const {departmentId, mainDepartId} = this.state;
+    console.log('FIRST', departmentId);
+    getInventoryByDepartApi(departmentId)
       .then(res => {
-        console.log('resInventory-->', res);
+        console.log('departID-->', res);
 
-        var filteredArray = res.data.filter(function (itm) {
-          return itm.departmentId === mainDepartId;
-        });
+        // var filteredArray = res.data.filter(function (itm) {
+        //   return itm.departmentId === mainDepartId;
+        // });
 
-        console.log('filteredArray', filteredArray);
+        // console.log('filteredArray', filteredArray);
 
-        let finalArray = filteredArray.map((item, index) => {
-          return {
-            title: item.name,
-            content: item.id,
-            departmentName: item.departmentName,
-          };
-        });
+        let finalArray =
+          res.data &&
+          res.data.departments[0].categories.map((item, index) => {
+            return {
+              title: item.name,
+              content: item.items,
+            };
+          });
         const result = finalArray;
+        console.log('rest', result);
+        // this.setState({
+        //   SECTIONS_HORIZONTAL: [...result],
+        //   modalLoader: false,
+        //   SECTIONS_SEC_INVEN: [...result],
+        // });
+
         this.setState({
-          SECTIONS_HORIZONTAL: [...result],
+          SECTIONS: [...result],
           modalLoader: false,
-          SECTIONS_SEC_INVEN: [...result],
+          SECTIONS_BACKUP: [...result],
         });
       })
       .catch(err => {
@@ -284,7 +293,7 @@ class DepartmentPurchaseSec extends Component {
       (n, {totalQuantity}) => n + totalQuantity,
       0,
     );
-    // console.log('finalAmt', finalAmt);
+    console.log('section', section);
 
     return (
       <View
@@ -385,7 +394,7 @@ class DepartmentPurchaseSec extends Component {
 
       const value = valueType === 'input' ? valueAdd : valueMinus;
       // console.log('Value', value);
-      const {screenType, SECTIONS, activeSections} = this.state;
+      const {screenType, SECTIONS} = this.state;
       const deltaOriginal = Number(data.delta);
       const isSelectedValue = value !== '' && value > 0 ? true : false;
       const newDeltaVal =
@@ -550,7 +559,7 @@ class DepartmentPurchaseSec extends Component {
       const value = valueType === 'add' ? valueAdd : valueMinus;
       // console.log('value--> ', value);
 
-      const {screenType, SECTIONS, activeSections} = this.state;
+      const {screenType, SECTIONS} = this.state;
       const deltaOriginal = Number(data.delta);
       const isSelectedValue = value !== '' && value > 0 ? true : false;
       const newDeltaVal =
@@ -697,7 +706,7 @@ class DepartmentPurchaseSec extends Component {
   };
 
   _renderContent = section => {
-    // console.log('sec', section);
+    console.log('sec', section);
     return (
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={{backgroundColor: '#fff', width: wp('87%')}}>
@@ -720,7 +729,7 @@ class DepartmentPurchaseSec extends Component {
                     <TouchableOpacity
                       onPress={() => this.openModalFun(item, section, index)}
                       style={{}}>
-                      <Text>{item.productName}</Text>
+                      <Text>{item.name}</Text>
                     </TouchableOpacity>
                   </View>
                   <View
@@ -1052,61 +1061,36 @@ class DepartmentPurchaseSec extends Component {
   };
 
   navigateSubFun = item => {
-    const {inventoryStatus, finalBasketData, supplierId} = this.state;
+    const {inventoryStatus, finalBasketData} = this.state;
     if (finalBasketData.length > 0) {
       console.log('addToBasketFunHorizontal-->');
       this.addToBasketFunHorizontal();
     }
-    if (inventoryStatus) {
-      const {
-        SECTIONS,
-        activeSections,
-        supplierId,
-        screenType,
-        basketId,
-        navigateType,
-        supplierName,
-      } = this.state;
-      const catId = item.content;
-      const catName = item.title;
+    const {
+      SECTIONS,
 
-      this.setState(
-        {
-          supplierId,
-          catName,
-          catId,
-          screenType,
-          basketId,
-          navigateType,
-          finalBasketData: [],
-          supplierName,
-        },
-        () => this.getInsideInventoryFun(),
-      );
-    } else {
-      const {
+      supplierId,
+      screenType,
+      basketId,
+      navigateType,
+      supplierName,
+    } = this.state;
+    const catId = item.content;
+    const catName = item.title;
+
+    this.setState(
+      {
         supplierId,
-        SECTIONS,
-        activeSections,
+        catName,
+        catId,
         screenType,
         basketId,
         navigateType,
+        finalBasketData: [],
         supplierName,
-      } = this.state;
-      const catName = item.title;
-      this.setState(
-        {
-          supplierId,
-          catName,
-          screenType,
-          basketId,
-          navigateType,
-          finalBasketData: [],
-          supplierName,
-        },
-        () => this.getInsideSupplierFun(),
-      );
-    }
+      },
+      () => this.getInsideInventoryFun(),
+    );
   };
 
   getInsideInventoryFun = () => {
@@ -1562,39 +1546,8 @@ class DepartmentPurchaseSec extends Component {
 
     console.log('finalBsketData', finalBasketData);
 
-    const orderData = [
-      {
-        action: 'New',
-        id: '',
-        inventoryId: 'a1808dc4-932e-45bf-a4ae-1f2f62ec62d5',
-        inventoryProductMappingId: '',
-        isCorrect: true,
-        notes: '',
-        position: 1,
-        quantityOrdered: '',
-        tdcVolume: 0,
-        unitId: '2e0fcd02-33e3-4e9a-b248-e17ab25b03e5',
-        unitPrice: '',
-        name: 'Almond milk',
-        units: [
-          {
-            converter: 1,
-            isDefault: true,
-            label: 'ml',
-            value: 'cbe95c2a-dbdf-4978-a8ec-85a020477cde',
-          },
-          {
-            converter: 1000,
-            isDefault: false,
-            label: 'Carton',
-            value: '2e0fcd02-33e3-4e9a-b248-e17ab25b03e5',
-          },
-        ],
-      },
-    ];
-
     this.props.navigation.navigate('AddPurchaseScreen', {
-      orderData,
+      finalBasketData,
     });
 
     // if (draftStatus) {
@@ -1632,7 +1585,6 @@ class DepartmentPurchaseSec extends Component {
       pageData,
       screenType,
       SECTIONS,
-      activeSections,
     } = this.state;
     console.log('sectIndex', sectionIndex);
     console.log('sectionData', sectionData);
@@ -1708,37 +1660,55 @@ class DepartmentPurchaseSec extends Component {
 
     console.log('LastArr--> ', LastArr);
 
-    const finalArr = LastArr.map((item, index) => {
-      const firstArr = item.content.filter(function (itm) {
-        if (itm.quantityProduct !== '') {
-          return itm.isSelected === true;
-        }
-      });
-      return firstArr;
-    });
+    // const finalArr = LastArr.map((item, index) => {
+    //   const firstArr = item.content.filter(function (itm) {
+    //     if (itm.quantityProduct !== '') {
+    //       return itm.isSelected === true;
+    //     }
+    //   });
+    //   return firstArr;
+    // });
 
-    console.log('finAAA', finalArr);
+    // console.log('finAAA', finalArr);
 
-    var merged = [].concat.apply([], finalArr);
-    console.log('merged', merged);
+    // var merged = [].concat.apply([], finalArr);
+    // console.log('merged', merged);
 
     const basketArr = [];
-    merged.map(item => {
+    // merged.map(item => {
+    //   basketArr.push({
+    //     action: 'New',
+    //     id: '',
+    //     inventoryId: item.id,
+    //     inventoryProductMappingId: item.inventoryProductMappingId,
+    //     isCorrect: '',
+    //     isRollingAverageUsed: item.isRollingAverageUsed,
+    //     name: item.name,
+    //     notes: item.notes,
+    //     position: item.position,
+    //     quantityOrdered: '',
+    //     rollingAveragePrice: item.rollingAveragePrice,
+    //     tdcVolume: item.tdcVolume,
+    //     unitPrice: item.productPrice,
+    //     unitId: item.unitId,
+    //     units: item.units,
+    //   });
+    // });
+
+    LastArr.map(item => {
       basketArr.push({
         action: 'New',
         id: '',
-        inventoryId: item.id,
+        inventoryId: item.inventoryId,
         inventoryProductMappingId: item.inventoryProductMappingId,
-        isCorrect: '',
-        isRollingAverageUsed: item.isRollingAverageUsed,
-        name: item.name,
-        notes: item.notes,
-        position: item.position,
+        isCorrect: true,
+        notes: '',
+        position: 1,
         quantityOrdered: '',
-        rollingAveragePrice: item.rollingAveragePrice,
-        tdcVolume: item.tdcVolume,
-        unitPrice: item.productPrice,
+        tdcVolume: 0,
         unitId: item.unitId,
+        unitPrice: item.productPrice,
+        name: item.name,
         units: item.units,
       });
     });
@@ -1999,67 +1969,59 @@ class DepartmentPurchaseSec extends Component {
             </View>
           ) : null}
 
-          <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
+          {/* <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
             <ScrollView style={{}}>
               {SECTIONS_HORIZONTAL.map((item, index) => {
                 return (
                   <View>
-                    <TouchableOpacity
-                      onPress={() => this.onPressInventoryFun(item, index)}
-                      style={{
-                        borderRadius: 5,
-                        backgroundColor:
-                          index === listIndex ? '#F2F2F2' : '#fff',
-                        height: 60,
-                        marginRight: 10,
-                        paddingHorizontal: 15,
-                        marginVertical: 10,
-                        justifyContent: 'space-between',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter-SemiBold',
-                          fontSize: 12,
-                        }}>
-                        {item.title}
-                      </Text>
-                      <Image
-                        style={{
-                          height: 15,
-                          width: 15,
-                          resizeMode: 'contain',
-                          marginLeft: wp('3%'),
-                        }}
-                        source={img.arrowDownIcon}
-                      />
-                    </TouchableOpacity>
+                   
                     <View>
-                      {index === listIndex ? (
+                      <View style={{}}>
                         <View style={{}}>
-                          <View style={{}}>
-                            {modalLoader ? (
-                              <ActivityIndicator size="large" color="#5297c1" />
-                            ) : (
-                              <Accordion
-                                expandMultiple
-                                underlayColor="#fff"
-                                sections={SECTIONS}
-                                activeSections={activeSections}
-                                renderHeader={this._renderHeader}
-                                renderContent={this._renderContent}
-                                onChange={this._updateSections}
-                              />
-                            )}
-                          </View>
+                          {modalLoader ? (
+                            <ActivityIndicator size="large" color="#5297c1" />
+                          ) : (
+                            <Accordion
+                              expandMultiple
+                              underlayColor="#fff"
+                              sections={SECTIONS}
+                              activeSections={activeSections}
+                              renderHeader={this._renderHeader}
+                              renderContent={this._renderContent}
+                              onChange={this._updateSections}
+                            />
+                          )}
                         </View>
-                      ) : null}
+                      </View>
                     </View>
                   </View>
                 );
               })}
             </ScrollView>
+          </View> */}
+
+          <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
+            <View>
+              <View>
+                <View style={{}}>
+                  <View style={{}}>
+                    {modalLoader ? (
+                      <ActivityIndicator size="large" color="#5297c1" />
+                    ) : (
+                      <Accordion
+                        expandMultiple
+                        underlayColor="#fff"
+                        sections={SECTIONS}
+                        activeSections={activeSections}
+                        renderHeader={this._renderHeader}
+                        renderContent={this._renderContent}
+                        onChange={this._updateSections}
+                      />
+                    )}
+                  </View>
+                </View>
+              </View>
+            </View>
           </View>
 
           <Modal isVisible={orderingThreeModal} backdropOpacity={0.35}>

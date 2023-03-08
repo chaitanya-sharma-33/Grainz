@@ -1730,9 +1730,7 @@ class ViewReviewOrder extends Component {
                                 </View>
 
                                 <TouchableOpacity
-                                  onPress={() =>
-                                    this.deleteFunOrder(item, index)
-                                  }
+                                  onPress={() => this.deleteFun(item, index)}
                                   style={{
                                     flex: 1,
                                     alignItems: 'flex-end',
@@ -1796,7 +1794,7 @@ class ViewReviewOrder extends Component {
                                     {item.inventoryMapping &&
                                       item.inventoryMapping.productPrice}{' '}
                                     Є/
-                                    {item.inventoryMapping.productUnit}
+                                    {/* {item.inventoryMapping.productUnit} */}
                                   </Text>
                                 </View>
                                 <View
@@ -1813,7 +1811,7 @@ class ViewReviewOrder extends Component {
                                       fontWeight: 'bold',
                                     }}>
                                     {/* {item.value.toFixed(2)} */}
-                                    {item.value}
+                                    {item.orderValue}
                                   </Text>
                                 </View>
                                 <View
@@ -1829,7 +1827,7 @@ class ViewReviewOrder extends Component {
                                       fontSize: 14,
                                       fontWeight: 'bold',
                                     }}>
-                                    {item.calculatedQuantity}
+                                    {item.displayQuantity}
                                   </Text>
                                 </View>
                               </View>

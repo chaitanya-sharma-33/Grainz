@@ -24,6 +24,7 @@ import {
   draftOrderingApi,
   deleteOrderApi,
   duplicateApi,
+  orderByStatusApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -50,6 +51,9 @@ class DraftOrder extends Component {
       param: '',
       duplicateModalStatus: false,
       deleteModalStatus: false,
+      pageSize: '10',
+      selectedPage: '1',
+      loadMoreStatus: false,
     };
   }
 
@@ -113,10 +117,24 @@ class DraftOrder extends Component {
   };
 
   getDraftOrderData = () => {
-    draftOrderingApi()
+    const {selectedPage, pageSize, loadMoreStatus, draftsOrderData} =
+      this.state;
+
+    let payload = {
+      status: 'Draft',
+      selectedPage: selectedPage,
+      pageSize: pageSize,
+    };
+    orderByStatusApi(payload)
       .then(res => {
+        console.log('res-->ORDER', res);
+        console.log('res-->draftsOrderData', draftsOrderData);
+
+        const finalArr = [...draftsOrderData, ...res.data];
+        console.log('res-->finalArr', finalArr);
+
         this.setState({
-          draftsOrderData: res.data.reverse(),
+          draftsOrderData: loadMoreStatus ? finalArr : res.data.reverse(),
           draftsOrderDataBackup: res.data,
           modalLoaderDrafts: false,
         });
@@ -383,6 +401,19 @@ class DraftOrder extends Component {
       pickerModalStatus: true,
       param: item,
     });
+  };
+
+  addMoreFun = () => {
+    const {selectedPage} = this.state;
+    const newPageNumber = parseInt(selectedPage) + 1;
+    this.setState(
+      {
+        selectedPage: newPageNumber,
+        modalLoaderDrafts: true,
+        loadMoreStatus: true,
+      },
+      () => this.getDraftOrderData(),
+    );
   };
 
   render() {
@@ -904,7 +935,7 @@ class DraftOrder extends Component {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                // onPress={() => alert('View More')}
+                onPress={() => this.addMoreFun()}
                 style={{
                   marginTop: hp('4%'),
                   alignSelf: 'center',
@@ -957,7 +988,6 @@ export default connect(mapStateToProps, {UserTokenAction})(DraftOrder);
 // import {UserTokenAction} from '../../../../../redux/actions/UserTokenAction';
 // import {
 //   getMyProfileApi,
-//   getCasualPurchasesApi,
 //   draftOrderingApi,
 // } from '../../../../../connectivity/api';
 // import {translate} from '../../../../../utils/translations';

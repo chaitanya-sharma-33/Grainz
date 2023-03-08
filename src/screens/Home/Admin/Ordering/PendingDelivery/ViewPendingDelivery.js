@@ -76,7 +76,6 @@ class ViewPendingDelivery extends Component {
       modalPricePaid: '',
       modalNotes: '',
       modalData: '',
-      isCheckedStatus: false,
       initialValueAllCorrect: 'null',
       isCheckedEditableStatus: true,
       isDatePickerArrivalDateSpecific: false,
@@ -90,6 +89,8 @@ class ViewPendingDelivery extends Component {
       imageModalStatus: false,
       listIndex: '',
       finalData: '',
+      switchValueAll: false,
+      switchValueSingle: '',
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -147,21 +148,21 @@ class ViewPendingDelivery extends Component {
     const {productId, supplierId, supplierName, basketId, listId, finalData} =
       this.props.route && this.props.route.params;
 
-    // this.props.navigation.addListener('focus', () => {
-    this.setState(
-      {
-        productId: productId,
-        arrivalDataStatus: false,
-        loaderCompStatus: true,
-        supplierId: supplierId,
-        supplierName: supplierName,
-        basketId: basketId,
-        listId: listId,
-        finalData,
-      },
-      () => this.getOrderFun(),
-    );
-    // });
+    this.props.navigation.addListener('focus', () => {
+      this.setState(
+        {
+          productId: productId,
+          arrivalDataStatus: false,
+          loaderCompStatus: true,
+          supplierId: supplierId,
+          supplierName: supplierName,
+          basketId: basketId,
+          listId: listId,
+          finalData,
+        },
+        () => this.getOrderFun(),
+      );
+    });
   }
 
   getInitialValues = () => {};
@@ -250,7 +251,7 @@ class ViewPendingDelivery extends Component {
     this.props.navigation.navigate('MyProfile');
   };
 
-  saveFun = () => {
+  processOrderFun = () => {
     this.setState(
       {
         loaderCompStatus: true,
@@ -273,6 +274,7 @@ class ViewPendingDelivery extends Component {
       finalApiData,
       productId,
       isCheckedStatus,
+      switchValueAll,
     } = this.state;
     let payload = {
       ambientTemp: pageAmbientTemp,
@@ -289,7 +291,7 @@ class ViewPendingDelivery extends Component {
       orderItems: finalApiData,
       orderReference: pageData.orderReference,
       placedBy: pageData.placedByNAme,
-      isChecked: isCheckedStatus,
+      isChecked: switchValueAll,
     };
 
     processPendingOrderApi(payload)
@@ -300,12 +302,6 @@ class ViewPendingDelivery extends Component {
           },
           () => this.navigateToOrderScreen(),
         );
-        // Alert.alert(`Grainz`, 'Order processed successfully', [
-        //   {
-        //     text: 'Okay',
-        //     onPress: () => this.navigateToOrderScreen(),
-        //   },
-        // ]);
       })
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
@@ -321,12 +317,6 @@ class ViewPendingDelivery extends Component {
     const {arrivalDataStatus} = this.state;
     if (arrivalDataStatus) {
       this.getOrderFun();
-      // this.setState(
-      //   {
-      //     loaderCompStatus: true,
-      //   },
-      //   () =>
-      // );
     } else {
       this.props.navigation.navigate('OrderingAdminScreen');
     }
@@ -343,6 +333,7 @@ class ViewPendingDelivery extends Component {
             this.setState(
               {
                 loaderCompStatus: true,
+                pageOrderItems: [],
               },
               () => this.hitDeleteApi(item),
             ),
@@ -511,12 +502,8 @@ class ViewPendingDelivery extends Component {
   };
 
   updateCorrectStatusSec = (item, value) => {
-    const finalValue =
-      value && value.choiceCode === 'Y'
-        ? 'true'
-        : value && value.choiceCode === 'N'
-        ? 'false'
-        : null;
+    const finalValue = value;
+
     let payload = {
       action: 'Update',
       arrivedDate: item.arrivedDate,
@@ -536,6 +523,8 @@ class ViewPendingDelivery extends Component {
       userQuantityDelivered: item.userQuantityDelivered,
       userQuantityInvoiced: item.userQuantityInvoiced,
     };
+
+    console.log('payload', payload);
     if (item.arrivedDate) {
       processPendingOrderItemApi(payload)
         .then(res => {
@@ -545,19 +534,6 @@ class ViewPendingDelivery extends Component {
             },
             () => this.getOrderFun(),
           );
-          // Alert.alert(`Grainz`, 'Correct status updated successfully', [
-          //   {
-          //     text: 'Okay',
-          //     onPress: () =>
-          //       this.setState(
-          //         {
-          //           loaderCompStatus: true,
-          //         },
-
-          //         () => this.getOrderFun(),
-          //       ),
-          //   },
-          // ]);
         })
         .catch(err => {
           Alert.alert(
@@ -961,6 +937,21 @@ class ViewPendingDelivery extends Component {
     }
   };
 
+  checkSingleItemFun = (item, value, index) => {
+    this.setState(
+      {
+        switchSingleValue: value,
+      },
+      () => this.updateCorrectStatus(item, value),
+    );
+  };
+
+  checkAllItemFun = value => {
+    this.setState({
+      switchValueAll: value,
+    });
+  };
+
   render() {
     const {
       chooseImageModalStatus,
@@ -1008,6 +999,8 @@ class ViewPendingDelivery extends Component {
       unitPrizeModal,
       listIndex,
       finalData,
+      switchSingleValue,
+      switchValueAll,
     } = this.state;
     console.log('finalData--->', finalData);
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
@@ -1082,7 +1075,12 @@ class ViewPendingDelivery extends Component {
                         />
                       </View>
                       <TouchableOpacity
-                        onPress={() => alert('See Details')}
+                        onPress={() =>
+                          this.props.navigation.navigate(
+                            'PendingOrderDeliveryScreen',
+                            {finalData: finalData},
+                          )
+                        }
                         style={{
                           marginTop: 15,
                         }}>
@@ -1839,9 +1837,7 @@ class ViewPendingDelivery extends Component {
                                 </View>
 
                                 <TouchableOpacity
-                                  onPress={() =>
-                                    this.deleteFunOrder(item, index)
-                                  }
+                                  onPress={() => this.deleteFun(item, index)}
                                   style={{
                                     flex: 1,
                                     alignItems: 'flex-end',
@@ -1883,10 +1879,7 @@ class ViewPendingDelivery extends Component {
                                   flexDirection: 'row',
                                   borderLeftWidth: 1,
                                   borderRightWidth: 1,
-                                  borderBottomWidth: 1,
                                   borderColor: 'grey',
-                                  borderBottomLeftRadius: 6,
-                                  borderBottomRightRadius: 6,
                                   padding: 10,
                                 }}>
                                 <View
@@ -1922,7 +1915,7 @@ class ViewPendingDelivery extends Component {
                                       fontWeight: 'bold',
                                     }}>
                                     {/* {item.value.toFixed(2)} */}
-                                    {item.value}
+                                    {item.orderValue}
                                   </Text>
                                 </View>
                                 <View
@@ -1938,11 +1931,71 @@ class ViewPendingDelivery extends Component {
                                       fontSize: 14,
                                       fontWeight: 'bold',
                                     }}>
-                                    {item.calculatedQuantity}
+                                    {item.displayQuantity}
                                   </Text>
                                 </View>
                               </View>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  flexDirection: 'row',
+                                  borderLeftWidth: 1,
+                                  borderRightWidth: 1,
+                                  borderBottomWidth: 1,
+                                  borderColor: 'grey',
+                                  borderBottomLeftRadius: 6,
+                                  borderBottomRightRadius: 6,
+                                  padding: 10,
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    Arrived Date
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {item.deliveredDate
+                                      ? moment(item.deliveredDate).format(
+                                          'DD/MM/YYYY',
+                                        )
+                                      : ''}
+                                  </Text>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                  }}>
+                                  <Text>Checked</Text>
+                                  <Switch
+                                    thumbColor={'#fff'}
+                                    trackColor={{
+                                      false: 'grey',
+                                      true: '#5197C1',
+                                    }}
+                                    ios_backgroundColor="white"
+                                    onValueChange={value =>
+                                      this.checkSingleItemFun(
+                                        item,
+                                        value,
+                                        index,
+                                      )
+                                    }
+                                    value={item.isCorrect}
+                                  />
+                                </View>
+                              </View>
                             </View>
+
                             {/* <View
                                 style={{
                                   paddingVertical: 10,
@@ -2722,11 +2775,145 @@ class ViewPendingDelivery extends Component {
                   </View>
                 </View>
 
+                <View>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      marginTop: hp('2%'),
+                      alignItems: 'center',
+                      marginTop: '5%',
+                      marginBottom: '5%',
+                      borderBottomWidth: 1,
+                      paddingBottom: 20,
+                      borderBottomColor: '#DCDCDC',
+                    }}>
+                    <TouchableOpacity
+                      onPress={() => this.addNewOrderLineFun()}
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: wp('90%'),
+                      }}>
+                      <View>
+                        <Text
+                          style={{
+                            color: '#5197C1',
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                          }}>
+                          {translate('Add order item')}
+                        </Text>
+                      </View>
+
+                      <View>
+                        <Image
+                          source={img.arrowDownIcon}
+                          style={{
+                            width: 15,
+                            height: 15,
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <View>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      marginTop: hp('2%'),
+                      alignItems: 'center',
+                      marginTop: '5%',
+                      marginBottom: '5%',
+                    }}>
+                    <TouchableOpacity
+                      onPress={() => this.addNewOrderLineFun()}
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: wp('90%'),
+                      }}>
+                      <View>
+                        <Text
+                          style={{
+                            color: 'black',
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                          }}>
+                          Mark all as Checked
+                        </Text>
+                      </View>
+
+                      <View>
+                        <Switch
+                          thumbColor={'#fff'}
+                          trackColor={{
+                            false: 'grey',
+                            true: '#5197C1',
+                          }}
+                          ios_backgroundColor="white"
+                          onValueChange={value => this.checkAllItemFun(value)}
+                          value={switchValueAll}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <View>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      marginTop: hp('2%'),
+                      alignItems: 'center',
+                      marginTop: '5%',
+                      marginBottom: '5%',
+                      backgroundColor: '#fff',
+                    }}>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: wp('90%'),
+                        padding: 10,
+                      }}>
+                      <View>
+                        <Text
+                          style={{
+                            color: 'black',
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                          }}>
+                          Total HTVA:
+                        </Text>
+                      </View>
+
+                      <View>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: 'black',
+                          }}>
+                          {parseInt(finalData.htva).toFixed(2)} €
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                   <TouchableOpacity
                     // onPress={() => this.previewPDFFun()}
                     style={{
-                      height: hp('5.5%'),
+                      height: hp('7%'),
                       width: wp('87%'),
                       // backgroundColor: '#5197C1',
                       justifyContent: 'center',
@@ -2753,7 +2940,7 @@ class ViewPendingDelivery extends Component {
                   <TouchableOpacity
                     // onPress={() => this.sendFun()}
                     style={{
-                      height: hp('6%'),
+                      height: hp('7%'),
                       width: wp('87%'),
                       // backgroundColor: '#5197C1',
                       justifyContent: 'center',
@@ -2779,9 +2966,9 @@ class ViewPendingDelivery extends Component {
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    // onPress={() => this.updateBasketFun()}
+                    onPress={() => this.processOrderFun()}
                     style={{
-                      height: hp('6%'),
+                      height: hp('7%'),
                       width: wp('87%'),
                       backgroundColor: '#5197C1',
                       justifyContent: 'center',
@@ -2807,7 +2994,7 @@ class ViewPendingDelivery extends Component {
                   <TouchableOpacity
                     onPress={() => this.props.navigation.goBack()}
                     style={{
-                      height: hp('6%'),
+                      height: hp('7%'),
                       width: wp('80%'),
                       justifyContent: 'center',
                       alignItems: 'center',
@@ -2922,35 +3109,6 @@ class ViewPendingDelivery extends Component {
                         fontWeight: 'bold',
                       }}>
                       {translate('Add image')}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View> */}
-
-              {/* <View>
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    marginTop: hp('2%'),
-                    alignItems: 'center',
-                  }}>
-                  <TouchableOpacity
-                    onPress={() => this.addNewOrderLineFun()}
-                    style={{
-                      width: wp('60%'),
-                      height: hp('5%'),
-                      backgroundColor: '#94C036',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: 100,
-                    }}>
-                    <Text
-                      style={{
-                        color: '#fff',
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('Add New Order Line')}
                     </Text>
                   </TouchableOpacity>
                 </View>

@@ -111,6 +111,8 @@ class AddItems extends Component {
       finalData: '',
       mainDepartId: '',
       modalQuantity: '0',
+      actionOpen: false,
+      expandAllStatus: false,
     };
   }
 
@@ -1035,7 +1037,7 @@ class AddItems extends Component {
       discountPriceValue: item.discount,
       sectionData: section,
       sectionIndex: index,
-      modalQuantity: '0',
+      // modalQuantity: '0',
     });
   };
 
@@ -1199,12 +1201,26 @@ class AddItems extends Component {
   };
 
   onPressInventoryFun = (item, index) => {
-    this.setState(
-      {
-        listIndex: index,
-      },
-      () => this.navigateSubFun(item),
-    );
+    const {actionOpen} = this.state;
+    if (actionOpen === true) {
+      this.setState(
+        {
+          listIndex: '',
+          actionOpen: false,
+          modalQuantity: '0',
+        },
+        () => this.navigateSubFun(item),
+      );
+    } else {
+      this.setState(
+        {
+          listIndex: index,
+          actionOpen: true,
+          modalQuantity: '0',
+        },
+        () => this.navigateSubFun(item),
+      );
+    }
   };
 
   addToBasketFunHorizontal = () => {
@@ -1984,6 +2000,19 @@ class AddItems extends Component {
     }
   };
 
+  expandAllFun = () => {
+    const {expandAllStatus} = this.state;
+    if (expandAllStatus === false) {
+      this.setState({
+        expandAllStatus: true,
+      });
+    } else {
+      this.setState({
+        expandAllStatus: false,
+      });
+    }
+  };
+
   render() {
     const {
       recipeLoader,
@@ -2028,10 +2057,12 @@ class AddItems extends Component {
       sectionData,
       sectionIndex,
       modalQuantity,
+      actionOpen,
+      expandAllStatus,
     } = this.state;
 
     console.log('PAGE DATA', pageData);
-    console.log('modalLoooo', modalLoader);
+    console.log('modalQuantity', modalQuantity);
 
     return (
       <View style={styles.container}>
@@ -2085,7 +2116,7 @@ class AddItems extends Component {
                   {translate('InventoryList')}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => this.supplierFun()}
                 style={{
                   flex: 1,
@@ -2107,7 +2138,7 @@ class AddItems extends Component {
                   }}>
                   {translate('Supplier catalog')}
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
           {/* {inventoryStatus ? (
@@ -2199,7 +2230,7 @@ class AddItems extends Component {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    height: hp('5.5%'),
+                    height: hp('7%'),
                     width: wp('90%'),
                     alignSelf: 'center',
                     marginVertical: hp('2%'),
@@ -2312,6 +2343,15 @@ class AddItems extends Component {
             </View>
           ) : null}
 
+          {/* <TouchableOpacity
+            onPress={() => this.expandAllFun()}
+            style={{
+              marginHorizontal: wp('6%'),
+              marginTop: hp('2%'),
+            }}>
+            {expandAllStatus ? <Text>Close all</Text> : <Text>Expand all</Text>}
+          </TouchableOpacity> */}
+
           <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
             <ScrollView style={{}}>
               {SECTIONS_HORIZONTAL.map((item, index) => {
@@ -2346,7 +2386,11 @@ class AddItems extends Component {
                           resizeMode: 'contain',
                           marginLeft: wp('3%'),
                         }}
-                        source={img.arrowDownIcon}
+                        source={
+                          actionOpen === true
+                            ? img.upArrowIcon
+                            : img.arrowDownIcon
+                        }
                       />
                     </TouchableOpacity>
                     <View>
@@ -3051,7 +3095,7 @@ class AddItems extends Component {
                                 fontSize: 12,
                                 color: 'red',
                               }}>
-                              Delta Δ
+                              {/* Delta Δ */}
                             </Text>
 
                             {pageData.deltaNew > 0 ? (
@@ -3063,7 +3107,7 @@ class AddItems extends Component {
                                   fontWeight: 'bold',
                                   marginTop: 10,
                                 }}>
-                                Δ {pageData.deltaNew.toFixed(2)} {pageData.unit}
+                                {/* Δ {pageData.deltaNew.toFixed(2)} {pageData.unit} */}
                               </Text>
                             ) : (
                               <Text
@@ -3073,7 +3117,7 @@ class AddItems extends Component {
                                   fontWeight: 'bold',
                                   marginTop: 10,
                                 }}>
-                                Δ 0 {pageData && pageData.unit}
+                                {/* Δ 0 {pageData && pageData.unit} */}
                               </Text>
                             )}
                           </View>
@@ -3095,7 +3139,9 @@ class AddItems extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              {pageData.grainzVolume}
+                              {pageData.quantityProduct
+                                ? pageData.quantityProduct
+                                : modalQuantity}
                             </Text>
                           </View>
                           <View
@@ -3116,7 +3162,7 @@ class AddItems extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              {pageData.packSize}
+                              {pageData.packSize} {pageData.productUnit}
                             </Text>
                           </View>
                         </View>

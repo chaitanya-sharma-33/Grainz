@@ -17,7 +17,6 @@ import moment from 'moment';
 import {UserTokenAction} from '../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
-  getCasualPurchasesApi,
   getCasualPurchasesByPageApi,
   getSearchDataApi,
 } from '../../connectivity/api';

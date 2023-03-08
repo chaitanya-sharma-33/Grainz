@@ -234,9 +234,13 @@ class NewOrderSec extends Component {
       placedByData,
     };
 
-    this.props.navigation.navigate('NewOrderThirdScreen', {
-      finalData,
-    });
+    if (finalDeliveryDate && supplierId) {
+      this.props.navigation.navigate('NewOrderThirdScreen', {
+        finalData,
+      });
+    } else {
+      alert('Please select all');
+    }
   }
 
   render() {

@@ -117,7 +117,8 @@ class index extends Component {
               id: 1,
               name: translate('Casual purchase'),
               icon: img.CasualIcon,
-              screen: 'ViewPurchaseScreen',
+              // screen: 'ViewPurchaseScreen',
+              screen: '',
             },
             {
               id: 2,
@@ -232,7 +233,7 @@ class index extends Component {
                         {item.name}
                       </Text>
                     </View>
-                    <View style={styles.tileTextContainerSec}>
+                    {/* <View style={styles.tileTextContainerSec}>
                       <Text style={styles.tileTextStylingSec} numberOfLines={1}>
                         {item.screen === 'OrderingAdminScreen'
                           ? '1 Action'
@@ -242,7 +243,7 @@ class index extends Component {
                           ? '3 Actions'
                           : 'Coming Soon'}
                       </Text>
-                    </View>
+                    </View> */}
                   </TouchableOpacity>
                 </View>
               )}

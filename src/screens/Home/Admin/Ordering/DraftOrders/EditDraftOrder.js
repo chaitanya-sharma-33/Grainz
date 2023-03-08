@@ -143,8 +143,8 @@ class EditDraftOrder extends Component {
       apiOrderDate &&
       placedByValue &&
       supplierValue &&
-      finalApiData &&
-      apiDeliveryDate
+      finalApiData
+      // apiDeliveryDate
     ) {
       let payload = {
         id: basketId,
@@ -1507,6 +1507,7 @@ class EditDraftOrder extends Component {
                     <View
                       style={{
                         marginHorizontal: wp('7%'),
+                        marginBottom: 10,
                       }}>
                       <View
                         style={{

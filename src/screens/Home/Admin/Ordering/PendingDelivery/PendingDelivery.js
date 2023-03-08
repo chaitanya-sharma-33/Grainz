@@ -24,6 +24,7 @@ import {
   reviewOrderApi,
   historyOrderApi,
   duplicateApi,
+  orderByStatusApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -57,6 +58,9 @@ class PendingDelivery extends Component {
       duplicateModalStatus: false,
       deleteModalStatus: false,
       param: '',
+      loadMoreStatus: false,
+      pageSize: '10',
+      selectedPage: '1',
     };
   }
 
@@ -134,10 +138,23 @@ class PendingDelivery extends Component {
   };
 
   getDeliveryPendingData = () => {
-    deliveryPendingApi()
+    const {selectedPage, pageSize, loadMoreStatus, deliveryPendingData} =
+      this.state;
+
+    let payload = {
+      status: 'Pending',
+      selectedPage: selectedPage,
+      pageSize: pageSize,
+    };
+    orderByStatusApi(payload)
       .then(res => {
+        console.log('res-->Pending', res);
+        console.log('res-->deliveryPendingData', deliveryPendingData);
+
+        const finalArr = [...deliveryPendingData, ...res.data];
+        console.log('res-->finalArr', finalArr);
         this.setState({
-          deliveryPendingData: res.data,
+          deliveryPendingData: loadMoreStatus ? finalArr : res.data,
           deliveryPendingDataBackup: res.data,
           modalLoaderDrafts: false,
           type: 'Pending',
@@ -149,10 +166,22 @@ class PendingDelivery extends Component {
   };
 
   getReviewOrdersData = () => {
-    reviewOrderApi()
+    const {selectedPage, pageSize, loadMoreStatus, deliveryPendingData} =
+      this.state;
+    let payload = {
+      status: 'Review',
+      selectedPage: selectedPage,
+      pageSize: pageSize,
+    };
+    orderByStatusApi(payload)
       .then(res => {
+        console.log('res-->Pending', res);
+        console.log('res-->deliveryPendingData', deliveryPendingData);
+
+        const finalArr = [...deliveryPendingData, ...res.data];
+        console.log('res-->finalArr', finalArr);
         this.setState({
-          deliveryPendingData: res.data,
+          deliveryPendingData: loadMoreStatus ? finalArr : res.data,
           deliveryPendingDataBackup: res.data,
           modalLoaderDrafts: false,
           type: 'Review',
@@ -164,10 +193,22 @@ class PendingDelivery extends Component {
   };
 
   getHistoryOrdersData = () => {
-    historyOrderApi()
+    const {selectedPage, pageSize, loadMoreStatus, deliveryPendingData} =
+      this.state;
+    let payload = {
+      status: 'History',
+      selectedPage: selectedPage,
+      pageSize: pageSize,
+    };
+    orderByStatusApi(payload)
       .then(res => {
+        console.log('res-->Pending', res);
+        console.log('res-->deliveryPendingData', deliveryPendingData);
+
+        const finalArr = [...deliveryPendingData, ...res.data];
+        console.log('res-->finalArr', finalArr);
         this.setState({
-          deliveryPendingData: res.data,
+          deliveryPendingData: loadMoreStatus ? finalArr : res.data,
           deliveryPendingDataBackup: res.data,
           modalLoaderDrafts: false,
           type: 'History',
@@ -228,31 +269,47 @@ class PendingDelivery extends Component {
         finalData: item,
       });
     } else if (listId === 3) {
-      this.props.navigation.navigate('ViewReviewOrderScreen', {
-        productId: item.id,
-        supplierId: item.supplierId,
-        supplierName: item.supplierName,
-        basketId: item.shopingBasketId,
-        listId: 3,
-        finalData: item,
-      });
-    } else if (listId === 4) {
       if (item.isTDC === true) {
-        console.log('item', item);
-        this.props.navigation.navigate('EditHistoryOrderScreen', {
+        this.props.navigation.navigate('EditPurchase', {
+          item: item,
           orderData: item,
-          finalData: item,
         });
+
+        //   this.props.navigation.navigate('ViewReviewOrderScreen', {
+        //   productId: item.id,
+        //   supplierId: item.supplierId,
+        //   supplierName: item.supplierName,
+        //   basketId: item.shopingBasketId,
+        //   listId: 3,
+        //   finalData: item,
+        // });
       } else {
-        this.props.navigation.navigate('ViewHistoryOrderScreen', {
+        this.props.navigation.navigate('ViewReviewOrderScreen', {
           productId: item.id,
           supplierId: item.supplierId,
           supplierName: item.supplierName,
           basketId: item.shopingBasketId,
-          listId: 4,
+          listId: 3,
           finalData: item,
         });
       }
+    } else if (listId === 4) {
+      // if (item.isTDC === true) {
+      //   console.log('item', item);
+      //   this.props.navigation.navigate('EditHistoryOrderScreen', {
+      //     orderData: item,
+      //     finalData: item,
+      //   });
+      // } else {
+      this.props.navigation.navigate('ViewHistoryOrderScreen', {
+        productId: item.id,
+        supplierId: item.supplierId,
+        supplierName: item.supplierName,
+        basketId: item.shopingBasketId,
+        listId: 4,
+        finalData: item,
+      });
+      // }
     }
   };
 
@@ -439,10 +496,6 @@ class PendingDelivery extends Component {
   };
 
   duplicateModalFunSec = () => {
-    // this.setState({
-    //   duplicateModalStatus: false,
-    // });
-
     const {param} = this.state;
     this.setState(
       {
@@ -462,6 +515,19 @@ class PendingDelivery extends Component {
             });
             console.warn('Duplicateerror', error.response);
           }),
+    );
+  };
+
+  addMoreFun = () => {
+    const {selectedPage} = this.state;
+    const newPageNumber = parseInt(selectedPage) + 1;
+    this.setState(
+      {
+        selectedPage: newPageNumber,
+        modalLoaderDrafts: true,
+        loadMoreStatus: true,
+      },
+      () => this.getFinalData(),
     );
   };
 
@@ -1190,7 +1256,7 @@ class PendingDelivery extends Component {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                // onPress={() => alert('View More')}
+                onPress={() => this.addMoreFun()}
                 style={{
                   marginTop: hp('4%'),
                   alignSelf: 'center',

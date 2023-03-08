@@ -187,7 +187,7 @@
   "Add Data": "Add Data",
   "Audit Complete": "Audit Complete",
   "Add line item": "Add line item",
-  "Add New Order Line": "Add New Order Line",
+  "Add order item": "Add order item",
   "Add image": "Add image",
   "Total price": "Total price",
   "paid": "paid",
@@ -807,5 +807,6 @@
   "Package size": "Package size",
   "Order No": "Order No",
   "Request credit note": "Request credit note",
-  "Delivery checklist": "Delivery checklist"
+  "Delivery checklist": "Delivery checklist",
+  "Pending": "Pending"
 }

@@ -215,7 +215,7 @@ export const addManualLogApi = async payload => {
 
 export async function getCasualPurchasesApi() {
   const token = await AsyncStorage.getItem('@appToken');
-  return axios.get(baseURL + '/Order/casual purchases', {
+  return axios.get(baseURL + '/CasulPurchase/getinventorylist', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -901,6 +901,19 @@ export const getSupplierCatalogApi = async id => {
   );
 };
 
+export const getInventoryByDepartApi = async id => {
+  console.log(('dddd---->', id));
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.get(
+    baseURL + `/Inventory/get list by department?DepartmentId=${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};
+
 export const getSupplierProductsApi = async (id, catName, orderId) => {
   const token = await AsyncStorage.getItem('@appToken');
   const finalURL = orderId
@@ -1195,4 +1208,31 @@ export const getOrdersByStatusApi = async (pageNumber, pageSize) => {
       Authorization: `Bearer ${token}`,
     },
   });
+};
+
+export const orderByStatusApi = async payload => {
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(baseURL + `/Order/get orders by status`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const deliveredDateUpdateApi = async (
+  id,
+  deliveredDate,
+  deliveryDate,
+) => {
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(
+    baseURL +
+      `/Order/process order delivered date?Id=${id}&DeliveredDate=${deliveredDate}&DeliveryDate=${deliveryDate}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 };
