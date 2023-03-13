@@ -60,7 +60,7 @@ class index extends Component {
           <View
             style={{
               width: wp('80%'),
-              height: this.props.extraButton ? hp('45%') : hp('42%'),
+              height: this.props.extraButton ? hp('45%') : hp('35%'),
               backgroundColor: '#fff',
               alignSelf: 'center',
               borderRadius: 6,
@@ -79,7 +79,11 @@ class index extends Component {
                   flex: 3,
                   marginLeft: wp('15%'),
                 }}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                  }}>
                   {this.props.headingText ? this.props.headingText : ''}
                 </Text>
               </View>
@@ -107,6 +111,8 @@ class index extends Component {
                   <Text
                     style={{
                       fontSize: 15,
+                      textAlign: 'center',
+                      color: 'black',
                     }}>
                     {this.props.bodyText}
                   </Text>

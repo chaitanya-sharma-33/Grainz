@@ -30,6 +30,7 @@ import ViewDraftOrdersScreen from '../screens/Home/Admin/Ordering/DraftOrders/Vi
 import PendingDeliveryAdminScreen from '../screens/Home/Admin/Ordering/PendingDelivery/PendingDelivery';
 import ViewPendingDeliveryScreen from '../screens/Home/Admin/Ordering/PendingDelivery/ViewPendingDelivery';
 import PendingOrderDeliveryScreen from '../screens/Home/Admin/Ordering/PendingDelivery/PendingOrderDelivery';
+import HistoryOrderDeliveryScreen from '../screens/Home/Admin/Ordering/HistoryOrder/HistoryOrderDelivery';
 import ReportsAdminScreen from '../screens/Home/Admin/Reports/Reports';
 import GrossMarginAdminScreen from '../screens/Home/Admin/Reports/GrossMargin';
 import MenuAnalysisAdminScreen from '../screens/Home/Admin/Reports/MenuAnalysis';
@@ -182,6 +183,11 @@ export default function AppNavFun() {
       <AppNav.Screen
         name="PendingOrderDeliveryScreen"
         component={PendingOrderDeliveryScreen}
+      />
+
+      <AppNav.Screen
+        name="HistoryOrderDeliveryScreen"
+        component={HistoryOrderDeliveryScreen}
       />
 
       <AppNav.Screen name="AddPurchaseScreen" component={AddPurchaseScreen} />

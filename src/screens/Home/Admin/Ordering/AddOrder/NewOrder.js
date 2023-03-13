@@ -374,9 +374,15 @@ class NewOrder extends Component {
           .then(res => {
             const finalArr = [];
             res.data.map(item => {
+              console.log('res->NEW ORDER', res);
               finalArr.push({
                 name: item.name,
                 id: item.id,
+                customerNumber:
+                  item.customerNumbers.length > 0
+                    ? item.customerNumbers[0].customerNumber
+                    : '',
+                channel: item.channel,
               });
             });
             this.setState({

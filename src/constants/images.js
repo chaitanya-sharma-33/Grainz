@@ -70,4 +70,5 @@ export default {
   cameraIcon: require('../assests/Images/cameraIcon.png'),
   messageIcon: require('../assests/Images/messageIcon.png'),
   listIcon: require('../assests/Images/listIcon.png'),
+  tickIcon: require('../assests/Images/tickIcon.png'),
 };

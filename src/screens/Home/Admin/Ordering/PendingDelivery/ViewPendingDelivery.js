@@ -25,6 +25,7 @@ import {
   getOrderByIdApi,
   processPendingOrderApi,
   processPendingOrderItemApi,
+  processDeliveredDateApi,
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
@@ -91,6 +92,8 @@ class ViewPendingDelivery extends Component {
       finalData: '',
       switchValueAll: false,
       switchValueSingle: '',
+      finalArrivedDate: '',
+      productionDateArrived: '',
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -186,9 +189,9 @@ class ViewPendingDelivery extends Component {
             apiDeliveryDate: data.deliveryDate,
             pageOrderItems: data.orderItems,
             apiArrivalDate: data.deliveredDate,
-            finalArrivalDate:
+            finalArrivedDate:
               data.deliveredDate &&
-              moment(data.deliveredDate).format('DD-MM-YYYY'),
+              moment(data.deliveredDate).format('DD/MM/YYYY'),
             loaderCompStatus: false,
             totalValue: data.htva.toFixed(2),
           },
@@ -952,6 +955,63 @@ class ViewPendingDelivery extends Component {
     });
   };
 
+  showDatePickerFunArrived = () => {
+    this.setState({
+      isDatePickerVisibleArrived: true,
+    });
+  };
+
+  handleConfirmArrived = date => {
+    let newdate = moment(date).format('DD/MM/YYYY');
+    this.setState(
+      {
+        finalArrivedDate: newdate,
+        productionDateArrived: moment.utc(date).format(),
+        loaderCompStatus: true,
+      },
+      () =>
+        setTimeout(() => {
+          this.hitArriveDateApi();
+        }, 1000),
+    );
+
+    this.hideDatePickerArrived();
+  };
+
+  hideDatePickerArrived = () => {
+    this.setState({
+      isDatePickerVisibleArrived: false,
+    });
+  };
+
+  hitArriveDateApi = () => {
+    const {pageData, productionDateArrived} = this.state;
+    let payload = {};
+    processDeliveredDateApi(
+      payload,
+      pageData.id,
+      productionDateArrived,
+      pageData.deliveryDate,
+    )
+      .then(res => {
+        console.log('res-ARIIVED-DATE', res);
+        this.setState(
+          {
+            loaderCompStatus: false,
+          },
+          () => this.getOrderFun(),
+        );
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+  };
+
   render() {
     const {
       chooseImageModalStatus,
@@ -1001,6 +1061,9 @@ class ViewPendingDelivery extends Component {
       finalData,
       switchSingleValue,
       switchValueAll,
+      finalArrivedDate,
+      isDatePickerVisibleArrived,
+      productionDateArrived,
     } = this.state;
     console.log('finalData--->', finalData);
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
@@ -1052,28 +1115,52 @@ class ViewPendingDelivery extends Component {
                         padding: 15,
                         borderTopLeftRadius: 6,
                       }}>
-                      <View style={{}}>
-                        <Text
+                      <TouchableOpacity
+                        onPress={() => this.showDatePickerFunArrived()}>
+                        <View style={{}}>
+                          <Text
+                            style={{
+                              fontSize: 11,
+                            }}>
+                            Arrived Date
+                          </Text>
+                        </View>
+                        <View
                           style={{
-                            fontSize: 11,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            marginTop: 10,
+                            alignItems: 'center',
                           }}>
-                          {translate('Order No')}.
-                        </Text>
-                      </View>
-                      <View
-                        style={{
-                          marginTop: 10,
-                        }}>
-                        <TextInput
-                          value={finalData.orderReference}
-                          editable={false}
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                            color: 'black',
-                          }}
-                        />
-                      </View>
+                          <TextInput
+                            placeholder="DD/MM/YY"
+                            placeholderTextColor="black"
+                            value={finalArrivedDate}
+                            editable={false}
+                            style={{
+                              fontWeight: 'bold',
+                              color: 'black',
+                            }}
+                          />
+                          <Image
+                            source={img.calenderIcon}
+                            style={{
+                              width: 20,
+                              tintColor: 'grey',
+                              height: 20,
+                              resizeMode: 'contain',
+                              marginRight: 10,
+                            }}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                      <DateTimePickerModal
+                        isVisible={isDatePickerVisibleArrived}
+                        mode={'date'}
+                        onConfirm={this.handleConfirmArrived}
+                        onCancel={this.hideDatePickerArrived}
+                        // minimumDate={minTime}
+                      />
                       <TouchableOpacity
                         onPress={() =>
                           this.props.navigation.navigate(

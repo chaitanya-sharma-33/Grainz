@@ -72,6 +72,8 @@ class NewOrderSec extends Component {
       saveTouchableStatus: false,
       recipeLoader: true,
       placedByData: '',
+      customerNumber: '',
+      channel: '',
     };
   }
 
@@ -114,6 +116,8 @@ class NewOrderSec extends Component {
         this.setState({
           supplierId: item.id,
           supplierName: item.name,
+          customerNumber: item.customerNumber,
+          channel: item.channel,
         });
       }
       this.getDepartmentData();
@@ -222,6 +226,8 @@ class NewOrderSec extends Component {
       finalDeliveryDate,
       finalOrderDate,
       placedByData,
+      customerNumber,
+      channel,
     } = this.state;
 
     let finalData = {
@@ -232,6 +238,8 @@ class NewOrderSec extends Component {
       finalDeliveryDate,
       finalOrderDate,
       placedByData,
+      customerNumber,
+      channel,
     };
 
     if (finalDeliveryDate && supplierId) {
@@ -256,6 +264,8 @@ class NewOrderSec extends Component {
       supplierId,
       supplierName,
       placedByData,
+      customerNumber,
+      channel,
     } = this.state;
 
     return (
@@ -383,10 +393,7 @@ class NewOrderSec extends Component {
                   onCancel={this.hideDatePickerDelivery}
                   // minimumDate={minTime}
                 />
-                <TouchableOpacity
-                  //   onPress={() =>
-                  //     this.props.navigation.navigate('SupplierListScreen')
-                  //   }
+                <View
                   style={{
                     backgroundColor: '#fff',
                     borderRadius: 6,
@@ -424,7 +431,49 @@ class NewOrderSec extends Component {
                       }}
                     />
                   </View>
-                </TouchableOpacity>
+                </View>
+
+                {customerNumber ? (
+                  <View
+                    style={{
+                      backgroundColor: '#fff',
+                      borderRadius: 6,
+                      padding: 12,
+                      marginBottom: hp('2%'),
+                    }}>
+                    <View style={{}}>
+                      <Text style={{}}>Customer Number</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 10,
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        style={{
+                          color: '#4A4C55',
+                          fontSize: 14,
+                          fontFamily: 'Inter-Regular',
+                          fontWeight: 'bold',
+                        }}>
+                        {customerNumber}
+                      </Text>
+                      <Image
+                        source={img.calenderIcon}
+                        style={{
+                          height: 20,
+                          width: 20,
+                          resizeMode: 'contain',
+                          tintColor: 'grey',
+                          marginRight: 10,
+                          tintColor: 'grey',
+                        }}
+                      />
+                    </View>
+                  </View>
+                ) : null}
                 <TouchableOpacity
                   onPress={() =>
                     this.props.navigation.navigate('NewOrderScreen', {

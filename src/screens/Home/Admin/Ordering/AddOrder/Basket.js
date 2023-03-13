@@ -364,6 +364,29 @@ class Basket extends Component {
   };
 
   sendFun = () => {
+    const {finalDataSec} = this.state;
+    if (finalDataSec.channel === 'Ftp') {
+      Alert.alert(`Grainz`, 'Do yo want to send this order?', [
+        {
+          text: 'Yes',
+          onPress: () => this.sendFTPFun(),
+        },
+        {
+          text: 'No',
+          // onPress: () => this.props.navigation.goBack(),
+        },
+      ]);
+    } else {
+      this.setState(
+        {
+          loaderCompStatus: true,
+        },
+        () => this.sendFunSec(),
+      );
+    }
+  };
+
+  sendFTPFun = () => {
     this.setState(
       {
         loaderCompStatus: true,
@@ -381,6 +404,7 @@ class Basket extends Component {
       basketId,
       apiDeliveryDate,
       totalHTVAVal,
+      finalDataSec,
     } = this.state;
     if (
       apiOrderDate &&
@@ -397,12 +421,14 @@ class Basket extends Component {
         placedBy: placedByValue,
         totalValue: totalHTVAVal,
         shopingBasketItemList: finalApiData,
+        customerNumber: finalDataSec.customerNumber,
+        channel: finalDataSec.channel,
       };
       console.log('payload', payload);
       updateDraftOrderNewApi(payload)
         .then(res => {
           this.setState({
-            mailModalVisible: true,
+            mailModalVisible: finalDataSec.channel === 'Ftp' ? false : true,
             loaderCompStatus: false,
             toRecipientValue: res.data && res.data.emailDetails.toRecipient,
             ccRecipientValue: res.data && res.data.emailDetails.ccRecipients,
@@ -462,10 +488,12 @@ class Basket extends Component {
   };
 
   hitDeleteApiFun = () => {
-    const {supplierId, basketId, finalArrData} = this.state;
+    const {supplierId, basketId, finalArrData, finalDataSec} = this.state;
     console.log(supplierId, basketId, finalArrData);
     let payload = {
       supplierId: supplierId,
+      customerNumber: finalDataSec.customerNumber,
+      channel: finalDataSec.channel,
       shopingBasketItemList: [
         {
           id: finalArrData.id,
@@ -509,6 +537,7 @@ class Basket extends Component {
       basketId,
       modalData,
       totalHTVAVal,
+      finalDataSec,
     } = this.state;
     let payload = {
       id: basketId,
@@ -518,6 +547,8 @@ class Basket extends Component {
       placedBy: placedByValue,
       totalValue: totalHTVAVal,
       shopingBasketItemList: finalApiData,
+      customerNumber: finalDataSec.customerNumber,
+      channel: finalDataSec.channel,
     };
     console.log('payload', payload);
     if (apiOrderDate && placedByValue && supplierId && finalApiData) {
@@ -593,6 +624,7 @@ class Basket extends Component {
       basketId,
       apiDeliveryDate,
       totalHTVAVal,
+      finalDataSec,
     } = this.state;
     let payload = {
       id: basketId,
@@ -602,6 +634,8 @@ class Basket extends Component {
       placedBy: placedByValue,
       totalValue: totalHTVAVal,
       shopingBasketItemList: finalApiData,
+      customerNumber: finalDataSec.customerNumber,
+      channel: finalDataSec.channel,
     };
 
     if (
@@ -733,11 +767,13 @@ class Basket extends Component {
   };
 
   updateBasketFun = () => {
-    const {supplierId, basketId, modalData} = this.state;
+    const {supplierId, basketId, modalData, finalDataSec} = this.state;
     let payload = {
       supplierId: supplierId,
       shopingBasketItemList: modalData,
       id: basketId,
+      customerNumber: finalDataSec.customerNumber,
+      channel: finalDataSec.channel,
     };
     updateBasketApi(payload)
       .then(res => {

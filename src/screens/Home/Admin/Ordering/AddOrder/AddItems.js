@@ -1525,6 +1525,7 @@ class AddItems extends Component {
       navigateType,
       productId,
       supplierName,
+      finalData,
     } = this.state;
     if (screenType === 'New') {
       console.log('NEWWW');
@@ -1532,8 +1533,10 @@ class AddItems extends Component {
         let payload = {
           supplierId: supplierId,
           shopingBasketItemList: finalBasketData,
+          customerNumber: finalData.customerNumber,
+          channel: finalData.channel,
         };
-        // console.log('Payload--> New', payload);
+        console.log('Payload--> ADDITEMS', payload);
         addBasketApi(payload)
           .then(res => {
             this.setState(
@@ -1645,7 +1648,7 @@ class AddItems extends Component {
   };
 
   createApiData = () => {
-    const {modalData} = this.state;
+    const {modalData, finalData} = this.state;
     const finalArr = [];
     modalData.map(item => {
       finalArr.push({
@@ -1656,6 +1659,8 @@ class AddItems extends Component {
         quantity: item.quantity,
         action: 'string',
         value: item.value,
+        customerNumber: finalData.customerNumber,
+        channel: finalData.channel,
       });
     });
     this.setState(
@@ -1714,6 +1719,7 @@ class AddItems extends Component {
       supplierId,
       basketId,
       finalApiData,
+      finalData,
     } = this.state;
     let payload = {
       id: basketId,
@@ -1722,6 +1728,8 @@ class AddItems extends Component {
       deliveryDate: apiDeliveryDate,
       placedBy: placedByValue,
       shopingBasketItemList: finalApiData,
+      customerNumber: finalData.customerNumber,
+      finalData: finalData.channel,
     };
 
     // console.log('Payload', payload);
@@ -1827,6 +1835,7 @@ class AddItems extends Component {
         finalData,
       });
     } else {
+      console.log('SAVEEEEE');
       this.saveChangesFun();
     }
   };
@@ -2103,7 +2112,7 @@ class AddItems extends Component {
                   borderBottomColor: inventoryStatus ? '#5197C1' : '#D8DCE6',
                   borderBottomWidth: 3,
                   backgroundColor: inventoryStatus ? '#E6F3F3' : '#fff',
-                  height: hp('5%'),
+                  height: hp('7%'),
                 }}>
                 <Text
                   style={{
@@ -3084,70 +3093,11 @@ class AddItems extends Component {
                             flexDirection: 'row',
                             alignItems: 'center',
                             flex: 1,
-                            marginTop: hp('2%'),
+                            marginTop: hp('3%'),
                           }}>
                           <View
                             style={{
                               flex: 1,
-                            }}>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                                color: 'red',
-                              }}>
-                              {/* Delta Δ */}
-                            </Text>
-
-                            {pageData.deltaNew > 0 ? (
-                              <Text
-                                numberOfLines={1}
-                                style={{
-                                  color: 'red',
-                                  fontSize: 13,
-                                  fontWeight: 'bold',
-                                  marginTop: 10,
-                                }}>
-                                {/* Δ {pageData.deltaNew.toFixed(2)} {pageData.unit} */}
-                              </Text>
-                            ) : (
-                              <Text
-                                style={{
-                                  color: 'black',
-                                  fontSize: 13,
-                                  fontWeight: 'bold',
-                                  marginTop: 10,
-                                }}>
-                                {/* Δ 0 {pageData && pageData.unit} */}
-                              </Text>
-                            )}
-                          </View>
-                          <View
-                            style={{
-                              flex: 1,
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                              }}>
-                              {translate('Ordered Qty')}.
-                            </Text>
-                            <Text
-                              numberOfLines={1}
-                              style={{
-                                fontSize: 13,
-                                fontWeight: 'bold',
-                                marginTop: 10,
-                              }}>
-                              {pageData.quantityProduct
-                                ? pageData.quantityProduct
-                                : modalQuantity}
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              flex: 1,
-                              alignItems: 'center',
                             }}>
                             <Text
                               style={{
@@ -3163,6 +3113,27 @@ class AddItems extends Component {
                                 marginTop: 10,
                               }}>
                               {pageData.packSize} {pageData.productUnit}
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              {translate('Ordered Val')}.
+                            </Text>
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              € {pageData.price}
                             </Text>
                           </View>
                         </View>
@@ -3193,16 +3164,16 @@ class AddItems extends Component {
                               {pageData.productPrice} €/{pageData.productUnit}
                             </Text>
                           </View>
+
                           <View
                             style={{
                               flex: 1,
-                              alignItems: 'center',
                             }}>
                             <Text
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Ordered Val')}.
+                              {translate('Ordered Qty')}.
                             </Text>
                             <Text
                               numberOfLines={1}
@@ -3211,10 +3182,47 @@ class AddItems extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              € {pageData.price}
+                              {pageData.quantityProduct
+                                ? pageData.quantityProduct
+                                : modalQuantity}
                             </Text>
                           </View>
-                          <View
+                          {/* <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                color: 'red',
+                              }}>
+                              Delta Δ
+                            </Text>
+
+                            {pageData.deltaNew > 0 ? (
+                              <Text
+                                numberOfLines={1}
+                                style={{
+                                  color: 'red',
+                                  fontSize: 13,
+                                  fontWeight: 'bold',
+                                  marginTop: 10,
+                                }}>
+                                Δ {pageData.deltaNew.toFixed(2)} {pageData.unit}
+                              </Text>
+                            ) : (
+                              <Text
+                                style={{
+                                  color: 'black',
+                                  fontSize: 13,
+                                  fontWeight: 'bold',
+                                  marginTop: 10,
+                                }}>
+                                Δ 0 {pageData && pageData.unit}
+                              </Text>
+                            )}
+                          </View> */}
+                          {/* <View
                             style={{
                               flex: 1,
                               alignItems: 'center',
@@ -3230,7 +3238,7 @@ class AddItems extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}></Text>
-                          </View>
+                          </View> */}
                         </View>
 
                         <View

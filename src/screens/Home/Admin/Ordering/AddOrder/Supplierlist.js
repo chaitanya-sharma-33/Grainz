@@ -169,6 +169,7 @@ class SupplierList extends Component {
       () =>
         getSupplierProductsApi(supplierId, catName)
           .then(res => {
+            console.log('res-SUPP', res);
             const finalArr = res.data;
             finalArr.forEach(function (item) {
               item.isSelected = false;

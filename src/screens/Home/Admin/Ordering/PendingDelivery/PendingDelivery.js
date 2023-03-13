@@ -25,6 +25,7 @@ import {
   historyOrderApi,
   duplicateApi,
   orderByStatusApi,
+  updateOrderStatusApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -61,6 +62,7 @@ class PendingDelivery extends Component {
       loadMoreStatus: false,
       pageSize: '10',
       selectedPage: '1',
+      pickerModalStatusOption: false,
     };
   }
 
@@ -103,7 +105,6 @@ class PendingDelivery extends Component {
 
   componentDidMount() {
     this.getData();
-
     this.props.navigation.addListener('focus', () => {
       const {listId} = this.props.route && this.props.route.params;
       const {filterData} = this.props.route && this.props.route.params;
@@ -490,9 +491,25 @@ class PendingDelivery extends Component {
 
   pickerFun = item => {
     this.setState({
-      duplicateModalStatus: true,
+      pickerModalStatusOption: true,
       param: item,
     });
+  };
+
+  duplicateModalFun = () => {
+    this.setState(
+      {
+        pickerModalStatusOption: false,
+      },
+      () =>
+        setTimeout(
+          () =>
+            this.setState({
+              duplicateModalStatus: true,
+            }),
+          1000,
+        ),
+    );
   };
 
   duplicateModalFunSec = () => {
@@ -531,6 +548,50 @@ class PendingDelivery extends Component {
     );
   };
 
+  pendingFun = () => {
+    const {param} = this.state;
+
+    console.log('param', param);
+
+    let payload = {};
+
+    updateOrderStatusApi(payload, param.id, 'Pending')
+      .then(res => {
+        this.setState(
+          {
+            pickerModalStatusOption: false,
+            modalLoaderDrafts: true,
+          },
+          () => this.getFinalData(),
+        );
+      })
+      .catch(err => {
+        console.warn('err', err);
+      });
+  };
+
+  reviewFun = () => {
+    const {param} = this.state;
+
+    console.log('param', param);
+
+    let payload = {};
+
+    updateOrderStatusApi(payload, param.id, 'Review')
+      .then(res => {
+        this.setState(
+          {
+            pickerModalStatusOption: false,
+            modalLoaderDrafts: true,
+          },
+          () => this.getFinalData(),
+        );
+      })
+      .catch(err => {
+        console.warn('err', err);
+      });
+  };
+
   render() {
     const {
       buttonsSubHeader,
@@ -549,6 +610,7 @@ class PendingDelivery extends Component {
       pickerModalStatus,
       duplicateModalStatus,
       deleteModalStatus,
+      pickerModalStatusOption,
     } = this.state;
 
     return (
@@ -848,7 +910,7 @@ class PendingDelivery extends Component {
                             fontFamily: 'Inter-SemiBold',
                             fontSize: 14,
                           }}>
-                          {translate('HTVA')}
+                          {translate('HTVA')} €
                         </Text>
                         <View>
                           <Image
@@ -1026,6 +1088,124 @@ class PendingDelivery extends Component {
                   </View>
                 )}
               </ScrollView>
+
+              <Modal
+                isVisible={pickerModalStatusOption}
+                backdropOpacity={0.35}
+                animationIn="bounceInRight">
+                <View
+                  style={{
+                    width: wp('80%'),
+                    height: hp('20%'),
+                    backgroundColor: '#fff',
+                    alignSelf: 'center',
+                    borderRadius: 6,
+                  }}>
+                  <View
+                    style={{
+                      height: hp('5%'),
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <View
+                      style={{
+                        flex: 3,
+                      }}></View>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flex: 1,
+                      }}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.setState({
+                            pickerModalStatusOption: false,
+                          })
+                        }>
+                        <Image
+                          source={img.cancelIcon}
+                          style={{
+                            height: 22,
+                            width: 22,
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <ScrollView>
+                    <View style={{padding: hp('3%')}}>
+                      <TouchableOpacity
+                        onPress={() => this.duplicateModalFun()}
+                        style={{
+                          width: wp('70%'),
+                          height: hp('5%'),
+                          backgroundColor: '#5297c1',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderRadius: 6,
+                          marginBottom: 5,
+                          alignSelf: 'center',
+                        }}>
+                        <Text
+                          style={{
+                            color: '#fff',
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                          }}>
+                          {translate('Duplicate')}
+                        </Text>
+                      </TouchableOpacity>
+
+                      {listId === 2 ? null : listId === 3 ? (
+                        <TouchableOpacity
+                          onPress={() => this.pendingFun()}
+                          style={{
+                            width: wp('90%'),
+                            height: hp('5%'),
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 10,
+                            marginBottom: 5,
+                            alignSelf: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: 'black',
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                            }}>
+                            Move to Pending
+                          </Text>
+                        </TouchableOpacity>
+                      ) : listId == 4 ? (
+                        <TouchableOpacity
+                          onPress={() => this.reviewFun()}
+                          style={{
+                            width: wp('90%'),
+                            height: hp('5%'),
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 10,
+                            marginBottom: 5,
+                            alignSelf: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: 'black',
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                            }}>
+                            Move to Review
+                          </Text>
+                        </TouchableOpacity>
+                      ) : null}
+                    </View>
+                  </ScrollView>
+                </View>
+              </Modal>
               <Modal isVisible={mailModalVisible} backdropOpacity={0.35}>
                 <View
                   style={{
@@ -1208,7 +1388,7 @@ class PendingDelivery extends Component {
                 saveFun={() => this.duplicateModalFunSec()}
                 yesStatus
               />
-              <SurePopUp
+              {/* <SurePopUp
                 pickerModalStatus={deleteModalStatus}
                 headingText={translate('Delete')}
                 crossFun={() => this.closeModalFun()}
@@ -1216,7 +1396,7 @@ class PendingDelivery extends Component {
                 cancelFun={() => this.closeModalFun()}
                 saveFun={() => this.deleteFun()}
                 yesStatus
-              />
+              /> */}
               <TouchableOpacity
                 onPress={() =>
                   this.props.navigation.navigate('NewOrderSecScreen', {

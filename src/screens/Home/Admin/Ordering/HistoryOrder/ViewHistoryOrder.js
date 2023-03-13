@@ -3115,6 +3115,7 @@ import {
   getOrderByIdApi,
   processPendingOrderApi,
   processPendingOrderItemApi,
+  updateOrderStatusApi,
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
@@ -3124,6 +3125,8 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import LoaderComp from '../../../../../components/Loader';
 import TriStateToggleSwitch from 'rn-tri-toggle-switch';
 import Modal from 'react-native-modal';
+import SurePopUp from '../../../../../components/SurePopUp';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 class ViewHistoryOrder extends Component {
   constructor(props) {
@@ -3176,6 +3179,10 @@ class ViewHistoryOrder extends Component {
       showMoreStatus: false,
       listIndex: '',
       finalData: '',
+      reviewModalStatus: false,
+      cancelModalStatus: false,
+      checklistModalStatus: false,
+      checklistNotes: '',
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -3259,7 +3266,7 @@ class ViewHistoryOrder extends Component {
         this.setState(
           {
             pageData: data,
-            finalDeliveryDate: moment(data.deliveryDate).format('DD-MM-YYYY'),
+            finalDeliveryDate: moment(data.deliveryDate).format('DD/MM/YYYY'),
             pageInvoiceNumber: data.invoiceNumber,
             pageDeliveryNoteReference: data.deliveryNoteReference,
             pageAmbientTemp: data.ambientTemp,
@@ -3269,7 +3276,7 @@ class ViewHistoryOrder extends Component {
             apiDeliveryDate: data.deliveryDate,
             pageOrderItems: data.orderItems,
             apiArrivalDate: data.deliveredDate,
-            finalArrivalDate: moment(data.deliveredDate).format('DD-MM-YYYY'),
+            finalArrivalDate: moment(data.deliveredDate).format('DD/MM/YYYY'),
             loaderCompStatus: false,
             totalValue: data.htva.toFixed(2),
           },
@@ -3281,7 +3288,7 @@ class ViewHistoryOrder extends Component {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
             text: 'Okay',
-            // onPress: () => this.props.navigation.goBack(),
+            onPress: () => this.props.navigation.goBack(),
           },
         ]);
       });
@@ -3492,7 +3499,7 @@ class ViewHistoryOrder extends Component {
   };
 
   handleConfirmDeliveryDate = date => {
-    let newdate = moment(date).format('DD-MM-YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     let apiDeliveryDate = date.toISOString();
     this.setState({
       finalDeliveryDate: newdate,
@@ -3520,7 +3527,7 @@ class ViewHistoryOrder extends Component {
   };
 
   handleConfirmArrivalDate = date => {
-    let newdate = moment(date).format('DD-MM-YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     let apiArrivalDate = date.toISOString();
     this.hideDatePickerArrivalDate();
     this.setState(
@@ -3560,7 +3567,7 @@ class ViewHistoryOrder extends Component {
   };
 
   handleConfirmArrivalDateSpecific = date => {
-    let newdate = moment(date).format('DD-MM-YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     let apiArrivalDateSpecific = date.toISOString();
     this.hideDatePickerArrivalDateSpecific();
     this.setState({
@@ -3807,7 +3814,7 @@ class ViewHistoryOrder extends Component {
       modalUserQuantityInvoiced: item.userQuantityInvoiced,
       modalPricePaid: item.pricePaid,
       modalNotes: item.notes,
-      finalArrivalDateSpecific: moment(item.arrivedDate).format('DD-MM-YYYY'),
+      finalArrivalDateSpecific: moment(item.arrivedDate).format('DD/MM/YYYY'),
     });
   };
 
@@ -3825,7 +3832,7 @@ class ViewHistoryOrder extends Component {
         modalUserQuantityInvoiced: item.userQuantityInvoiced,
         modalPricePaid: item.orderValue,
         modalNotes: item.notes,
-        finalArrivalDateSpecific: moment(item.arrivedDate).format('DD-MM-YYYY'),
+        finalArrivalDateSpecific: moment(item.arrivedDate).format('DD/MM/YYYY'),
         listIndex: '',
       });
     } else {
@@ -3839,7 +3846,7 @@ class ViewHistoryOrder extends Component {
         modalUserQuantityInvoiced: item.userQuantityInvoiced,
         modalPricePaid: item.orderValue,
         modalNotes: item.notes,
-        finalArrivalDateSpecific: moment(item.arrivedDate).format('DD-MM-YYYY'),
+        finalArrivalDateSpecific: moment(item.arrivedDate).format('DD/MM/YYYY'),
         listIndex: index,
       });
     }
@@ -3937,7 +3944,7 @@ class ViewHistoryOrder extends Component {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
             text: 'Okay',
-            // onPress: () => this.props.navigation.goBack(),
+            onPress: () => this.props.navigation.goBack(),
           },
         ]);
       });
@@ -3953,6 +3960,49 @@ class ViewHistoryOrder extends Component {
       listId: listId,
     });
   };
+
+  closeModalFun = () => {
+    this.setState({
+      reviewModalStatus: false,
+      cancelModalStatus: false,
+    });
+  };
+
+  moveToReviewFun = () => {
+    this.setState({
+      reviewModalStatus: true,
+    });
+  };
+
+  moveToReviewFunSec = () => {
+    const {finalData} = this.state;
+
+    let payload = {};
+
+    updateOrderStatusApi(payload, finalData.id, 'Review')
+      .then(res => {
+        this.setState(
+          {
+            reviewModalStatus: false,
+          },
+          () => this.props.navigation.goBack(),
+        );
+      })
+      .catch(err => {
+        console.warn('err', err);
+      });
+  };
+
+  cancelModalFun = () => {
+    this.setState(
+      {
+        cancelModalStatus: false,
+      },
+      () => this.props.navigation.goBack(),
+    );
+  };
+
+  previewPDFFun = () => {};
 
   render() {
     const {
@@ -3993,7 +4043,13 @@ class ViewHistoryOrder extends Component {
       showMoreStatus,
       listIndex,
       finalData,
+      reviewModalStatus,
+      cancelModalStatus,
+      checklistModalStatus,
+      checklistNotes,
     } = this.state;
+
+    console.log('finalData', finalData);
 
     return (
       <View style={styles.container}>
@@ -4001,11 +4057,7 @@ class ViewHistoryOrder extends Component {
           logoutFun={this.myProfile}
           logoFun={() => this.props.navigation.navigate('HomeScreen')}
         />
-        {/* {loader ? (
-          <ActivityIndicator size="small" color="#98C13E" />
-        ) : (
-          <SubHeader {...this.props} buttons={buttonsSubHeader} index={0} />
-        )} */}
+
         <LoaderComp loaderComp={loaderCompStatus} />
         <View style={{...styles.subContainer, flex: 1}}>
           <View style={styles.firstContainer}>
@@ -4015,7 +4067,9 @@ class ViewHistoryOrder extends Component {
               <Image source={img.backIcon} style={styles.tileImageBack} />
             </TouchableOpacity>
             <View style={styles.flex}>
-              <Text style={styles.adminTextStyle}>{translate('History')}</Text>
+              <Text style={styles.adminTextStyle}>
+                {translate('History')} - {finalData.supplierName}
+              </Text>
             </View>
           </View>
           <View style={{flex: 1}}>
@@ -4063,7 +4117,12 @@ class ViewHistoryOrder extends Component {
                         />
                       </View>
                       <TouchableOpacity
-                        onPress={() => alert('See Details')}
+                        onPress={() =>
+                          this.props.navigation.navigate(
+                            'HistoryOrderDeliveryScreen',
+                            {finalData: finalData},
+                          )
+                        }
                         style={{
                           marginTop: 15,
                         }}>
@@ -4132,17 +4191,36 @@ class ViewHistoryOrder extends Component {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  // onPress={() => this.previewPDFFun()}
+                  onPress={() =>
+                    this.setState({
+                      checklistModalStatus: true,
+                    })
+                  }
                   style={{
-                    height: hp('5.5%'),
+                    height: hp('7%'),
                     width: wp('87%'),
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginTop: hp('2%'),
+                    marginVertical: hp('3%'),
                     borderRadius: 10,
                     borderWidth: 1,
                     borderColor: '#5197C1',
+                    flexDirection: 'row',
                   }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                    }}>
+                    <Image
+                      source={img.tickIcon}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        resizeMode: 'contain',
+                        tintColor: '#5197C1',
+                      }}
+                    />
+                  </View>
                   <View
                     style={{
                       alignItems: 'center',
@@ -4153,7 +4231,7 @@ class ViewHistoryOrder extends Component {
                         marginLeft: 10,
                         fontFamily: 'Inter-SemiBold',
                       }}>
-                      {translate('Delivery checklist')}
+                      Checklist
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -4792,18 +4870,77 @@ class ViewHistoryOrder extends Component {
                         console.log('item', item);
                         return (
                           <View key={index}>
-                            <View style={{marginTop: hp('2%')}}>
+                            <View
+                              style={{
+                                position: 'absolute',
+                                flexDirection: 'row',
+                                borderRadius: 5,
+                                bottom: '85%',
+                                left: '5%',
+                                zIndex: 10,
+                                backgroundColor:
+                                  item.inventoryMapping &&
+                                  item.inventoryMapping.departmentName === 'Bar'
+                                    ? '#B2B4B8'
+                                    : item.inventoryMapping &&
+                                      item.inventoryMapping.departmentName ===
+                                        'Kitchen'
+                                    ? '#D448A7'
+                                    : item.inventoryMapping &&
+                                      item.inventoryMapping.departmentName ===
+                                        'Rental'
+                                    ? '#E1A72E'
+                                    : item.inventoryMapping &&
+                                      item.inventoryMapping.departmentName ===
+                                        'Other'
+                                    ? '#85CF31'
+                                    : null,
+                                padding: 5,
+                              }}>
+                              <View>
+                                <Image
+                                  style={{
+                                    width: 15,
+                                    height: 15,
+                                    resizeMode: 'contain',
+                                  }}
+                                  source={
+                                    item.inventoryMapping &&
+                                    item.inventoryMapping.departmentName ===
+                                      'Bar'
+                                      ? img.barIcon
+                                      : item.inventoryMapping &&
+                                        item.inventoryMapping.departmentName ===
+                                          'Kitchen'
+                                      ? img.kitchenIcon
+                                      : item.inventoryMapping &&
+                                        item.inventoryMapping.departmentName ===
+                                          'Rental'
+                                      ? img.retailIcon
+                                      : item.inventoryMapping &&
+                                        item.inventoryMapping.departmentName ===
+                                          'Other'
+                                      ? img.otherIcon
+                                      : null
+                                  }
+                                />
+                              </View>
+                            </View>
+                            <View
+                              style={{
+                                marginTop: hp('2%'),
+                                marginBottom: hp('2%'),
+                              }}>
                               <View
                                 style={{
                                   flexDirection: 'row',
-                                  borderTopWidth: 1,
-                                  borderLeftWidth: 1,
-                                  borderRightWidth: 1,
                                   borderColor: 'grey',
                                   borderTopLeftRadius: 6,
                                   borderTopRightRadius: 6,
                                   padding: 10,
                                   flex: 1,
+                                  marginTop: 10,
+                                  backgroundColor: '#fff',
                                 }}>
                                 <View
                                   style={{
@@ -4818,7 +4955,7 @@ class ViewHistoryOrder extends Component {
                                       item.inventoryMapping.inventoryName}
                                   </Text>
                                 </View>
-
+                                {/* 
                                 <TouchableOpacity
                                   onPress={() => this.deleteFun(item, index)}
                                   style={{
@@ -4834,17 +4971,16 @@ class ViewHistoryOrder extends Component {
                                       tintColor: 'red',
                                     }}
                                   />
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
                               </View>
                               <View
                                 style={{
                                   flex: 1,
                                   flexDirection: 'row',
-                                  borderLeftWidth: 1,
-                                  borderRightWidth: 1,
-                                  borderBottomWidth: 1,
+                                  borderBottomWidth: 0.5,
                                   borderColor: 'grey',
                                   padding: 10,
+                                  backgroundColor: '#fff',
                                 }}>
                                 <View
                                   style={{
@@ -4860,20 +4996,18 @@ class ViewHistoryOrder extends Component {
                                 style={{
                                   flex: 1,
                                   flexDirection: 'row',
-                                  borderLeftWidth: 1,
-                                  borderRightWidth: 1,
-                                  borderBottomWidth: 1,
                                   borderColor: 'grey',
                                   borderBottomLeftRadius: 6,
                                   borderBottomRightRadius: 6,
                                   padding: 10,
+                                  backgroundColor: '#fff',
                                 }}>
                                 <View
                                   style={{
                                     flex: 1,
                                   }}>
                                   <Text style={{fontSize: 10}}>
-                                    {translate('Price')}
+                                    Arrived date
                                   </Text>
                                   <Text
                                     style={{
@@ -4881,43 +5015,9 @@ class ViewHistoryOrder extends Component {
                                       fontSize: 14,
                                       fontWeight: 'bold',
                                     }}>
-                                    {item.inventoryMapping &&
-                                      item.inventoryMapping.productPrice}{' '}
-                                    Є/
-                                    {/* {item.inventoryMapping.productUnit} */}
-                                  </Text>
-                                </View>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
-                                  <Text style={{fontSize: 10}}>
-                                    {translate('Ordered Val')}.
-                                  </Text>
-                                  <Text
-                                    style={{
-                                      marginTop: 10,
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {/* {item.value.toFixed(2)} */}
-                                    {item.orderValue}
-                                  </Text>
-                                </View>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
-                                  <Text style={{fontSize: 10}}>
-                                    {translate('Ordered Qty')}.
-                                  </Text>
-                                  <Text
-                                    style={{
-                                      marginTop: 10,
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {item.displayQuantity}
+                                    {moment(item.arrivedDate).format(
+                                      'DD/MM/YYYY',
+                                    )}
                                   </Text>
                                 </View>
                               </View>
@@ -5681,69 +5781,64 @@ class ViewHistoryOrder extends Component {
                   <View
                     style={{
                       flexDirection: 'row',
-                      justifyContent: 'space-between',
                       flex: 1,
                       backgroundColor: '#FFFFFF',
-                      paddingVertical: hp('3%'),
+                      padding: 10,
                       borderTopLeftRadius: 5,
                       borderTopRightRadius: 5,
-                      paddingHorizontal: 20,
+                      alignItems: 'center',
                     }}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        this.setState({isAuditStatus: !isAuditStatus})
-                      }
-                      style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <View
-                        style={{
-                          borderRadius: 100,
-                          // backgroundColor: isCheckedEditableStatus
-                          //   ? '#D6D6D6'
-                          //   : '#fff',
-                        }}>
-                        <CheckBox
-                          disabled={true}
-                          value={isAuditStatus}
-                          // onValueChange={() =>
-                          //   this.setState({isAuditStatus: !isAuditStatus})
-                          // }
-                          style={{
-                            height: 20,
-                            width: 20,
-                          }}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter-Regular',
-                          marginLeft: 10,
-                          textAlign: 'center',
-                        }}>
-                        {' '}
-                        Audit Complete ?
-                      </Text>
-                    </TouchableOpacity>
                     <View
                       style={{
                         flex: 1,
-                        justifyContent: 'center',
-                        marginLeft: wp('5%'),
                       }}>
-                      <Text style={{}}>Total HTVA</Text>
+                      <Text style={{color: 'black', fontWeight: 'bold'}}>
+                        Total HTVA:
+                      </Text>
                     </View>
                     <View
                       style={{
                         flex: 1,
-                        justifyContent: 'center',
-                        marginLeft: wp('5%'),
+                        alignItems: 'flex-end',
                       }}>
-                      <Text> € {totalValue}</Text>
-                      {/* <Text> $ {Number(totalHTVAVal).toFixed(2)}</Text> */}
+                      <Text> {totalValue} €</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      flex: 0.5,
+                      alignItems: 'center',
+                      marginTop: hp('2%'),
+                    }}>
+                    <View
+                      style={{
+                        flex: 1,
+                      }}>
+                      <CheckBox
+                        disabled={true}
+                        value={finalData.isAuditComplete}
+                        style={{
+                          height: 20,
+                          width: 20,
+                          color: 'grey',
+                        }}
+                      />
+                    </View>
+                    <View
+                      style={{
+                        flex: 7,
+                      }}>
+                      <Text
+                        style={{
+                          color: 'grey',
+                        }}>
+                        Audit complete(You can select when all items are checked
+                        correct)
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -5751,11 +5846,10 @@ class ViewHistoryOrder extends Component {
 
               <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <TouchableOpacity
-                  // onPress={() => this.sendFun()}
+                  onPress={() => this.previewPDFFun()}
                   style={{
-                    height: hp('6%'),
+                    height: hp('7%'),
                     width: wp('87%'),
-                    // backgroundColor: '#5197C1',
                     justifyContent: 'center',
                     alignItems: 'center',
                     marginTop: hp('3%'),
@@ -5779,9 +5873,9 @@ class ViewHistoryOrder extends Component {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  // onPress={() => this.updateBasketFun()}
+                  onPress={() => this.moveToReviewFun()}
                   style={{
-                    height: hp('6%'),
+                    height: hp('7%'),
                     width: wp('87%'),
                     backgroundColor: '#5197C1',
                     justifyContent: 'center',
@@ -5799,13 +5893,368 @@ class ViewHistoryOrder extends Component {
                         marginLeft: 10,
                         fontFamily: 'Inter-SemiBold',
                       }}>
-                      {translate('Save')}
+                      Move to Review
                     </Text>
                   </View>
                 </TouchableOpacity>
 
+                <SurePopUp
+                  pickerModalStatus={reviewModalStatus}
+                  headingText="Move to review"
+                  crossFun={() => this.closeModalFun()}
+                  bodyText="Are you sure you want to move this to review?"
+                  cancelFun={() => this.closeModalFun()}
+                  saveFun={() => this.moveToReviewFunSec()}
+                  yesStatus
+                />
+
+                <Modal isVisible={checklistModalStatus} backdropOpacity={0.35}>
+                  <View
+                    style={{
+                      width: wp('100%'),
+                      height: hp('100%'),
+                      backgroundColor: '#F0F4FE',
+                      alignSelf: 'center',
+                    }}>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: '#f2efef',
+                      }}>
+                      <KeyboardAwareScrollView
+                        keyboardShouldPersistTaps="always"
+                        showsVerticalScrollIndicator={false}
+                        enableOnAndroid>
+                        <View style={styles.secondContainer}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              height: hp('10%'),
+                              marginHorizontal: wp('6%'),
+                              marginTop: hp('4%'),
+                              borderBottomWidth: 0.5,
+                              borderBottomColor: 'grey',
+                            }}>
+                            <TouchableOpacity
+                              onPress={() =>
+                                this.setState({
+                                  checklistModalStatus: false,
+                                })
+                              }
+                              style={{
+                                backgroundColor: '#fff',
+                                borderRadius: 100,
+                                padding: 5,
+                                marginRight: wp('2%'),
+                              }}>
+                              <Image
+                                source={img.backIcon}
+                                style={{
+                                  height: 15,
+                                  width: 15,
+                                  resizeMode: 'contain',
+                                }}
+                              />
+                            </TouchableOpacity>
+                            <View
+                              style={{
+                                flex: 4,
+                              }}>
+                              <Text style={styles.textStylingLogo}>
+                                Checklist
+                              </Text>
+                            </View>
+                          </View>
+                          {pageOrderItems.map((item, index) => {
+                            console.log('item----->', item);
+                            return (
+                              <View
+                                style={{
+                                  marginTop: hp('3%'),
+                                  borderBottomWidth: 0.5,
+                                  borderBottomColor: 'grey',
+                                  paddingBottom: 15,
+                                  marginHorizontal: wp('3%'),
+                                }}>
+                                <View style={styles.insideContainer}>
+                                  <View>
+                                    <Text
+                                      style={{
+                                        fontSize: 14,
+                                        fontWeight: 'bold',
+                                        color: 'black',
+                                      }}>
+                                      {item.inventoryName}
+                                    </Text>
+                                    <Text
+                                      style={{
+                                        fontSize: 12,
+                                        color: 'black',
+                                        marginTop: 10,
+                                      }}>
+                                      {item.productName}
+                                    </Text>
+                                  </View>
+
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      flex: 1,
+                                      marginTop: hp('3%'),
+                                    }}>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 12,
+                                        }}>
+                                        Ordered No.
+                                      </Text>
+                                      <Text
+                                        numberOfLines={1}
+                                        style={{
+                                          fontSize: 13,
+                                          fontWeight: 'bold',
+                                          marginTop: 10,
+                                        }}>
+                                        {item.quantityOrdered}
+                                      </Text>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 12,
+                                        }}>
+                                        {translate('Ordered Qty')}.
+                                      </Text>
+                                      <Text
+                                        numberOfLines={1}
+                                        style={{
+                                          fontSize: 13,
+                                          fontWeight: 'bold',
+                                          marginTop: 10,
+                                        }}>
+                                        {item.grainzVolume *
+                                          item.quantityOrdered}{' '}
+                                        {item.unit}
+                                      </Text>
+                                    </View>
+                                  </View>
+
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      flex: 1,
+                                      marginTop: hp('2%'),
+                                    }}>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 12,
+                                        }}>
+                                        Delivered No.
+                                      </Text>
+                                      <Text
+                                        style={{
+                                          fontSize: 13,
+                                          fontWeight: 'bold',
+                                          marginTop: 10,
+                                        }}>
+                                        {item.quantityDelivered}
+                                      </Text>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 12,
+                                        }}>
+                                        Delivered Qty.
+                                      </Text>
+                                      <Text
+                                        numberOfLines={1}
+                                        style={{
+                                          fontSize: 13,
+                                          fontWeight: 'bold',
+                                          marginTop: 10,
+                                        }}>
+                                        {item.userQuantityDelivered} {item.unit}
+                                      </Text>
+                                    </View>
+                                  </View>
+
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      flex: 1,
+                                      marginTop: hp('2%'),
+                                    }}>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 12,
+                                        }}>
+                                        Invoiced No.
+                                      </Text>
+                                      <Text
+                                        style={{
+                                          fontSize: 13,
+                                          fontWeight: 'bold',
+                                          marginTop: 10,
+                                        }}>
+                                        {item.quantityInvoiced}
+                                      </Text>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 12,
+                                        }}>
+                                        Invoiced Qty.
+                                      </Text>
+                                      <Text
+                                        numberOfLines={1}
+                                        style={{
+                                          fontSize: 13,
+                                          fontWeight: 'bold',
+                                          marginTop: 10,
+                                        }}>
+                                        {item.userQuantityInvoiced} {item.unit}
+                                      </Text>
+                                    </View>
+                                  </View>
+                                </View>
+                              </View>
+                            );
+                          })}
+                        </View>
+                      </KeyboardAwareScrollView>
+                      <View style={{}}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                          }}>
+                          <TextInput
+                            placeholder="Notes"
+                            multiline
+                            style={{
+                              padding: 10,
+                              backgroundColor: '#fff',
+                              borderRadius: 10,
+                              width: wp('88%'),
+                              height: hp('15%'),
+                              marginTop: 10,
+                            }}
+                            value={checklistNotes}
+                            onChangeText={value =>
+                              this.setState({
+                                checklistNotes: value,
+                              })
+                            }
+                          />
+                        </View>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.setState({
+                            checklistModalStatus: false,
+                          })
+                        }
+                        style={{
+                          height: hp('7%'),
+                          width: wp('87%'),
+                          backgroundColor: '#5197C1',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderRadius: 10,
+                          alignSelf: 'center',
+                          marginTop: hp('3%'),
+                        }}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: 'white',
+                              marginLeft: 10,
+                              fontFamily: 'Inter-SemiBold',
+                            }}>
+                            Save
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.setState({
+                            checklistModalStatus: false,
+                          })
+                        }
+                        style={{
+                          height: hp('7%'),
+                          width: wp('80%'),
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginBottom: hp('3%'),
+                          alignSelf: 'center',
+                        }}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: '#5197C1',
+                              marginLeft: 10,
+                              fontFamily: 'Inter-SemiBold',
+                            }}>
+                            {translate('Cancel')}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+
+                <SurePopUp
+                  pickerModalStatus={cancelModalStatus}
+                  // headingText="Move to review"
+                  crossFun={() => this.closeModalFun()}
+                  bodyText="Are you sure?"
+                  cancelFun={() => this.closeModalFun()}
+                  saveFun={() => this.cancelModalFun()}
+                  yesStatus
+                />
+
                 <TouchableOpacity
-                  onPress={() => this.props.navigation.goBack()}
+                  onPress={() =>
+                    this.setState({
+                      cancelModalStatus: true,
+                    })
+                  }
                   style={{
                     height: hp('6%'),
                     width: wp('80%'),

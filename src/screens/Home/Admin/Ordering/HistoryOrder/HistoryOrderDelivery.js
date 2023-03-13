@@ -48,7 +48,7 @@ minTime.setMilliseconds(0);
 // let todayDate = moment(new Date()).format('DD/MM/YYYY');
 // let todayDateProd = moment.utc(new Date()).format();
 
-class PendingOrderDelivery extends Component {
+class HistoryOrderDelivery extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -313,7 +313,7 @@ class PendingOrderDelivery extends Component {
                 </TouchableOpacity>
                 <View style={styles.flex}>
                   <Text style={styles.adminTextStyle}>
-                    {translate('Pending')} - {finalData.supplierName}
+                    {translate('History')} - {finalData.supplierName}
                   </Text>
                 </View>
               </View>
@@ -777,7 +777,7 @@ class PendingOrderDelivery extends Component {
             </View>
           </View>
         </ScrollView>
-        <View style={{}}>
+        {/* <View style={{}}>
           <View
             style={{
               alignItems: 'center',
@@ -828,7 +828,7 @@ class PendingOrderDelivery extends Component {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
       </View>
     );
   }
@@ -842,5 +842,5 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps, {UserTokenAction})(
-  PendingOrderDelivery,
+  HistoryOrderDelivery,
 );

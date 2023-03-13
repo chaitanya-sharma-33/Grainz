@@ -19,6 +19,7 @@ import {
   getMyProfileApi,
   getUserLocationApi,
   setCurrentLocation,
+  updateUserApi,
 } from '../../connectivity/api';
 import {
   widthPercentageToDP as wp,
@@ -68,6 +69,7 @@ class index extends Component {
   getProfileData = () => {
     getMyProfileApi()
       .then(res => {
+        console.log('res---->USER', res);
         const {firstName, lastName, email, jobTitle, phoneNumber} = res.data;
         this.setState({
           firstName,
@@ -208,6 +210,35 @@ class index extends Component {
         }),
       2000,
     );
+  };
+
+  updateUserFun = () => {
+    const {
+      email,
+      phoneNumber,
+      jobTitle,
+      finalLang,
+      finalLocation,
+      firstName,
+      lastName,
+    } = this.state;
+    const payload = {
+      email: email,
+      firstName: firstName,
+      id: 'd8aa6950-9d4d-4ba3-9319-3a0c42c8c7d3',
+      jobTitle: jobTitle,
+      language: finalLang,
+      lastName: lastName,
+      phoneNumber: phoneNumber,
+    };
+
+    updateUserApi(payload)
+      .then(res => {
+        console.log('Res', res);
+      })
+      .catch(err => {
+        console.warn('ERr', err);
+      });
   };
 
   render() {
@@ -358,7 +389,11 @@ class index extends Component {
                     fontWeight: 'bold',
                     color: 'black',
                   }}
-                  editable={false}
+                  onChangeText={value =>
+                    this.setState({
+                      jobTitle: value,
+                    })
+                  }
                 />
               </View>
 
@@ -379,13 +414,18 @@ class index extends Component {
                 </Text>
                 <TextInput
                   value={phoneNumber}
+                  keyboardType="numeric"
                   placeholder={translate('Mobile phone')}
                   style={{
                     paddingVertical: 10,
                     fontWeight: 'bold',
                     color: 'black',
                   }}
-                  editable={false}
+                  onChangeText={value =>
+                    this.setState({
+                      phoneNumber: value,
+                    })
+                  }
                 />
               </View>
 
@@ -582,7 +622,7 @@ class index extends Component {
                 </TouchableOpacity>
               </View>
               <TouchableOpacity
-                onPress={() => this.createOrder()}
+                onPress={() => this.updateUserFun()}
                 style={{
                   width: wp('90%'),
                   height: hp('7%'),

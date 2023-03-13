@@ -1236,3 +1236,45 @@ export const deliveredDateUpdateApi = async (
     },
   );
 };
+
+export const updateOrderStatusApi = async (payload, id, status) => {
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(
+    baseURL + `/Order/update order status?Id=${id}&Status=${status}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};
+
+export const updateUserApi = async payload => {
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(baseURL + `/User/update current user`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const processDeliveredDateApi = async (
+  payload,
+  id,
+  deliveredDate,
+  deliveryDate,
+) => {
+  console.log(payload, id, deliveredDate, deliveryDate);
+  const token = await AsyncStorage.getItem('@appToken');
+  return axios.post(
+    baseURL +
+      `/Order/process order delivered date?Id=${id}&DeliveredDate=${deliveredDate}&DeliveryDate=${deliveryDate}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};
