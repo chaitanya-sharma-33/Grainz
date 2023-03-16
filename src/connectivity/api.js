@@ -45,59 +45,74 @@ export const loginApi = payload => {
 
 export async function getMyProfileApi() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Account/users/me', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 
 export async function getCountriesApi() {
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Lookup/GetCountries', {
-    headers: {},
+    headers: {
+      LocationId: location,
+    },
   });
 }
 
 export async function getPendingMepsApi() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Recipe/pending meps', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 export async function getMepsHistoryApi() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Recipe/mep history', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 
 export async function getMepsOldHistoryApi() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Recipe/mep old history', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 
 export const deleteMepApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Recipe/delete mep', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const forgotPassApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Account/Forgot Password', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -105,9 +120,11 @@ export const forgotPassApi = async payload => {
 export const getMepRecipesApi = async date => {
   let url = baseURL + `/Recipe/mep recipes?productionDate=${date}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -115,9 +132,11 @@ export const getMepRecipesApi = async date => {
 export const getMepRecipeByIdsApi = async id => {
   let url = baseURL + `/Recipe/mepbyid?Id=${id}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -125,99 +144,121 @@ export const getMepRecipeByIdsApi = async id => {
 export const getAdvanceRecipeByIdsApi = async recipeId => {
   let url = baseURL + `/Recipe/recipe advance details?Id=${recipeId}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const newMepListApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Recipe/new mep list', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const updateMepListApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Recipe/update mep list', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export async function getManualLogList() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Manuallog/manual logs', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 
 export const deleteManualLog = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/ManualLog/delete manual log', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 export const getManualLogsById = async id => {
   let url = baseURL + `/ManualLog/manual log by id?Id=${id}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export async function getManualLogTypes() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/ManualLog/manual log types', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 
 export async function getManualLogItemList() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/ManualLog/manual log item list 2', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 
 export const updateManualLogApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/ManualLog/update manual log', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addManualLogApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/ManualLog/add manual log', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export async function getCasualPurchasesApi() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/CasulPurchase/getinventorylist', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
@@ -228,9 +269,11 @@ export const getCasualPurchasesByPageApi = async (pageNumber, pageSize) => {
     baseURL +
     `/CasulPurchase/getlistbypage?PageNumber=${pageNumber}&PageSize=${pageSize}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -241,54 +284,66 @@ export const getSearchDataApi = async (criteria, pageNumber, pageSize) => {
     baseURL +
     `/CasulPurchase/search?Criteria=${criteria}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getfilteredDataApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/CasulPurchase/get list by filter', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getfilteredOrderDataApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Order/filter orders', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addOrderApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Order/add order', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addDraftApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Order/add draft', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export async function getSupplierListApi() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Supplier/Supplier list', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
@@ -296,9 +351,11 @@ export async function getSupplierListApi() {
 export const deleteOrderApi = async (id, payload) => {
   let url = baseURL + `/Order/Delete order?Id=${id}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(url, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -306,9 +363,11 @@ export const deleteOrderApi = async (id, payload) => {
 export const getOrderByIdApi = async id => {
   let url = baseURL + `/Order/order by id?Id=${id}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -316,27 +375,33 @@ export const getOrderByIdApi = async id => {
 export const getInventoryByIdApi = async id => {
   let url = baseURL + `/Inventory/inventorybyid?Id=${id}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export async function getInventoryListApi() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Inventory/inventory list', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 
 export const updateOrderApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Order/update casual purchase order', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -344,9 +409,11 @@ export const updateOrderApi = async payload => {
 export const getOrderItemByIdApi = async id => {
   let url = baseURL + `/Order/order item by id?Id=${id}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -354,18 +421,22 @@ export const getOrderItemByIdApi = async id => {
 export const getOrderImagesByIdApi = async id => {
   let url = baseURL + `/Order/order images by id?id=${id}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export async function getDepartmentsApi() {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Lookup/Departments', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
@@ -374,9 +445,11 @@ export async function getNewStockTakeApi(id, date) {
   let url =
     baseURL + `/StockTake/new stock?DepartmentId=${id}&StockTakeDate=${date}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
@@ -386,9 +459,11 @@ export async function lookupInventoryApi(depatId) {
     baseURL +
     `/Lookup/Inventory categories by department?DepartmentId=${depatId}&IncludeEmpty=false`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
@@ -398,9 +473,11 @@ export async function getNewTopStockTakeApi(id, date, count) {
     baseURL +
     `/StockTake/top new stock?DepartmentId=${id}&StockTakeDate=${date}&count=${count}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
@@ -410,9 +487,11 @@ export async function getPreviousStockDatesApi(id) {
     baseURL +
     `/StockTake/previous stock dates by department id?DepartmentId=${id}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
@@ -421,66 +500,80 @@ export async function getPreviousStockDatesDataApi(date) {
   let url =
     baseURL + `/StockTake/stock take list by date?StockTakeDate=${date}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 }
 
 export const updateStockTakeApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/StockTake/update stocktake', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addStockTakeApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/StockTake/add stocktake', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const inventoryLevelsApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Inventory/inventory levels', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const eventsAdminApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Event/Events', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getDepartmentsAdminApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + '/Lookup/Departments', {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getDepartmentsReportsAdminApi = async (depId, time) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL +
       `/Report/GM report by department?DepartmentId=${depId}&Type=${time}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -488,113 +581,137 @@ export const getDepartmentsReportsAdminApi = async (depId, time) => {
 
 export const menuAnalysisAdminApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Report/Menu analysis report`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const salesReportAdminApi = async (startDate, endDate) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   const url =
     baseURL + `/report/sales report?StartDate=${startDate}&EndDate=${endDate}`;
 
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getOrderingCountApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Order/orders count`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const draftOrderingApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Order/draft orders`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const deliveryPendingApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Order/non delivered orders`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const reviewOrderApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Order/review orders`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const historyOrderApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Order/history orders`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getCustomerDataApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Customer/get customer`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const updateCustomerDataApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + '/Customer/update customer', payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getSupplierListAdminApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Supplier/Supplier list`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getCurrentLocUsersAdminApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/User/get current location users`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const clonePreviousApi = async supplierId => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/Order/orders by supplier?SupplierId=${supplierId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -602,12 +719,14 @@ export const clonePreviousApi = async supplierId => {
 
 export const inventoryListAdminApi = async supplierId => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL +
       `/InventoryProductMapping/Inventory product mappings by supplierId?supplierId=${supplierId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -615,11 +734,13 @@ export const inventoryListAdminApi = async supplierId => {
 
 export const supplierAdminApi = async supplierId => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/Product/Products by supplier id?SupplierId=${supplierId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -627,12 +748,14 @@ export const supplierAdminApi = async supplierId => {
 
 export const unMapProductApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL + '/InventoryProductMapping/remove product mapping',
     payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -640,12 +763,14 @@ export const unMapProductApi = async payload => {
 
 export const updateInventoryProductApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL + '/InventoryProductMapping/update custom fields',
     payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -653,21 +778,25 @@ export const updateInventoryProductApi = async payload => {
 
 export const lookupDepartmentsApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Lookup/Departments`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const lookupCategoriesApi = async deptId => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL +
       `/Lookup/Inventory categories by department?DepartmentId=${deptId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -675,12 +804,14 @@ export const lookupCategoriesApi = async deptId => {
 
 export const getStockDataApi = async (deptId, catId, date) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL +
       `/StockTake/new stock by category?DepartmentId=${deptId}&CategoryId=${catId}&StockTakeDate=${date}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -688,11 +819,13 @@ export const getStockDataApi = async (deptId, catId, date) => {
 
 export const lookupInsideCategoriesApi = async catId => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/Inventory/inventory levels?CategoryId=${catId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -700,12 +833,14 @@ export const lookupInsideCategoriesApi = async catId => {
 
 export const getOrderCategoriesApi = async (catId, supId) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL +
       `/Inventory/inventory list by category and supplier?CategoryId=${catId}&SupplieId=${supId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -713,11 +848,13 @@ export const getOrderCategoriesApi = async (catId, supId) => {
 
 export const inventoryListSetupCatApi = async catId => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/Inventory/inventory list by category?CategoryId=${catId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -725,147 +862,179 @@ export const inventoryListSetupCatApi = async catId => {
 
 export const deleteInventoryListProductApi = async (payload, id) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Inventory/Delete Inventory?Id=${id}`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getRecipeNamesApi = async catId => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Recipe/recipe names`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getRecipeDetailsApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Recipe/recipe advance details?id=${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getSupplierListSetupApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Supplier/Supplier list`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getMenuItemsSetupApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/menu/menu item list`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const viewMenuItemsSetupApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Menu/menu item by id?id=${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addManualEntrySalesApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/SaleInvoice/add manual entry`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const deleteEventAdminApi = async (payload, id) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Event/delete event?Id=${id}`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getUserNameEventsApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/User/get all location users`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addEventAdminApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Event/add event`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getEventDetailsAdminApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Event/Event details?Id=${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const updateEventAdminApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Event/update event`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getMenuItemsAdminApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Menu/menus`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const deleteOfferEventAdminApi = async (payload, id) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Event/delete event offer?Id=${id}`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const deleteEventItemAdminApi = async (payload, id) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Event/delete event Item?Id=${id}`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getMappedProductsInventoryAdminApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL +
       `/InventoryProductMapping/Inventory product mappings by inventory id?inventoryId=${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -873,29 +1042,35 @@ export const getMappedProductsInventoryAdminApi = async id => {
 
 export const getDraftOrdersInventoryAdminApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Order/draft orders?supplierId=${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addOrderItemAdminApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Order/add order item`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getSupplierCatalogApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/Product/Products categories by supplier id?SupplierId=${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -904,11 +1079,13 @@ export const getSupplierCatalogApi = async id => {
 export const getInventoryByDepartApi = async id => {
   console.log(('dddd---->', id));
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/Inventory/get list by department?DepartmentId=${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -916,6 +1093,7 @@ export const getInventoryByDepartApi = async id => {
 
 export const getSupplierProductsApi = async (id, catName, orderId) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   const finalURL = orderId
     ? `/Product/Products by category and supplier id?SupplierId=${id}&Category=${catName}&shopingBasketId=${orderId}`
     : `/Product/Products by category and supplier id?SupplierId=${id}&Category=${catName}`;
@@ -924,18 +1102,21 @@ export const getSupplierProductsApi = async (id, catName, orderId) => {
   return axios.get(baseURL + finalURL, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const unMapProductAdminApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL + `/InventoryProductMapping/remove product mapping`,
     payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -943,12 +1124,14 @@ export const unMapProductAdminApi = async payload => {
 
 export const mapProductAdminApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL + `/InventoryProductMapping/add product mapping`,
     payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -956,29 +1139,35 @@ export const mapProductAdminApi = async payload => {
 
 export const updateDraftOrderApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Order/update order`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const updateDraftOrderNewApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Order/update draft`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getInventoryBySupplierIdApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/lookup/Inventory categories by supplier?SupplierId=${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -986,6 +1175,7 @@ export const getInventoryBySupplierIdApi = async id => {
 
 export const getInsideInventoryNewApi = async (catId, supId, orderId) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   const finalURL = orderId
     ? `/inventory/inventories by category and supplier?CategoryId=${catId}&SupplieId=${supId}&shopingBasketId=${orderId}`
     : `/inventory/inventories by category and supplier?CategoryId=${catId}&SupplieId=${supId}`;
@@ -994,26 +1184,31 @@ export const getInsideInventoryNewApi = async (catId, supId, orderId) => {
   return axios.get(baseURL + finalURL, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addBasketApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/ShopingBasket/add basket`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getBasketApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/ShopingBasket/Get shoping basket by id?Id=${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -1021,57 +1216,69 @@ export const getBasketApi = async id => {
 
 export const updateBasketApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/ShopingBasket/update basket`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const sendOrderApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Order/send order`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const viewShoppingBasketApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Order/view shoping basket?Id=${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const downloadPDFApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Order/viewPDF?Id=${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const viewHTMLApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/order/ViewOrderHTML?id=${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const searchInventoryItemLApi = async (id, searchText) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL +
       `/inventory/search inventory mappings by name and supplier?Name=${searchText}&SupplierId=${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -1079,11 +1286,13 @@ export const searchInventoryItemLApi = async (id, searchText) => {
 
 export const searchSupplierItemLApi = async (id, searchText) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/Product/Search products?Search=${searchText}&SupplierId=${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -1091,48 +1300,58 @@ export const searchSupplierItemLApi = async (id, searchText) => {
 
 export const processPendingOrderApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Order/process order`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const processPendingOrderItemApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Order/process order item`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const addNewOrderLineApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Order/add order items`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const getUserLocationApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Location/get user locations`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const setCurrentLocation = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL + `/Location/set current location?Id=${id}`,
     {},
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -1140,18 +1359,22 @@ export const setCurrentLocation = async id => {
 
 export const getCurrentUserApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/User/get current user`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const revenuePostReportApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Report/Revenue cost report`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -1164,9 +1387,11 @@ export const createProspectApi = async payload => {
 
 export const getCasualListNewApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(baseURL + `/Inventory/get list`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -1174,11 +1399,13 @@ export const getCasualListNewApi = async () => {
 export const getListByDepartment = async DepartmentId => {
   console.log('ID--->', DepartmentId);
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(
     baseURL + `/Inventory/get list by department?DepartmentId=${DepartmentId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -1186,12 +1413,14 @@ export const getListByDepartment = async DepartmentId => {
 
 export const duplicateApi = async id => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL + `/Order/duplicate order?Id=${id}`,
     {},
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -1203,18 +1432,22 @@ export const getOrdersByStatusApi = async (pageNumber, pageSize) => {
     baseURL +
     `/CasulPurchase/getlistbypage?PageNumber=${pageNumber}&PageSize=${pageSize}`;
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
 
 export const orderByStatusApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/Order/get orders by status`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
 };
@@ -1225,6 +1458,7 @@ export const deliveredDateUpdateApi = async (
   deliveryDate,
 ) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL +
       `/Order/process order delivered date?Id=${id}&DeliveredDate=${deliveredDate}&DeliveryDate=${deliveryDate}`,
@@ -1232,6 +1466,7 @@ export const deliveredDateUpdateApi = async (
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -1239,12 +1474,14 @@ export const deliveredDateUpdateApi = async (
 
 export const updateOrderStatusApi = async (payload, id, status) => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL + `/Order/update order status?Id=${id}&Status=${status}`,
     payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );
@@ -1252,11 +1489,28 @@ export const updateOrderStatusApi = async (payload, id, status) => {
 
 export const updateUserApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(baseURL + `/User/update current user`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
+      LocationId: location,
     },
   });
+};
+
+export const flagApi = async (payload, id, status) => {
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.post(
+    baseURL + `/Order/flag order item?Id=${id}&IsFlagged=${status}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        LocationId: location,
+      },
+    },
+  );
 };
 
 export const processDeliveredDateApi = async (
@@ -1267,6 +1521,7 @@ export const processDeliveredDateApi = async (
 ) => {
   console.log(payload, id, deliveredDate, deliveryDate);
   const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
   return axios.post(
     baseURL +
       `/Order/process order delivered date?Id=${id}&DeliveredDate=${deliveredDate}&DeliveryDate=${deliveryDate}`,
@@ -1274,6 +1529,7 @@ export const processDeliveredDateApi = async (
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        LocationId: location,
       },
     },
   );

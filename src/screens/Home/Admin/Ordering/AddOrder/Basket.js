@@ -95,6 +95,7 @@ class Basket extends Component {
       departmentData: [],
       buttonsLoader: true,
       supplierValue: '',
+      finalLanguage: '',
     };
   }
 
@@ -138,8 +139,10 @@ class Basket extends Component {
   getProfileData = () => {
     getMyProfileApi()
       .then(res => {
+        console.log('res', res);
         this.setState({
           recipeLoader: false,
+          finalLanguage: res.data.language,
           buttonsSubHeader: [
             {name: translate('ADMIN')},
             {name: translate('Setup')},
@@ -427,14 +430,17 @@ class Basket extends Component {
       console.log('payload', payload);
       updateDraftOrderNewApi(payload)
         .then(res => {
-          this.setState({
-            mailModalVisible: finalDataSec.channel === 'Ftp' ? false : true,
-            loaderCompStatus: false,
-            toRecipientValue: res.data && res.data.emailDetails.toRecipient,
-            ccRecipientValue: res.data && res.data.emailDetails.ccRecipients,
-            mailTitleValue: res.data && res.data.emailDetails.subject,
-            mailMessageValue: res.data && res.data.emailDetails.text,
-          });
+          this.setState(
+            {
+              mailModalVisible: finalDataSec.channel === 'Ftp' ? false : true,
+              loaderCompStatus: false,
+              toRecipientValue: res.data && res.data.emailDetails.toRecipient,
+              ccRecipientValue: res.data && res.data.emailDetails.ccRecipients,
+              mailTitleValue: res.data && res.data.emailDetails.subject,
+              mailMessageValue: res.data && res.data.emailDetails.text,
+            },
+            () => this.sendOrderCheckFun(),
+          );
         })
         .catch(err => {
           Alert.alert(
@@ -455,6 +461,45 @@ class Basket extends Component {
           onPress: () => this.closeLoaderComp(),
         },
       ]);
+    }
+  };
+
+  sendOrderCheckFun = () => {
+    console.log('FTP');
+    const {finalDataSec, finalLanguage, basketId} = this.state;
+    if (finalDataSec.channel === 'Ftp') {
+      console.log('FTP-SEC');
+
+      let payload = {
+        shopingBasketId: basketId,
+        lang: finalLanguage,
+      };
+
+      console.log('Payload', payload);
+
+      sendOrderApi(payload)
+        .then(res => {
+          console.log('res-FTP', res);
+          this.setState(
+            {
+              mailModalVisible: false,
+              loaderCompStatus: false,
+            },
+            () => this.props.navigation.navigate('OrderingAdminScreen'),
+          );
+        })
+        .catch(err => {
+          Alert.alert(
+            `Error - ${err.response.status}`,
+            'Something went wrong',
+            [
+              {
+                text: 'Okay',
+                onPress: () => this.closeLoaderComp(),
+              },
+            ],
+          );
+        });
     }
   };
 

@@ -121,6 +121,7 @@ class index extends Component {
   getUserLocationFun = () => {
     getUserLocationApi()
       .then(res => {
+        console.log('res-->LOC', res);
         let finalUsersList = res.data.map((item, index) => {
           return {
             label: item.name,
@@ -148,7 +149,9 @@ class index extends Component {
 
   setCurrentLocFun = id => {
     setCurrentLocation(id)
-      .then(res => {})
+      .then(res => {
+        console.log('res-SETLOC', res);
+      })
       .catch(err => {
         console.warn('ERr', err);
       });

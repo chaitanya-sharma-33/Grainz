@@ -53,6 +53,7 @@ class index extends Component {
   getProfileData = () => {
     getMyProfileApi()
       .then(res => {
+        console.log('res', res);
         this.setState({
           loader: false,
           buttons: [

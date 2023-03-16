@@ -81,6 +81,7 @@ class EditDraftOrder extends Component {
       deliveryDateOrder: '',
       departmentData: [],
       buttonsLoader: true,
+      channel: '',
     };
   }
 
@@ -122,12 +123,26 @@ class EditDraftOrder extends Component {
   };
 
   sendFun = () => {
-    this.setState(
-      {
-        loaderCompStatus: true,
-      },
-      () => this.sendFunSec(),
-    );
+    const {channel} = this.state;
+    if (channel === 'Ftp') {
+      Alert.alert(`Grainz`, 'Do yo want to send this order?', [
+        {
+          text: 'Yes',
+          onPress: () => this.sendFunSec(),
+        },
+        {
+          text: 'No',
+          // onPress: () => this.props.navigation.goBack(),
+        },
+      ]);
+    } else {
+      this.setState(
+        {
+          loaderCompStatus: true,
+        },
+        () => this.sendFunSec(),
+      );
+    }
   };
   sendFunSec = () => {
     const {
@@ -162,7 +177,7 @@ class EditDraftOrder extends Component {
             {
               loaderCompStatus: false,
             },
-            () => this.openMailModal(res),
+            () => this.optionFun(res),
           );
         })
         .catch(err => {
@@ -183,6 +198,23 @@ class EditDraftOrder extends Component {
           onPress: () => this.closeLoaderComp(),
         },
       ]);
+    }
+  };
+
+  optionFun = res => {
+    const {channel} = this.state;
+    if (channel === 'Ftp') {
+      this.setState(
+        {
+          toRecipientValue: res.data && res.data.emailDetails.toRecipient,
+          ccRecipientValue: res.data && res.data.emailDetails.ccRecipients,
+          mailTitleValue: res.data && res.data.emailDetails.subject,
+          mailMessageValue: res.data && res.data.emailDetails.text,
+        },
+        () => this.sendMailFun(),
+      );
+    } else {
+      this.openMailModal(res);
     }
   };
 
@@ -618,10 +650,11 @@ class EditDraftOrder extends Component {
 
   getInventoryFun = () => {
     const {productId, basketId, apiDeliveryDate} = this.state;
+    console.log('BASKWTID', basketId);
 
     getBasketApi(basketId)
       .then(res => {
-        console.log('res', res);
+        console.log('res-BASKETDATA', res);
         this.setState(
           {
             draftsOrderData: res.data,
@@ -642,6 +675,7 @@ class EditDraftOrder extends Component {
             apiOrderDate: res.data && res.data.orderDate,
             placedByValue: res.data && res.data.placedBy,
             productId,
+            channel: res.data.deliveryChannel,
           },
           () => this.createApiData(),
         );
@@ -790,7 +824,7 @@ class EditDraftOrder extends Component {
       {
         loaderCompStatus: true,
       },
-      () => this.sendFunSec(),
+      () => this.sendMailFunSec(),
     );
   };
 

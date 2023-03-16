@@ -14,7 +14,11 @@ import img from '../../constants/images';
 import SubHeader from '../../components/SubHeader';
 import Header from '../../components/Header';
 import {UserTokenAction} from '../../redux/actions/UserTokenAction';
-import {getMyProfileApi} from '../../connectivity/api';
+import {
+  getMyProfileApi,
+  getUserLocationApi,
+  setCurrentLocation,
+} from '../../connectivity/api';
 import styles from './style';
 
 import {translate, setI18nConfig} from '../../utils/translations';
@@ -27,6 +31,8 @@ class index extends Component {
       token: '',
       buttonsSubHeader: [],
       loader: false,
+      locationArr: [],
+      finalLocation: '',
     };
   }
 
@@ -165,9 +171,60 @@ class index extends Component {
   componentDidMount() {
     // this.props.navigation.addListener('focus', () => {
     this.getData();
+    this.getUserLocationFun();
     // });
     this.setLanguage();
   }
+
+  getUserLocationFun = () => {
+    getUserLocationApi()
+      .then(res => {
+        console.log('res-->LOC', res);
+        let finalUsersList = res.data.map((item, index) => {
+          return {
+            label: item.name,
+            value: item.id,
+          };
+        });
+
+        let defaultUser = res.data.map((item, index) => {
+          if (item.isCurrent === true) {
+            return item.id;
+          }
+        });
+        let finalData = defaultUser.filter(function (element) {
+          return element !== undefined;
+        });
+        this.setState(
+          {
+            locationArr: finalUsersList,
+            finalLocation: finalData[0],
+          },
+          () => this.setCurrentLocFun(),
+        );
+      })
+      .catch(err => {
+        console.warn('ERr', err);
+      });
+  };
+
+  setCurrentLocFun = () => {
+    const {finalLocation} = this.state;
+    setCurrentLocation(finalLocation)
+      .then(res => {
+        console.log('res-SETLOC', res);
+        this.storeLocationFun();
+      })
+      .catch(err => {
+        console.warn('ERr', err);
+      });
+  };
+
+  storeLocationFun = async () => {
+    const {finalLocation} = this.state;
+    console.log('res-STORE', finalLocation);
+    await AsyncStorage.setItem('@location', finalLocation);
+  };
 
   setLanguage = async () => {
     setI18nConfig();

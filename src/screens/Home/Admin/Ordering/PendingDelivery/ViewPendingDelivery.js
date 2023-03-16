@@ -15,6 +15,7 @@ import {connect} from 'react-redux';
 import img from '../../../../../constants/images';
 import SubHeader from '../../../../../components/SubHeader';
 import Header from '../../../../../components/Header';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -26,6 +27,7 @@ import {
   processPendingOrderApi,
   processPendingOrderItemApi,
   processDeliveredDateApi,
+  flagApi,
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
@@ -77,6 +79,7 @@ class ViewPendingDelivery extends Component {
       modalPricePaid: '',
       modalNotes: '',
       modalData: '',
+      flagStatus: false,
       initialValueAllCorrect: 'null',
       isCheckedEditableStatus: true,
       isDatePickerArrivalDateSpecific: false,
@@ -94,6 +97,12 @@ class ViewPendingDelivery extends Component {
       switchValueSingle: '',
       finalArrivedDate: '',
       productionDateArrived: '',
+      checklistModalStatus: false,
+      checklistNotes: '',
+      inventoryName: '',
+      productName: '',
+      productCode: '',
+      notArrivedStatus: false,
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -151,21 +160,21 @@ class ViewPendingDelivery extends Component {
     const {productId, supplierId, supplierName, basketId, listId, finalData} =
       this.props.route && this.props.route.params;
 
-    this.props.navigation.addListener('focus', () => {
-      this.setState(
-        {
-          productId: productId,
-          arrivalDataStatus: false,
-          loaderCompStatus: true,
-          supplierId: supplierId,
-          supplierName: supplierName,
-          basketId: basketId,
-          listId: listId,
-          finalData,
-        },
-        () => this.getOrderFun(),
-      );
-    });
+    // this.props.navigation.addListener('focus', () => {
+    this.setState(
+      {
+        productId: productId,
+        arrivalDataStatus: false,
+        loaderCompStatus: true,
+        supplierId: supplierId,
+        supplierName: supplierName,
+        basketId: basketId,
+        listId: listId,
+        finalData,
+      },
+      () => this.getOrderFun(),
+    );
+    // });
   }
 
   getInitialValues = () => {};
@@ -481,6 +490,7 @@ class ViewPendingDelivery extends Component {
     this.setState({
       finalArrivalDateSpecific: newdate,
       apiArrivalDateSpecific,
+      notArrivedStatus: false,
     });
   };
 
@@ -696,7 +706,7 @@ class ViewPendingDelivery extends Component {
   };
 
   showEditModal = (item, index) => {
-    console.log('item', item);
+    console.log('item123123123', item);
     this.setState({
       modalData: item,
       modalVisibleEditElement: true,
@@ -708,7 +718,9 @@ class ViewPendingDelivery extends Component {
       modalUserQuantityInvoiced: item.userQuantityInvoiced,
       modalPricePaid: item.orderValue.toFixed(2),
       modalNotes: item.notes,
-      finalArrivalDateSpecific: moment(item.arrivedDate).format('DD-MM-YYYY'),
+      finalArrivalDateSpecific:
+        item.arrivedDate && moment(item.arrivedDate).format('DD/MM/YYYY'),
+      apiArrivalDateSpecific: moment.utc(item.arrivedDate).format(),
       volume: item.inventoryMapping
         ? item.inventoryMapping.volume
         : item.grainzVolume,
@@ -717,6 +729,10 @@ class ViewPendingDelivery extends Component {
         ? item.inventoryMapping.packSize
         : item.packSize,
       unitPrizeModal: item.unitPrice,
+      inventoryName: item.inventoryName,
+      productName: item.productName,
+      productCode: item.productCode,
+      flagStatus: item.isFlagged,
     });
   };
 
@@ -789,22 +805,10 @@ class ViewPendingDelivery extends Component {
         this.setState(
           {
             loaderCompStatus: false,
+            modalVisibleEditElement: false,
           },
           () => this.getOrderFun(),
         );
-        // Alert.alert(`Grainz`, 'Order line item updated successfully', [
-        //   {
-        //     text: 'Okay',
-        //     onPress: () =>
-        //       this.setState(
-        //         {
-        //           loaderCompStatus: true,
-        //         },
-
-        //         () => this.getOrderFun(),
-        //       ),
-        //   },
-        // ]);
       })
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
@@ -1012,6 +1016,40 @@ class ViewPendingDelivery extends Component {
       });
   };
 
+  flagFunction = () => {
+    const {flagStatus} = this.state;
+    console.log('fla', flagStatus);
+    this.setState(
+      {
+        flagStatus: !flagStatus,
+      },
+      () => this.flagFunctionSec(),
+    );
+  };
+
+  flagFunctionSec = () => {
+    const {modalData, flagStatus} = this.state;
+    let payload = {};
+    flagApi(payload, modalData.id, flagStatus)
+      .then(res => {
+        console.log('res-FLAGGG', res);
+        this.setState(
+          {
+            loaderCompStatus: false,
+          },
+          () => this.getOrderFun(),
+        );
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+  };
+
   render() {
     const {
       chooseImageModalStatus,
@@ -1064,8 +1102,15 @@ class ViewPendingDelivery extends Component {
       finalArrivedDate,
       isDatePickerVisibleArrived,
       productionDateArrived,
+      checklistModalStatus,
+      checklistNotes,
+      inventoryName,
+      productName,
+      productCode,
+      notArrivedStatus,
+      flagStatus,
     } = this.state;
-    console.log('finalData--->', finalData);
+    console.log('flagStatus--->', flagStatus);
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
 
     return (
@@ -1236,7 +1281,11 @@ class ViewPendingDelivery extends Component {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  // onPress={() => this.previewPDFFun()}
+                  onPress={() =>
+                    this.setState({
+                      checklistModalStatus: true,
+                    })
+                  }
                   style={{
                     height: hp('7%'),
                     width: wp('87%'),
@@ -1893,23 +1942,104 @@ class ViewPendingDelivery extends Component {
                   <View>
                     {pageData && pageOrderItems.length > 0 ? (
                       pageOrderItems.map((item, index) => {
-                        console.log('item', item);
+                        console.log('item->MAIN PAGE', item);
                         return (
                           <View key={index}>
-                            <View style={{marginTop: hp('2%')}}>
+                            <View
+                              style={{
+                                position: 'absolute',
+                                flexDirection: 'row',
+                                borderRadius: 5,
+                                bottom: '87%',
+                                left: '5%',
+                                zIndex: 10,
+                                backgroundColor:
+                                  item.inventoryMapping &&
+                                  item.inventoryMapping.departmentName === 'Bar'
+                                    ? '#B2B4B8'
+                                    : item.inventoryMapping &&
+                                      item.inventoryMapping.departmentName ===
+                                        'Kitchen'
+                                    ? '#D448A7'
+                                    : item.inventoryMapping &&
+                                      item.inventoryMapping.departmentName ===
+                                        'Rental'
+                                    ? '#E1A72E'
+                                    : item.inventoryMapping &&
+                                      item.inventoryMapping.departmentName ===
+                                        'Other'
+                                    ? '#85CF31'
+                                    : null,
+                                padding: 5,
+                              }}>
+                              <View>
+                                <Image
+                                  style={{
+                                    width: 15,
+                                    height: 15,
+                                    resizeMode: 'contain',
+                                  }}
+                                  source={
+                                    item.inventoryMapping &&
+                                    item.inventoryMapping.departmentName ===
+                                      'Bar'
+                                      ? img.barIcon
+                                      : item.inventoryMapping &&
+                                        item.inventoryMapping.departmentName ===
+                                          'Kitchen'
+                                      ? img.kitchenIcon
+                                      : item.inventoryMapping &&
+                                        item.inventoryMapping.departmentName ===
+                                          'Rental'
+                                      ? img.retailIcon
+                                      : item.inventoryMapping &&
+                                        item.inventoryMapping.departmentName ===
+                                          'Other'
+                                      ? img.otherIcon
+                                      : null
+                                  }
+                                />
+                              </View>
+                            </View>
+                            {item.isFlagged === true ? (
+                              <View
+                                style={{
+                                  position: 'absolute',
+                                  flexDirection: 'row',
+                                  borderRadius: 5,
+                                  bottom: '85%',
+                                  left: '15%',
+                                  zIndex: 10,
+                                  padding: 5,
+                                }}>
+                                <View>
+                                  <Image
+                                    style={{
+                                      width: 25,
+                                      height: 25,
+                                      resizeMode: 'contain',
+                                    }}
+                                    source={img.flagIcon}
+                                  />
+                                </View>
+                              </View>
+                            ) : null}
+
+                            <View style={{marginTop: hp('3%')}}>
                               <View
                                 style={{
                                   flexDirection: 'row',
-                                  borderTopWidth: 1,
-                                  borderLeftWidth: 1,
-                                  borderRightWidth: 1,
                                   borderColor: 'grey',
                                   borderTopLeftRadius: 6,
                                   borderTopRightRadius: 6,
                                   padding: 10,
                                   flex: 1,
+                                  backgroundColor: '#fff',
                                 }}>
-                                <View
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    this.showEditModal(item, index)
+                                  }
                                   style={{
                                     flex: 3,
                                   }}>
@@ -1921,7 +2051,7 @@ class ViewPendingDelivery extends Component {
                                     {item.inventoryMapping &&
                                       item.inventoryMapping.inventoryName}
                                   </Text>
-                                </View>
+                                </TouchableOpacity>
 
                                 <TouchableOpacity
                                   onPress={() => this.deleteFun(item, index)}
@@ -1944,11 +2074,10 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   flex: 1,
                                   flexDirection: 'row',
-                                  borderLeftWidth: 1,
-                                  borderRightWidth: 1,
-                                  borderBottomWidth: 1,
                                   borderColor: 'grey',
+                                  borderBottomWidth: 0.5,
                                   padding: 10,
+                                  backgroundColor: '#fff',
                                 }}>
                                 <View
                                   style={{
@@ -1964,10 +2093,8 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   flex: 1,
                                   flexDirection: 'row',
-                                  borderLeftWidth: 1,
-                                  borderRightWidth: 1,
-                                  borderColor: 'grey',
                                   padding: 10,
+                                  backgroundColor: '#fff',
                                 }}>
                                 <View
                                   style={{
@@ -2026,13 +2153,10 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   flex: 1,
                                   flexDirection: 'row',
-                                  borderLeftWidth: 1,
-                                  borderRightWidth: 1,
-                                  borderBottomWidth: 1,
-                                  borderColor: 'grey',
                                   borderBottomLeftRadius: 6,
                                   borderBottomRightRadius: 6,
                                   padding: 10,
+                                  backgroundColor: '#fff',
                                 }}>
                                 <View
                                   style={{
@@ -2917,8 +3041,7 @@ class ViewPendingDelivery extends Component {
                       marginTop: '5%',
                       marginBottom: '5%',
                     }}>
-                    <TouchableOpacity
-                      onPress={() => this.addNewOrderLineFun()}
+                    <View
                       style={{
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -2949,7 +3072,7 @@ class ViewPendingDelivery extends Component {
                           value={switchValueAll}
                         />
                       </View>
-                    </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
 
@@ -3255,68 +3378,1123 @@ class ViewPendingDelivery extends Component {
                 </View>
               </View> */}
             </ScrollView>
-            {/* <Modal isVisible={modalVisibleEditElement} backdropOpacity={0.35}>
+
+            <Modal isVisible={checklistModalStatus} backdropOpacity={0.35}>
               <View
                 style={{
-                  width: wp('80%'),
-                  height: hp('75%'),
-                  backgroundColor: '#F0F4FF',
+                  width: wp('100%'),
+                  height: hp('100%'),
+                  backgroundColor: '#F0F4FE',
                   alignSelf: 'center',
-                  borderRadius: 6,
                 }}>
                 <View
                   style={{
-                    backgroundColor: '#7EA52D',
-                    height: hp('6%'),
-                    flexDirection: 'row',
-                    borderTopLeftRadius: 6,
-                    borderTopRightRadius: 6,
+                    flex: 1,
+                    backgroundColor: '#f2efef',
                   }}>
-                  <View
-                    style={{
-                      flex: 3,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color: '#fff',
-                        fontFamily: 'Inter-Regular',
-                      }}>
-                      Edit inventory item
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <TouchableOpacity
-                      onPress={() => this.setModalVisibleFalse()}>
-                      <Image
-                        source={img.cancelIcon}
+                  <KeyboardAwareScrollView
+                    keyboardShouldPersistTaps="always"
+                    showsVerticalScrollIndicator={false}
+                    enableOnAndroid>
+                    <View style={styles.secondContainer}>
+                      <View
                         style={{
-                          height: 22,
-                          width: 22,
-                          tintColor: 'white',
-                          resizeMode: 'contain',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          height: hp('10%'),
+                          marginHorizontal: wp('6%'),
+                          marginTop: hp('4%'),
+                          borderBottomWidth: 0.5,
+                          borderBottomColor: 'grey',
+                        }}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            this.setState({
+                              checklistModalStatus: false,
+                            })
+                          }
+                          style={{
+                            backgroundColor: '#fff',
+                            borderRadius: 100,
+                            padding: 5,
+                            marginRight: wp('2%'),
+                          }}>
+                          <Image
+                            source={img.backIcon}
+                            style={{
+                              height: 15,
+                              width: 15,
+                              resizeMode: 'contain',
+                            }}
+                          />
+                        </TouchableOpacity>
+                        <View
+                          style={{
+                            flex: 4,
+                          }}>
+                          <Text style={styles.textStylingLogo}>
+                            {translate('Delivery checklist')}
+                          </Text>
+                        </View>
+                      </View>
+                      {pageOrderItems.map((item, index) => {
+                        console.log('item----->', item);
+                        return (
+                          <View
+                            style={{
+                              marginTop: hp('3%'),
+                              borderBottomWidth: 0.5,
+                              borderBottomColor: 'grey',
+                              paddingBottom: 15,
+                              marginHorizontal: wp('3%'),
+                            }}>
+                            <View style={styles.insideContainer}>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  flex: 1,
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 4,
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                      color: 'black',
+                                    }}>
+                                    {item.inventoryName}
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      fontSize: 12,
+                                      color: 'black',
+                                      marginTop: 10,
+                                    }}>
+                                    {item.productName}
+                                  </Text>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <TouchableOpacity
+                                    // onPress={() => this.flagFunction()}
+                                    style={{
+                                      flex: 1,
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      marginTop: hp('2%'),
+                                      marginHorizontal: wp('7%'),
+                                      alignSelf: 'flex-end',
+                                    }}>
+                                    <Image
+                                      source={img.flagIcon}
+                                      style={{
+                                        width: 25,
+                                        height: 25,
+                                        resizeMode: 'contain',
+                                        tintColor:
+                                          item.isFlagged === false
+                                            ? 'grey'
+                                            : null,
+                                      }}
+                                    />
+                                  </TouchableOpacity>
+                                </View>
+                              </View>
+
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  flex: 1,
+                                  marginTop: hp('3%'),
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  {/* <Text
+                                    style={{
+                                      fontSize: 12,
+                                    }}>
+                                    Ordered No.
+                                  </Text>
+                                  <Text
+                                    numberOfLines={1}
+                                    style={{
+                                      fontSize: 13,
+                                      fontWeight: 'bold',
+                                      marginTop: 10,
+                                    }}>
+                                    {item.quantityOrdered}
+                                  </Text> */}
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 0.3,
+                                  }}></View>
+
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 12,
+                                    }}>
+                                    {translate('Ordered Qty')}.
+                                  </Text>
+                                  <Text
+                                    numberOfLines={1}
+                                    style={{
+                                      fontSize: 13,
+                                      fontWeight: 'bold',
+                                      marginTop: 10,
+                                    }}>
+                                    {item.grainzVolume * item.quantityOrdered}{' '}
+                                    {item.unit}
+                                  </Text>
+                                </View>
+                              </View>
+
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  flex: 1,
+                                  marginTop: hp('2%'),
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    backgroundColor: '#fff',
+                                    padding: 8,
+                                    borderRadius: 6,
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 12,
+                                    }}>
+                                    Delivered No.
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      fontSize: 13,
+                                      fontWeight: 'bold',
+                                      marginTop: 10,
+                                    }}>
+                                    {item.quantityDelivered}
+                                  </Text>
+                                </View>
+
+                                <View
+                                  style={{
+                                    flex: 0.3,
+                                  }}></View>
+
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    backgroundColor: '#fff',
+                                    padding: 8,
+                                    borderRadius: 6,
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 12,
+                                    }}>
+                                    Delivered Qty.
+                                  </Text>
+                                  <Text
+                                    numberOfLines={1}
+                                    style={{
+                                      fontSize: 13,
+                                      fontWeight: 'bold',
+                                      marginTop: 10,
+                                    }}>
+                                    {item.userQuantityDelivered} {item.unit}
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </KeyboardAwareScrollView>
+                  <View style={{}}>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                      }}>
+                      <TextInput
+                        placeholder="Notes"
+                        multiline
+                        style={{
+                          padding: 10,
+                          backgroundColor: '#fff',
+                          borderRadius: 10,
+                          width: wp('88%'),
+                          height: hp('15%'),
+                          marginTop: 10,
                         }}
+                        value={checklistNotes}
+                        onChangeText={value =>
+                          this.setState({
+                            checklistNotes: value,
+                          })
+                        }
                       />
-                    </TouchableOpacity>
+                    </View>
                   </View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        checklistModalStatus: false,
+                      })
+                    }
+                    style={{
+                      height: hp('7%'),
+                      width: wp('87%'),
+                      backgroundColor: '#5197C1',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                      alignSelf: 'center',
+                      marginTop: hp('3%'),
+                    }}>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        style={{
+                          color: 'white',
+                          marginLeft: 10,
+                          fontFamily: 'Inter-SemiBold',
+                        }}>
+                        Save
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        checklistModalStatus: false,
+                      })
+                    }
+                    style={{
+                      height: hp('7%'),
+                      width: wp('80%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: hp('3%'),
+                      alignSelf: 'center',
+                    }}>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        style={{
+                          color: '#5197C1',
+                          marginLeft: 10,
+                          fontFamily: 'Inter-SemiBold',
+                        }}>
+                        {translate('Cancel')}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                  <View style={{paddingHorizontal: hp('2%')}}>
+              </View>
+            </Modal>
+            <Modal isVisible={modalVisibleEditElement} backdropOpacity={0.35}>
+              <View
+                style={{
+                  width: wp('100%'),
+                  height: hp('100%'),
+                  backgroundColor: '#F0F4FE',
+                  alignSelf: 'center',
+                }}>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#f2efef',
+                  }}>
+                  <KeyboardAwareScrollView
+                    keyboardShouldPersistTaps="always"
+                    showsVerticalScrollIndicator={false}
+                    enableOnAndroid>
+                    <View style={styles.secondContainer}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          height: hp('10%'),
+                          marginHorizontal: wp('6%'),
+                          marginTop: hp('4%'),
+                        }}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            this.setState({
+                              modalVisibleEditElement: false,
+                            })
+                          }
+                          style={{
+                            backgroundColor: '#fff',
+                            borderRadius: 100,
+                            padding: 5,
+                            marginRight: wp('2%'),
+                          }}>
+                          <Image
+                            source={img.backIcon}
+                            style={{
+                              height: 15,
+                              width: 15,
+                              resizeMode: 'contain',
+                            }}
+                          />
+                        </TouchableOpacity>
+                        <View
+                          style={{
+                            flex: 4,
+                          }}>
+                          <Text style={styles.textStylingLogo}>
+                            {inventoryName}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <View
+                        style={{
+                          marginHorizontal: wp('3%'),
+                        }}>
+                        <View style={styles.insideContainer}>
+                          <View>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                color: 'black',
+                                marginTop: 10,
+                              }}>
+                              {productName}
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('3%'),
+                              borderBottomWidth: 0.5,
+                              borderBottomColor: 'grey',
+                              paddingBottom: 15,
+                            }}>
+                            <View
+                              style={{
+                                flex: 1,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Product code
+                              </Text>
+                              <Text
+                                numberOfLines={1}
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 'bold',
+                                  marginTop: 10,
+                                }}>
+                                {productCode}
+                              </Text>
+                            </View>
+                            <View
+                              style={{
+                                flex: 0.3,
+                              }}></View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Package size
+                              </Text>
+                              <Text
+                                numberOfLines={1}
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 'bold',
+                                  marginTop: 10,
+                                }}>
+                                {packSize}
+                              </Text>
+                            </View>
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('3%'),
+                            }}>
+                            <View
+                              style={{
+                                flex: 1,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Ordered No.
+                              </Text>
+                              <Text
+                                numberOfLines={1}
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 'bold',
+                                  marginTop: 10,
+                                }}>
+                                {modalQuantityOrdered}
+                              </Text>
+                            </View>
+                            <View
+                              style={{
+                                flex: 0.3,
+                              }}></View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                {translate('Ordered Qty')}.
+                              </Text>
+                              <Text
+                                numberOfLines={1}
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 'bold',
+                                  marginTop: 10,
+                                }}>
+                                {volume * modalQuantityOrdered} {modalData.unit}
+                              </Text>
+                            </View>
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('2%'),
+                            }}>
+                            <View
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#fff',
+                                padding: 8,
+                                borderRadius: 6,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Delivered No.
+                              </Text>
+                              <TextInput
+                                placeholder="Delivered"
+                                keyboardType="numeric"
+                                style={{
+                                  width: 80,
+                                  marginTop: 5,
+                                  fontWeight: 'bold',
+                                }}
+                                value={
+                                  modalQuantityDelivered &&
+                                  String(modalQuantityDelivered)
+                                }
+                                onChangeText={value =>
+                                  this.setState({
+                                    modalQuantityDelivered: value,
+                                    modalUserQuantityDelivered: value * volume,
+                                  })
+                                }
+                              />
+                            </View>
+                            <View
+                              style={{
+                                flex: 0.3,
+                              }}></View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#fff',
+                                padding: 8,
+                                borderRadius: 6,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Delivered Qty.
+                              </Text>
+                              <TextInput
+                                placeholder="Delivered Qty."
+                                value={
+                                  modalUserQuantityDelivered &&
+                                  String(modalUserQuantityDelivered)
+                                }
+                                style={{
+                                  width: 80,
+                                  marginTop: 5,
+                                  fontWeight: 'bold',
+                                }}
+                                onChangeText={value =>
+                                  this.setState({
+                                    modalUserQuantityDelivered: value,
+                                    modalQuantityDelivered:
+                                      (value /
+                                        Number(volume * modalQuantityOrdered)) *
+                                      modalQuantityOrdered,
+                                  })
+                                }
+                              />
+                            </View>
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('2%'),
+                            }}>
+                            <View
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#fff',
+                                padding: 8,
+                                borderRadius: 6,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Invoiced No.
+                              </Text>
+                              <TextInput
+                                placeholder="Invoiced"
+                                style={{
+                                  width: 80,
+                                  fontWeight: 'bold',
+                                  marginTop: 5,
+                                }}
+                                value={
+                                  modalQuantityInvoiced &&
+                                  String(modalQuantityInvoiced)
+                                }
+                                onChangeText={value =>
+                                  this.setState({
+                                    modalQuantityInvoiced: value,
+                                    modalUserQuantityInvoiced: value * volume,
+                                    modalPricePaid: (
+                                      value *
+                                      packSize *
+                                      unitPrizeModal
+                                    ).toFixed(2),
+                                  })
+                                }
+                              />
+                            </View>
+
+                            <View
+                              style={{
+                                flex: 0.3,
+                              }}></View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#fff',
+                                padding: 8,
+                                borderRadius: 6,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Invoiced Qty.
+                              </Text>
+                              <TextInput
+                                placeholder="Volume"
+                                style={{
+                                  width: 80,
+                                  marginTop: 5,
+                                  fontWeight: 'bold',
+                                }}
+                                value={
+                                  modalUserQuantityInvoiced &&
+                                  String(modalUserQuantityInvoiced)
+                                }
+                                onChangeText={value =>
+                                  this.setState({
+                                    modalUserQuantityInvoiced: value,
+                                    modalQuantityInvoiced:
+                                      (value /
+                                        Number(volume * modalQuantityOrdered)) *
+                                      modalQuantityOrdered,
+                                  })
+                                }
+                              />
+                            </View>
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('2%'),
+                            }}>
+                            <View
+                              style={{
+                                flex: 1,
+                                padding: 8,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Ordered Val. Expected
+                              </Text>
+                              <TextInput
+                                placeholder="Invoiced"
+                                style={{
+                                  width: 80,
+                                  fontWeight: 'bold',
+                                  marginTop: 5,
+                                }}
+                                value={
+                                  modalQuantityInvoiced &&
+                                  String(modalQuantityInvoiced)
+                                }
+                                onChangeText={value =>
+                                  this.setState({
+                                    modalQuantityInvoiced: value,
+                                    modalUserQuantityInvoiced: value * volume,
+                                    modalPricePaid: (
+                                      value *
+                                      packSize *
+                                      unitPrizeModal
+                                    ).toFixed(2),
+                                  })
+                                }
+                              />
+                            </View>
+
+                            <View
+                              style={{
+                                flex: 0.3,
+                              }}></View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#fff',
+                                padding: 8,
+                                borderRadius: 6,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Ordered Val. Actual
+                              </Text>
+                              <TextInput
+                                placeholder={translate('Order Value Ex-VAT')}
+                                style={{
+                                  width: 80,
+                                  marginTop: 5,
+                                  fontWeight: 'bold',
+                                }}
+                                value={modalPricePaid && String(modalPricePaid)}
+                                onChangeText={value =>
+                                  this.setState({
+                                    modalPricePaid: value,
+                                  })
+                                }
+                              />
+                            </View>
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('2%'),
+                              borderBottomWidth: 0.5,
+                              borderBottomColor: 'grey',
+                              paddingBottom: 15,
+                            }}>
+                            <View
+                              style={{
+                                flex: 1,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Price Expected
+                              </Text>
+                              <TextInput
+                                placeholder="Invoiced"
+                                style={{
+                                  width: 80,
+                                  fontWeight: 'bold',
+                                  marginTop: 5,
+                                }}
+                                value={
+                                  modalQuantityInvoiced &&
+                                  String(modalQuantityInvoiced)
+                                }
+                                onChangeText={value =>
+                                  this.setState({
+                                    modalQuantityInvoiced: value,
+                                    modalUserQuantityInvoiced: value * volume,
+                                    modalPricePaid: (
+                                      value *
+                                      packSize *
+                                      unitPrizeModal
+                                    ).toFixed(2),
+                                  })
+                                }
+                              />
+                            </View>
+
+                            <View
+                              style={{
+                                flex: 0.3,
+                              }}></View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Price Actual
+                              </Text>
+                              <TextInput
+                                placeholder="Volume"
+                                style={{
+                                  width: 80,
+                                  marginTop: 5,
+                                  fontWeight: 'bold',
+                                }}
+                                value={
+                                  modalUserQuantityInvoiced &&
+                                  String(modalUserQuantityInvoiced)
+                                }
+                                onChangeText={value =>
+                                  this.setState({
+                                    modalUserQuantityInvoiced: value,
+                                    modalQuantityInvoiced:
+                                      (value /
+                                        Number(volume * modalQuantityOrdered)) *
+                                      modalQuantityOrdered,
+                                  })
+                                }
+                              />
+                            </View>
+                          </View>
+
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.setState({
+                                notArrivedStatus: !notArrivedStatus,
+                                finalArrivalDateSpecific: '',
+                                apiArrivalDateSpecific: '',
+                              })
+                            }
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              marginTop: hp('2%'),
+                            }}>
+                            <View
+                              style={{
+                                borderRadius: 100,
+                                backgroundColor: isCheckedEditableStatus
+                                  ? '#D6D6D6'
+                                  : '#fff',
+                              }}>
+                              <CheckBox
+                                disabled={true}
+                                value={notArrivedStatus}
+                                style={{
+                                  height: 20,
+                                  width: 20,
+                                }}
+                              />
+                            </View>
+                            <Text
+                              style={{
+                                fontFamily: 'Inter-Regular',
+                                marginLeft: 10,
+                              }}>
+                              {' '}
+                              Not Arrived
+                            </Text>
+                          </TouchableOpacity>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('2%'),
+                              backgroundColor: '#fff',
+                              padding: 8,
+                              borderRadius: 6,
+                            }}>
+                            <TouchableOpacity
+                              onPress={() =>
+                                this.showDatePickerArrivalDateSpecific()
+                              }
+                              style={{
+                                flex: 1,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Arrived Date
+                              </Text>
+                              <TextInput
+                                placeholder="Arrived Date"
+                                editable={false}
+                                style={{
+                                  width: 100,
+                                  fontWeight: 'bold',
+                                  marginTop: 5,
+                                }}
+                                value={
+                                  finalArrivalDateSpecific &&
+                                  String(finalArrivalDateSpecific)
+                                }
+                              />
+                            </TouchableOpacity>
+                          </View>
+
+                          <DateTimePickerModal
+                            isVisible={isDatePickerArrivalDateSpecific}
+                            mode={'date'}
+                            onConfirm={this.handleConfirmArrivalDateSpecific}
+                            onCancel={this.hideDatePickerArrivalDateSpecific}
+                          />
+                        </View>
+                      </View>
+                      <View style={{}}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                          }}>
+                          <TextInput
+                            placeholder="Notes"
+                            multiline
+                            style={{
+                              padding: 10,
+                              backgroundColor: '#fff',
+                              borderRadius: 10,
+                              width: wp('85%'),
+                              height: hp('12%'),
+                              marginTop: 15,
+                            }}
+                            value={modalNotes}
+                            onChangeText={value =>
+                              this.setState({
+                                modalNotes: value,
+                              })
+                            }
+                          />
+                        </View>
+                      </View>
+
+                      <TouchableOpacity
+                        onPress={() => this.flagFunction()}
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginTop: hp('2%'),
+                          marginHorizontal: wp('7%'),
+                        }}>
+                        <Image
+                          source={img.flagIcon}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            resizeMode: 'contain',
+                            tintColor: flagStatus === false ? 'grey' : null,
+                          }}
+                        />
+
+                        <Text
+                          style={{
+                            fontFamily: 'Inter-Regular',
+                            marginLeft: 10,
+                          }}>
+                          Flagged
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.setState({
+                            modalVisibleEditElement: false,
+                          })
+                        }
+                        style={{
+                          height: hp('7%'),
+                          width: wp('87%'),
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderRadius: 10,
+                          alignSelf: 'center',
+                          marginTop: hp('3%'),
+                          borderWidth: 1,
+                          borderColor: '#5197C1',
+                        }}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: '#5197C1',
+                              marginLeft: 10,
+                              fontFamily: 'Inter-SemiBold',
+                            }}>
+                            Request credit note
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => this.saveFunInventoryItem()}
+                        style={{
+                          height: hp('7%'),
+                          width: wp('87%'),
+
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderRadius: 10,
+                          alignSelf: 'center',
+                          marginTop: hp('3%'),
+                          borderWidth: 1,
+                          borderColor: '#5197C1',
+                        }}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: '#5197C1',
+                              marginLeft: 10,
+                              fontFamily: 'Inter-SemiBold',
+                            }}>
+                            Save
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.setState({
+                            modalVisibleEditElement: false,
+                          })
+                        }
+                        style={{
+                          height: hp('7%'),
+                          width: wp('87%'),
+                          backgroundColor: '#5197C1',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderRadius: 10,
+                          alignSelf: 'center',
+                          marginTop: hp('3%'),
+                        }}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: 'white',
+                              marginLeft: 10,
+                              fontFamily: 'Inter-SemiBold',
+                            }}>
+                            Confirmed checked
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.setState({
+                            modalVisibleEditElement: false,
+                          })
+                        }
+                        style={{
+                          height: hp('7%'),
+                          width: wp('80%'),
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginBottom: hp('3%'),
+                          alignSelf: 'center',
+                        }}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: '#5197C1',
+                              marginLeft: 10,
+                              fontFamily: 'Inter-SemiBold',
+                            }}>
+                            {translate('Cancel')}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  </KeyboardAwareScrollView>
+                </View>
+                {/* <ScrollView showsVerticalScrollIndicator={false}>
+                  <View style={{}}>
                     <ScrollView
                       horizontal
                       showsHorizontalScrollIndicator={false}>
                       <View>
                         <View
                           style={{
-                            paddingVertical: 15,
-                            paddingHorizontal: 5,
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                             backgroundColor: '#EFFBCF',
@@ -3839,9 +5017,9 @@ class ViewPendingDelivery extends Component {
                       </Text>
                     </TouchableOpacity>
                   </View>
-                </View>
+                </View> */}
               </View>
-            </Modal> */}
+            </Modal>
             {/* <Modal isVisible={chooseImageModalStatus} backdropOpacity={0.35}>
               <View
                 style={{

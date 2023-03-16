@@ -72,6 +72,7 @@ import SearchInventoryScreen from '../screens/Home/Admin/Ordering/AddOrder/Searc
 import SearchSupplierScreen from '../screens/Home/Admin/Ordering/AddOrder/SearchSupplier';
 import PdfViewDraftScreen from '../screens/Home/Admin/Ordering/DraftOrders/PdfViewDraft';
 import ViewReviewOrderScreen from '../screens/Home/Admin/Ordering/ReviewOrder/ViewReviewOrder';
+import ReviewOrderDeliveryScreen from '../screens/Home/Admin/Ordering/ReviewOrder/ReviewOrderDelivery';
 import ViewHistoryOrderScreen from '../screens/Home/Admin/Ordering/HistoryOrder/ViewHistoryOrder';
 import HistroyDataScreen from '../screens/StockTake/HistroyData';
 import DashboardScreen from '../screens/Dashboard';
@@ -130,6 +131,12 @@ export default function AppNavFun() {
         name="ViewReviewOrderScreen"
         component={ViewReviewOrderScreen}
       />
+
+      <AppNav.Screen
+        name="ReviewOrderDeliveryScreen"
+        component={ReviewOrderDeliveryScreen}
+      />
+
       <AppNav.Screen
         name="ViewHistoryOrderScreen"
         component={ViewHistoryOrderScreen}

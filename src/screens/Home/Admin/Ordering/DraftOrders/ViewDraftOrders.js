@@ -108,8 +108,10 @@ class ViewDraftOrders extends Component {
 
   getDraftOrderData = () => {
     const {productId, basketId} = this.state;
+    console.log('BASKET', basketId);
     getBasketApi(basketId)
       .then(res => {
+        console.log('Res-GETBASKET', res);
         this.setState({
           draftsOrderData: res.data.shopingBasketItemList,
           modalLoaderDrafts: false,
