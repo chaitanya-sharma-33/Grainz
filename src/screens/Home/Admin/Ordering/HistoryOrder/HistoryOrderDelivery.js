@@ -125,7 +125,9 @@ class HistoryOrderDelivery extends Component {
       pageChilledTemp: finalData.chilledTemp,
       pageFrozenTemp: finalData.frozenTemp,
       pageNotes: finalData.notes,
-      finalArrivedDate: moment(finalData.deliveredDate).format('DD/MM/YYYY'),
+      finalArrivedDate:
+        finalData.deliveredDate &&
+        moment(finalData.deliveredDate).format('DD/MM/YYYY'),
     });
     this.getProfileDataFun();
     // });

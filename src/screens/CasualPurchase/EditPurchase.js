@@ -1401,14 +1401,14 @@ class EditPurchase extends Component {
           showsVerticalScrollIndicator={false}>
           <View style={styles.subContainer}>
             <View style={styles.firstContainer}>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.goBack()}
-                style={styles.goBackContainer}>
-                <Image source={img.backIcon} style={styles.tileImageBack} />
+              <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+                <View style={styles.goBackContainer}>
+                  <Image source={img.backIcon} style={styles.tileImageBack} />
+                </View>
+                <View style={styles.flex}>
+                  <Text style={styles.adminTextStyle}>{supplier}</Text>
+                </View>
               </TouchableOpacity>
-              <View style={styles.flex}>
-                <Text style={styles.adminTextStyle}>{supplier}</Text>
-              </View>
               {swapButton ? (
                 <TouchableOpacity
                   onPress={() => this.deleteCasualPurchase(yourOrder.id)}

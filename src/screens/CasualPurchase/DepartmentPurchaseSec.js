@@ -1807,16 +1807,16 @@ class DepartmentPurchaseSec extends Component {
           style={{marginBottom: hp('5%')}}
           showsVerticalScrollIndicator={false}>
           <View style={styles.subContainer}>
-            <View style={styles.firstContainer}>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.goBack()}
-                style={styles.goBackContainer}>
+            <TouchableOpacity
+              style={styles.firstContainer}
+              onPress={() => this.props.navigation.goBack()}>
+              <View style={styles.goBackContainer}>
                 <Image source={img.backIcon} style={styles.tileImageBack} />
-              </TouchableOpacity>
+              </View>
               <View style={styles.flex}>
                 <Text style={styles.adminTextStyle}>{departmentName}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
           {/* <View style={{}}>
             <View

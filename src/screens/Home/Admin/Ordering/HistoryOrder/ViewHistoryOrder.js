@@ -4060,18 +4060,18 @@ class ViewHistoryOrder extends Component {
 
         <LoaderComp loaderComp={loaderCompStatus} />
         <View style={{...styles.subContainer, flex: 1}}>
-          <View style={styles.firstContainer}>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.goBack()}
-              style={styles.goBackContainer}>
+          <TouchableOpacity
+            style={styles.firstContainer}
+            onPress={() => this.props.navigation.goBack()}>
+            <View style={styles.goBackContainer}>
               <Image source={img.backIcon} style={styles.tileImageBack} />
-            </TouchableOpacity>
+            </View>
             <View style={styles.flex}>
               <Text style={styles.adminTextStyle}>
                 {translate('History')} - {finalData.supplierName}
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={{flex: 1}}>
             <ScrollView style={{}} showsVerticalScrollIndicator={false}>
               <View style={{marginHorizontal: hp('3%')}}>
@@ -5845,7 +5845,7 @@ class ViewHistoryOrder extends Component {
               </View>
 
               <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => this.previewPDFFun()}
                   style={{
                     height: hp('7%'),
@@ -5870,7 +5870,7 @@ class ViewHistoryOrder extends Component {
                       {translate('Preview PDF')}
                     </Text>
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity
                   onPress={() => this.moveToReviewFun()}

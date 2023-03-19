@@ -134,7 +134,7 @@ class DraftOrder extends Component {
         console.log('res-->finalArr', finalArr);
 
         this.setState({
-          draftsOrderData: loadMoreStatus ? finalArr : res.data.reverse(),
+          draftsOrderData: loadMoreStatus ? finalArr : res.data,
           draftsOrderDataBackup: res.data,
           modalLoaderDrafts: false,
         });
@@ -437,18 +437,18 @@ class DraftOrder extends Component {
         <View style={{marginBottom: hp('2%')}}>
           <View>
             <View style={styles.subContainer}>
-              <View style={styles.firstContainer}>
-                <TouchableOpacity
-                  onPress={() => this.props.navigation.goBack()}
-                  style={styles.goBackContainer}>
+              <TouchableOpacity
+                style={styles.firstContainer}
+                onPress={() => this.props.navigation.goBack()}>
+                <View style={styles.goBackContainer}>
                   <Image source={img.backIcon} style={styles.tileImageBack} />
-                </TouchableOpacity>
+                </View>
                 <View style={styles.flex}>
                   <Text style={styles.adminTextStyle}>
                     {translate('Draft Orders')}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
           <View
@@ -651,7 +651,6 @@ class DraftOrder extends Component {
                     </View>
                     {draftsOrderData &&
                       draftsOrderData.map((item, index) => {
-                        console.log('item------->', item);
                         return (
                           <View style={{}}>
                             <View
@@ -760,23 +759,6 @@ class DraftOrder extends Component {
                                   source={img.threeDotsIcon}
                                 />
                               </TouchableOpacity>
-                              {/* <TouchableOpacity
-                                onPress={() => this.deleteDraftFun(item)}
-                                style={{
-                                  flex: 0.5,
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                }}>
-                                <Image
-                                  style={{
-                                    width: 17,
-                                    height: 17,
-                                    resizeMode: 'contain',
-                                    tintColor: 'red',
-                                  }}
-                                  source={img.deleteIconNew}
-                                />
-                              </TouchableOpacity> */}
                             </View>
                           </View>
                         );

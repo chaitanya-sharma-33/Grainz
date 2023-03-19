@@ -78,6 +78,9 @@ class PendingOrderDelivery extends Component {
       pageChilledTemp: '',
       pageFrozenTemp: '',
       pageNotes: '',
+      chooseImageModalStatus: false,
+      imageModalStatus: false,
+      imageData: '',
     };
   }
 
@@ -125,7 +128,9 @@ class PendingOrderDelivery extends Component {
       pageChilledTemp: finalData.chilledTemp,
       pageFrozenTemp: finalData.frozenTemp,
       pageNotes: finalData.notes,
-      finalArrivedDate: moment(finalData.deliveredDate).format('DD/MM/YYYY'),
+      finalArrivedDate:
+        finalData.deliveredDate &&
+        moment(finalData.deliveredDate).format('DD/MM/YYYY'),
     });
     this.getProfileDataFun();
     // });
@@ -267,6 +272,79 @@ class PendingOrderDelivery extends Component {
       });
   }
 
+  handleChoosePhoto() {
+    this.setState({
+      chooseImageModalStatus: true,
+    });
+  }
+
+  setModalVisibleImage = () => {
+    this.setState({
+      imageModalStatus: false,
+      chooseImageModalStatus: false,
+    });
+  };
+
+  choosePhotoFun = () => {
+    this.setState(
+      {
+        chooseImageModalStatus: false,
+      },
+      () =>
+        setTimeout(() => {
+          ImagePicker.openPicker({
+            width: 300,
+            height: 400,
+            includeBase64: true,
+            cropping: true,
+          }).then(image => {
+            this.setState({
+              imageModalStatus: true,
+              imageData: image,
+            });
+          });
+        }, 500),
+    );
+  };
+
+  clickPhotoFun = () => {
+    this.setState(
+      {
+        chooseImageModalStatus: false,
+      },
+      () =>
+        setTimeout(() => {
+          ImagePicker.openCamera({
+            width: 300,
+            height: 400,
+            cropping: true,
+          }).then(image => {
+            this.setState({
+              imageModalStatus: true,
+              imageData: image,
+            });
+          });
+        }, 500),
+    );
+  };
+
+  deleteImageFun = () => {
+    this.setState({
+      imageModalStatus: false,
+      imageData: '',
+      imageShow: false,
+      imageName: '',
+      imageDesc: '',
+    });
+  };
+
+  saveImageFun = () => {
+    this.setState({
+      imageModalStatus: false,
+      imageShow: true,
+    });
+  };
+
   render() {
     const {
       isDatePickerVisibleOrder,
@@ -289,6 +367,12 @@ class PendingOrderDelivery extends Component {
       pageFrozenTemp,
       pageChilledTemp,
       pageAmbientTemp,
+      chooseImageModalStatus,
+      imageModalStatus,
+      imageData,
+      imageName,
+      imageDesc,
+      imageShow,
     } = this.state;
     // console.log('finalData', finalData);
     return (
@@ -428,7 +512,7 @@ class PendingOrderDelivery extends Component {
                         alignItems: 'center',
                       }}>
                       <TextInput
-                        placeholder="DD/MM/YY"
+                        placeholder="DD/MM/YYYY"
                         value={finalArrivedDate}
                         editable={false}
                         style={{
@@ -773,10 +857,280 @@ class PendingOrderDelivery extends Component {
                     />
                   </View>
                 </View>
+
+                <TouchableOpacity
+                  onPress={() => this.handleChoosePhoto()}
+                  style={{
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                  }}>
+                  <Image
+                    source={img.cameraIcon}
+                    style={{
+                      height: 20,
+                      width: 20,
+                      resizeMode: 'contain',
+                      marginRight: 10,
+                      tintColor: '#5297c1',
+                    }}
+                  />
+
+                  <Text
+                    style={{
+                      color: '#5297c1',
+                      fontSize: 15,
+                      fontWeight: 'bold',
+                      textDecorationLine: 'underline',
+                    }}>
+                    {translate('Add image')}
+                  </Text>
+                </TouchableOpacity>
+
+                {imageShow ? (
+                  <TouchableOpacity
+                    style={{marginTop: 15}}
+                    onPress={() =>
+                      this.setState({
+                        imageModalStatus: true,
+                      })
+                    }>
+                    <Image
+                      style={{
+                        width: wp('60%'),
+                        height: 100,
+                        resizeMode: 'cover',
+                      }}
+                      source={{uri: imageData.path}}
+                    />
+                  </TouchableOpacity>
+                ) : null}
               </View>
             </View>
           </View>
         </ScrollView>
+
+        <Modal isVisible={chooseImageModalStatus} backdropOpacity={0.35}>
+          <View
+            style={{
+              width: wp('80%'),
+              height: hp('30%'),
+              backgroundColor: '#fff',
+              alignSelf: 'center',
+              borderRadius: 10,
+            }}>
+            <View
+              style={{
+                height: hp('7%'),
+                flexDirection: 'row',
+              }}>
+              <View
+                style={{
+                  flex: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text style={{fontSize: 16, color: 'black'}}>
+                  {translate('Add image')}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <TouchableOpacity
+                  onPress={() => this.setModalVisibleImage(false)}>
+                  <Image
+                    source={img.cancelIcon}
+                    style={{
+                      height: 22,
+                      width: 22,
+                      tintColor: 'black',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={{padding: hp('3%')}}>
+              <TouchableOpacity
+                onPress={() => this.choosePhotoFun()}
+                style={{
+                  width: wp('70%'),
+                  height: hp('7%'),
+                  alignSelf: 'flex-end',
+                  backgroundColor: '#5297c1',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 6,
+                }}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('Choose image from gallery')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => this.clickPhotoFun()}
+                style={{
+                  width: wp('70%'),
+                  height: hp('7%'),
+                  alignSelf: 'flex-end',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#5297c1',
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('Click Photo')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal isVisible={imageModalStatus} backdropOpacity={0.35}>
+          <View
+            style={{
+              width: wp('80%'),
+              height: hp('70%'),
+              backgroundColor: '#fff',
+              alignSelf: 'center',
+            }}>
+            <View
+              style={{
+                height: hp('7%'),
+                flexDirection: 'row',
+              }}>
+              <View
+                style={{
+                  flex: 3,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text style={{fontSize: 16, color: 'black'}}>Add Photo</Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <TouchableOpacity
+                  onPress={() => this.setModalVisibleImage(false)}>
+                  <Image
+                    source={img.cancelIcon}
+                    style={{
+                      height: 22,
+                      width: 22,
+                      tintColor: 'black',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <ScrollView>
+              <View style={{padding: hp('3%')}}>
+                <View>
+                  <Image
+                    style={{
+                      width: wp('60%'),
+                      height: 100,
+                      resizeMode: 'cover',
+                    }}
+                    source={{uri: imageData.path}}
+                  />
+                </View>
+                <View style={{}}>
+                  <TextInput
+                    placeholder="Enter Name"
+                    value={imageName}
+                    style={{
+                      borderWidth: 1,
+                      padding: 12,
+                      marginBottom: hp('3%'),
+                      justifyContent: 'space-between',
+                      marginTop: 20,
+                      borderRadius: 6,
+                    }}
+                    onChangeText={value => {
+                      this.setState({
+                        imageName: value,
+                      });
+                    }}
+                  />
+                </View>
+                <View style={{}}>
+                  <TextInput
+                    placeholder="Enter Description"
+                    value={imageDesc}
+                    style={{
+                      borderWidth: 1,
+                      padding: 12,
+                      marginBottom: hp('3%'),
+                      justifyContent: 'space-between',
+                      borderRadius: 6,
+                    }}
+                    onChangeText={value => {
+                      this.setState({
+                        imageDesc: value,
+                      });
+                    }}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => this.deleteImageFun()}
+                  style={{
+                    width: wp('70%'),
+                    height: hp('7%'),
+                    alignSelf: 'flex-end',
+                    backgroundColor: 'red',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 6,
+                  }}>
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontSize: 15,
+                      fontWeight: 'bold',
+                    }}>
+                    {translate('Delete')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => this.saveImageFun()}
+                  style={{
+                    width: wp('70%'),
+                    height: hp('7%'),
+                    alignSelf: 'flex-end',
+                    backgroundColor: '#5297c1',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: 10,
+                    borderRadius: 6,
+                  }}>
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontSize: 15,
+                      fontWeight: 'bold',
+                    }}>
+                    {translate('Save')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </Modal>
         <View style={{}}>
           <View
             style={{

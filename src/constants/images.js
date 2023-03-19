@@ -71,4 +71,5 @@ export default {
   messageIcon: require('../assests/Images/messageIcon.png'),
   listIcon: require('../assests/Images/listIcon.png'),
   tickIcon: require('../assests/Images/tickIcon.png'),
+  sendIcon: require('../assests/Images/sendIcon.png'),
 };

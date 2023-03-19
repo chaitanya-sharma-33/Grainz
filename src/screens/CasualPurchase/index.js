@@ -110,18 +110,18 @@ class index extends Component {
           <SubHeader {...this.props} buttons={buttonsSubHeader} />
         )} */}
         <View style={styles.subContainer}>
-          <View style={styles.firstContainer}>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.goBack()}
-              style={styles.goBackContainer}>
+          <TouchableOpacity
+            style={styles.firstContainer}
+            onPress={() => this.props.navigation.goBack()}>
+            <View style={styles.goBackContainer}>
               <Image source={img.backIcon} style={styles.tileImageBack} />
-            </TouchableOpacity>
+            </View>
             <View style={styles.flex}>
               <Text style={styles.adminTextStyle}>
                 {translate('Casual purchase')}
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
           <FlatList
             data={buttons}

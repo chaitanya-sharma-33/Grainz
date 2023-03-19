@@ -1106,18 +1106,18 @@ class Basket extends Component {
           style={{marginBottom: hp('2%')}}
           showsVerticalScrollIndicator={false}>
           <View style={styles.subContainer}>
-            <View style={styles.firstContainer}>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.goBack()}
-                style={styles.goBackContainer}>
+            <TouchableOpacity
+              style={styles.firstContainer}
+              onPress={() => this.props.navigation.goBack()}>
+              <View style={styles.goBackContainer}>
                 <Image source={img.backIcon} style={styles.tileImageBack} />
-              </TouchableOpacity>
+              </View>
               <View style={styles.flex}>
                 <Text style={styles.adminTextStyle}>
                   {translate('Items of New order')}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
 
           <View style={{marginHorizontal: wp('3%')}}>

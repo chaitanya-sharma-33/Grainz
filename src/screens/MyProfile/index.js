@@ -93,8 +93,10 @@ class index extends Component {
       });
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this.getProfileData();
+    const location = await AsyncStorage.getItem('@location');
+    console.log('Location', location);
     this.getUserLocationFun();
     this.getLanguageFun();
   }
@@ -150,11 +152,18 @@ class index extends Component {
   setCurrentLocFun = id => {
     setCurrentLocation(id)
       .then(res => {
+        this.storeLocationFun();
         console.log('res-SETLOC', res);
       })
       .catch(err => {
         console.warn('ERr', err);
       });
+  };
+
+  storeLocationFun = async () => {
+    const {finalLocation} = this.state;
+    console.log('res-STORE', finalLocation);
+    await AsyncStorage.setItem('@location', finalLocation);
   };
 
   removeToken = async () => {
@@ -216,6 +225,14 @@ class index extends Component {
   };
 
   updateUserFun = () => {
+    this.setState(
+      {
+        pageLoader: true,
+      },
+      () => this.updateUserFunSec(),
+    );
+  };
+  updateUserFunSec = () => {
     const {
       email,
       phoneNumber,
@@ -237,6 +254,9 @@ class index extends Component {
 
     updateUserApi(payload)
       .then(res => {
+        this.setState({
+          pageLoader: false,
+        });
         console.log('Res', res);
       })
       .catch(err => {
@@ -272,7 +292,7 @@ class index extends Component {
           style={styles.subContainer}
           showsVerticalScrollIndicator={false}>
           {pageLoader ? (
-            <ActivityIndicator color="#94C036" size="large" />
+            <ActivityIndicator color="#5297c1" size="large" />
           ) : (
             <View>
               <View style={styles.subContainer}>

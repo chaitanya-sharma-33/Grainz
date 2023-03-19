@@ -189,18 +189,18 @@ class index extends Component {
           <ActivityIndicator size="large" color="grey" />
         ) : (
           <View style={styles.subContainer}>
-            <View style={styles.firstContainer}>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.goBack()}
-                style={styles.goBackContainer}>
+            <TouchableOpacity
+              style={styles.firstContainer}
+              onPress={() => this.props.navigation.goBack()}>
+              <View style={styles.goBackContainer}>
                 <Image source={img.backIcon} style={styles.tileImageBack} />
-              </TouchableOpacity>
+              </View>
               <View style={{flex: 1, marginLeft: wp('3%')}}>
                 <Text style={styles.adminTextStyle}>
                   {translate('Ordering')}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={{marginHorizontal: wp('4%'), marginBottom: hp('2%')}}>
               <TouchableOpacity
                 onPress={() =>

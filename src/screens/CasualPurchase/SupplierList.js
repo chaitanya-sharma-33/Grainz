@@ -181,18 +181,18 @@ class SupplierList extends Component {
               flex: 1,
             }}>
             <View style={styles.subContainer}>
-              <View style={styles.firstContainer}>
-                <TouchableOpacity
-                  onPress={() => this.props.navigation.goBack()}
-                  style={styles.goBackContainer}>
+              <TouchableOpacity
+                style={styles.firstContainer}
+                onPress={() => this.props.navigation.goBack()}>
+                <View style={styles.goBackContainer}>
                   <Image source={img.backIcon} style={styles.tileImageBack} />
-                </TouchableOpacity>
+                </View>
                 <View style={styles.flex}>
                   <Text style={styles.adminTextStyle}>
                     {translate('Select Supplier')}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
             <View style={{marginHorizontal: wp('6%'), marginTop: hp('2%')}}>
               {dataListLoader ? (
