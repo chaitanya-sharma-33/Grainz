@@ -209,6 +209,8 @@ PODS:
     - React-Core
   - react-native-splash-screen (3.2.0):
     - React
+  - react-native-webview (11.26.1):
+    - React-Core
   - React-perflogger (0.64.0)
   - React-RCTActionSheet (0.64.0):
     - React-Core/RCTActionSheetHeaders (= 0.64.0)
@@ -355,6 +357,7 @@ DEPENDENCIES:
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -423,6 +426,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -494,6 +499,7 @@ SPEC CHECKSUMS:
   react-native-html-to-pdf: 1214f9c795a587fe60a950d11a891cd05be29625
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
+  react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-perflogger: 9c547d8f06b9bf00cb447f2b75e8d7f19b7e02af
   React-RCTActionSheet: 3080b6e12e0e1a5b313c8c0050699b5c794a1b11
   React-RCTAnimation: 3f96f21a497ae7dabf4d2f150ee43f906aaf516f
@@ -521,6 +527,6 @@ SPEC CHECKSUMS:
   TOCropViewController: 3105367e808b7d3d886a74ff59bf4804e7d3ab38
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
 
-PODFILE CHECKSUM: b8d88be8edca5f9c3ab6c44eb718887819ff09e2
+PODFILE CHECKSUM: b184b4c4b66f999ba9ccb279dfbdcd16863497f6
 
 COCOAPODS: 1.11.2

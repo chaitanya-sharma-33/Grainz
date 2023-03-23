@@ -86,6 +86,7 @@ class EditDraftOrder extends Component {
       pageNotes: '',
       lineDetailsModalStatus: false,
       modalQuantity: '0',
+      lineData: '',
     };
   }
 
@@ -382,6 +383,7 @@ class EditDraftOrder extends Component {
         navigateType: 'EditDraft',
         basketId: basketId,
         supplierValue,
+        finalDataSec: '',
       });
     } else if (item.id === 1) {
       const {editStatus} = this.state;
@@ -727,12 +729,29 @@ class EditDraftOrder extends Component {
     console.log('data', data);
 
     const valueSec = data.quantity === '' ? Number(0) : Number(data.quantity);
-
+    const volume = data.inventoryMapping && data.inventoryMapping.volume;
     const valueMinus = valueSec - Number(1);
     console.log('valueMinus--> ', valueMinus);
 
     const valueAdd = Number(1) + valueSec;
     console.log('valueAdd--> ', valueAdd);
+
+    const finalQuantityMinus = volume * valueMinus;
+    const finalQuantityAdd = volume * valueAdd;
+    const finalQuantityInput = volume * value;
+
+    const finalValueMinus =
+      data.inventoryMapping.productPrice *
+      data.inventoryMapping.packSize *
+      valueMinus;
+    const finalValueAdd =
+      data.inventoryMapping.productPrice *
+      data.inventoryMapping.packSize *
+      valueAdd;
+    const finalValueInput =
+      data.inventoryMapping.productPrice *
+      data.inventoryMapping.packSize *
+      value;
 
     if (valueType === 'minus') {
       let newArr = inventoryData.map((item, i) =>
@@ -740,6 +759,8 @@ class EditDraftOrder extends Component {
           ? {
               ...item,
               [type]: valueMinus,
+              ['calculatedQuantity']: finalQuantityMinus,
+              ['value']: finalValueMinus,
               ['action']: 'Update',
             }
           : item,
@@ -754,6 +775,8 @@ class EditDraftOrder extends Component {
           ? {
               ...item,
               [type]: value,
+              ['calculatedQuantity']: finalQuantityInput,
+              ['value']: finalValueInput,
               ['action']: 'Update',
             }
           : item,
@@ -768,6 +791,8 @@ class EditDraftOrder extends Component {
           ? {
               ...item,
               [type]: valueAdd,
+              ['calculatedQuantity']: finalQuantityAdd,
+              ['value']: finalValueAdd,
               ['action']: 'Update',
             }
           : item,
@@ -919,7 +944,43 @@ class EditDraftOrder extends Component {
       navigateType: 'EditDraft',
       basketId: basketId,
       supplierValue,
+      finalDataSec: '',
     });
+  };
+
+  updateQuantityFun = () => {};
+
+  deleteModalItemFun = data => {
+    this.setState(
+      {
+        lineDetailsModalStatus: false,
+      },
+      () => this.deleteFunOrder(data),
+    );
+  };
+
+  editModalQuantityFun = (type, value) => {
+    const {modalQuantity} = this.state;
+    console.log('modalQuantity', modalQuantity);
+    console.log('value', value);
+
+    if (type === 'minus' && modalQuantity !== 0) {
+      const valFinal = parseInt(modalQuantity) - parseInt(value);
+      console.log('valFinal', valFinal);
+      this.setState({
+        modalQuantity: valFinal,
+      });
+    } else if (type === 'input') {
+      this.setState({
+        modalQuantity: value,
+      });
+    } else if (type === 'add') {
+      const valFinal = parseInt(modalQuantity) + parseInt(value);
+      console.log('valFinal', valFinal);
+      this.setState({
+        modalQuantity: valFinal,
+      });
+    }
   };
 
   render() {
@@ -958,9 +1019,10 @@ class EditDraftOrder extends Component {
       pageNotes,
       lineDetailsModalStatus,
       modalQuantity,
+      lineData,
     } = this.state;
 
-    console.log('apiDe', apiDeliveryDate);
+    console.log('lineData', lineData);
 
     return (
       <View style={styles.container}>
@@ -1592,6 +1654,7 @@ class EditDraftOrder extends Component {
                           onPress={() =>
                             this.setState({
                               lineDetailsModalStatus: true,
+                              lineData: item,
                             })
                           }
                           style={{
@@ -1782,7 +1845,7 @@ class EditDraftOrder extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            {item.value.toFixed(2)}
+                            {Number(item.value).toFixed(2)}
                           </Text>
                         </View>
                         <View
@@ -2429,14 +2492,6 @@ class EditDraftOrder extends Component {
                         marginHorizontal: wp('6%'),
                         marginTop: hp('2%'),
                       }}>
-                      <View
-                        style={{
-                          flex: 4,
-                        }}>
-                        <Text style={styles.textStylingLogo}>
-                          {finalData.name}
-                        </Text>
-                      </View>
                       <TouchableOpacity
                         onPress={() =>
                           this.setState({
@@ -2449,7 +2504,7 @@ class EditDraftOrder extends Component {
                           padding: 5,
                         }}>
                         <Image
-                          source={img.crossIcon}
+                          source={img.backIcon}
                           style={{
                             height: 15,
                             width: 15,
@@ -2457,11 +2512,88 @@ class EditDraftOrder extends Component {
                           }}
                         />
                       </TouchableOpacity>
+                      <View style={{marginLeft: 10}}>
+                        <Text style={styles.textStylingLogo}>
+                          {lineData.inventoryMapping &&
+                            lineData.inventoryMapping.inventoryName}
+                        </Text>
+                      </View>
                     </View>
                     <View>
                       <View style={styles.insideContainer}>
-                        <View>
-                          <Text>{finalData.productName}</Text>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text>
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.productName}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 1.5,
+                              alignItems: 'center',
+                              flexDirection: 'row',
+                            }}>
+                            <TouchableOpacity
+                              onPress={() =>
+                                this.editModalQuantityFun('minus', '1')
+                              }
+                              style={{
+                                width: wp('20%'),
+                                height: hp('5%'),
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 29,
+                                  fontWeight: 'bold',
+                                  color: '#5197C1',
+                                }}>
+                                -
+                              </Text>
+                            </TouchableOpacity>
+
+                            <TextInput
+                              value={String(modalQuantity)}
+                              keyboardType="numeric"
+                              style={{
+                                borderRadius: 6,
+                                padding: 10,
+                                width: wp('20%'),
+                                backgroundColor: '#fff',
+                              }}
+                              onChangeText={value =>
+                                this.editModalQuantityFun('input', value)
+                              }
+                            />
+                            <TouchableOpacity
+                              onPress={() =>
+                                this.editModalQuantityFun('add', '1')
+                              }
+                              style={{
+                                width: wp('10%'),
+                                height: hp('5%'),
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                              <Text
+                                style={{
+                                  color: '#5197C1',
+                                  fontSize: 20,
+                                  fontWeight: 'bold',
+                                }}>
+                                +
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
 
                         <View
@@ -2488,7 +2620,10 @@ class EditDraftOrder extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              {finalData.packSize} {finalData.productUnit}
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.packSize}{' '}
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.productUnit}
                             </Text>
                           </View>
 
@@ -2509,7 +2644,14 @@ class EditDraftOrder extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              € {finalData.price}
+                              €{' '}
+                              {Number(
+                                lineData.inventoryMapping &&
+                                  lineData.inventoryMapping.productPrice *
+                                    modalQuantity *
+                                    (lineData.inventoryMapping &&
+                                      lineData.inventoryMapping.packSize),
+                              ).toFixed(2)}{' '}
                             </Text>
                           </View>
                         </View>
@@ -2537,7 +2679,11 @@ class EditDraftOrder extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              {finalData.productPrice} €/{finalData.productUnit}
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.productPrice}{' '}
+                              €/
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.productUnit}
                             </Text>
                           </View>
 
@@ -2558,91 +2704,74 @@ class EditDraftOrder extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              {finalData.quantityProduct
-                                ? finalData.quantityProduct
-                                : modalQuantity}
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.volume *
+                                  modalQuantity}{' '}
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.unit}
                             </Text>
                           </View>
                         </View>
-
-                        <View
+                        <TouchableOpacity
+                          onPress={() => this.deleteModalItemFun(lineData)}
                           style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            flexDirection: 'row',
+                            height: hp('7%'),
                             justifyContent: 'center',
-                            marginTop: hp('3%'),
+                            alignItems: 'center',
+                            marginTop: hp('25%'),
+                            width: wp('85%'),
+                            borderRadius: 10,
+                            alignSelf: 'center',
+                            flexDirection: 'row',
                           }}>
-                          <TouchableOpacity
-                            onPress={() =>
-                              this.editModalQuantityFun('minus', '1')
-                            }
+                          <Image
+                            source={img.deleteIcon}
                             style={{
-                              width: wp('20%'),
-                              height: hp('5%'),
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}>
-                            <Text
-                              style={{
-                                fontSize: 29,
-                                fontWeight: 'bold',
-                                color: '#5197C1',
-                              }}>
-                              -
-                            </Text>
-                          </TouchableOpacity>
-
-                          <TextInput
-                            value={String(modalQuantity)}
-                            keyboardType="numeric"
-                            style={{
-                              borderRadius: 6,
-                              padding: 10,
-                              width: wp('50%'),
-                              backgroundColor: '#fff',
+                              width: 18,
+                              height: 18,
+                              resizeMode: 'contain',
                             }}
-                            onChangeText={value =>
-                              this.editModalQuantityFun('input', value)
-                            }
                           />
-                          <TouchableOpacity
-                            onPress={() =>
-                              this.editModalQuantityFun('add', '1')
-                            }
+                          <Text
                             style={{
-                              width: wp('20%'),
-                              height: hp('5%'),
-                              alignItems: 'center',
-                              justifyContent: 'center',
+                              fontSize: 15,
+                              color: 'red',
+                              fontFamily: 'Inter-SemiBold',
+                              fontWeight: 'bold',
+                              marginLeft: 10,
                             }}>
-                            <Text
-                              style={{
-                                color: '#5197C1',
-                                fontSize: 20,
-                                fontWeight: 'bold',
-                              }}>
-                              +
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
+                            Delete item from the list
+                          </Text>
+                        </TouchableOpacity>
 
                         <TouchableOpacity
-                          onPress={() => this.confirmQuantityFun()}
-                          style={styles.signInStyling}>
+                          onPress={() => this.updateQuantityFun()}
+                          style={{
+                            height: hp('7%'),
+                            backgroundColor: '#5297C1',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: wp('85%'),
+                            borderRadius: 10,
+                            alignSelf: 'center',
+                          }}>
                           <Text style={styles.signInStylingText}>
-                            {translate('Confirm Quantity')}
+                            Update quantites
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                          onPress={() => this.closeFun()}
+                          onPress={() =>
+                            this.setState({
+                              lineDetailsModalStatus: false,
+                            })
+                          }
                           style={{
                             justifyContent: 'center',
                             alignItems: 'center',
+                            marginTop: hp('2%'),
                           }}>
-                          <ActivityIndicator color="#fff" size="small" />
-                          <Text style={{color: '#5297C1'}}>
-                            {translate('Close')}
+                          <Text style={{color: '#5297C1', fontWeight: 'bold'}}>
+                            Cancel
                           </Text>
                         </TouchableOpacity>
                       </View>

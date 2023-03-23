@@ -23,6 +23,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {UserTokenAction} from '../../../../../redux/actions/UserTokenAction';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
   getMyProfileApi,
   getSupplierProductsApi,
@@ -96,13 +97,16 @@ class Basket extends Component {
       buttonsLoader: true,
       supplierValue: '',
       finalLanguage: '',
+      lineDetailsModalStatus: false,
+      modalQuantity: '0',
+      lineData: '',
     };
   }
 
   getDepartmentData() {
     lookupDepartmentsApi()
       .then(res => {
-        console.log('resss', res.data);
+        // console.log('resss--> DEpartment', res.data);
         let finalArray = res.data.map((item, index) => {
           return {
             id: item.id,
@@ -139,7 +143,7 @@ class Basket extends Component {
   getProfileData = () => {
     getMyProfileApi()
       .then(res => {
-        console.log('res', res);
+        // console.log('res', res);
         this.setState({
           recipeLoader: false,
           finalLanguage: res.data.language,
@@ -181,12 +185,13 @@ class Basket extends Component {
       productId,
       supplierName,
       finalDataSec,
+      basketId,
     } = this.props.route && this.props.route.params;
     this.setState(
       {
         supplierId,
         itemType,
-        basketId: finalData,
+        basketId,
         modalLoader: true,
         finalOrderDate: moment(new Date()).format('DD-MM-YY'),
         finalOrderMinDate: new Date(),
@@ -202,9 +207,11 @@ class Basket extends Component {
 
   getBasketDataFun = () => {
     const {basketId} = this.state;
+    console.log('basketId->BASKET', basketId);
+
     getBasketApi(basketId)
       .then(res => {
-        console.log('res', res);
+        console.log('res->GetBasketId', res);
         this.setState(
           {
             modalData: res.data && res.data.shopingBasketItemList,
@@ -228,7 +235,7 @@ class Basket extends Component {
 
   createApiData = () => {
     const {modalData, finalDataSec} = this.state;
-    console.log('FINAAP', finalDataSec);
+    // console.log('FINAAP', finalDataSec);
     const finalArr = [];
     modalData.map(item => {
       finalArr.push({
@@ -311,15 +318,35 @@ class Basket extends Component {
   editQuantityFun = (index, type, value, data, valueType) => {
     const {modalData} = this.state;
 
-    console.log('data', data);
+    // console.log('value', value);
+    // console.log('data', data);
 
     const valueSec = data.quantity === '' ? Number(0) : Number(data.quantity);
 
     const valueMinus = valueSec - Number(1);
-    console.log('valueMinus--> ', valueMinus);
+    // console.log('valueMinus--> ', valueMinus);
+
+    const volume = data.inventoryMapping && data.inventoryMapping.volume;
 
     const valueAdd = Number(1) + valueSec;
-    console.log('valueAdd--> ', valueAdd);
+    // console.log('valueAdd--> ', valueAdd);
+
+    const finalQuantityMinus = volume * valueMinus;
+    const finalQuantityAdd = volume * valueAdd;
+    const finalQuantityInput = volume * value;
+
+    const finalValueMinus =
+      data.inventoryMapping.productPrice *
+      data.inventoryMapping.packSize *
+      valueMinus;
+    const finalValueAdd =
+      data.inventoryMapping.productPrice *
+      data.inventoryMapping.packSize *
+      valueAdd;
+    const finalValueInput =
+      data.inventoryMapping.productPrice *
+      data.inventoryMapping.packSize *
+      value;
 
     if (valueType === 'minus') {
       let newArr = modalData.map((item, i) =>
@@ -327,6 +354,8 @@ class Basket extends Component {
           ? {
               ...item,
               [type]: valueMinus,
+              ['calculatedQuantity']: finalQuantityMinus,
+              ['value']: finalValueMinus,
               ['action']: 'Update',
             }
           : item,
@@ -341,6 +370,8 @@ class Basket extends Component {
           ? {
               ...item,
               [type]: value,
+              ['calculatedQuantity']: finalQuantityInput,
+              ['value']: finalValueInput,
               ['action']: 'Update',
             }
           : item,
@@ -355,6 +386,8 @@ class Basket extends Component {
           ? {
               ...item,
               [type]: valueAdd,
+              ['calculatedQuantity']: finalQuantityAdd,
+              ['value']: finalValueAdd,
               ['action']: 'Update',
             }
           : item,
@@ -427,7 +460,7 @@ class Basket extends Component {
         customerNumber: finalDataSec.customerNumber,
         channel: finalDataSec.channel,
       };
-      console.log('payload', payload);
+      // console.log('payload', payload);
       updateDraftOrderNewApi(payload)
         .then(res => {
           this.setState(
@@ -465,21 +498,21 @@ class Basket extends Component {
   };
 
   sendOrderCheckFun = () => {
-    console.log('FTP');
+    // console.log('FTP');
     const {finalDataSec, finalLanguage, basketId} = this.state;
     if (finalDataSec.channel === 'Ftp') {
-      console.log('FTP-SEC');
+      // console.log('FTP-SEC');
 
       let payload = {
         shopingBasketId: basketId,
         lang: finalLanguage,
       };
 
-      console.log('Payload', payload);
+      // console.log('Payload', payload);
 
       sendOrderApi(payload)
         .then(res => {
-          console.log('res-FTP', res);
+          // console.log('res-FTP', res);
           this.setState(
             {
               mailModalVisible: false,
@@ -534,7 +567,7 @@ class Basket extends Component {
 
   hitDeleteApiFun = () => {
     const {supplierId, basketId, finalArrData, finalDataSec} = this.state;
-    console.log(supplierId, basketId, finalArrData);
+    // console.log(supplierId, basketId, finalArrData);
     let payload = {
       supplierId: supplierId,
       customerNumber: finalDataSec.customerNumber,
@@ -595,7 +628,7 @@ class Basket extends Component {
       customerNumber: finalDataSec.customerNumber,
       channel: finalDataSec.channel,
     };
-    console.log('payload', payload);
+    // console.log('payload', payload);
     if (apiOrderDate && placedByValue && supplierId && finalApiData) {
       updateDraftOrderNewApi(payload)
         .then(res => {
@@ -634,22 +667,22 @@ class Basket extends Component {
     });
   };
 
-  flatListFun = item => {
-    const {basketId} = this.state;
-    if (item.id === 0) {
-      this.props.navigation.navigate('AddItemsOrderScreen', {
-        screen: 'Update',
-        basketId: basketId,
-      });
-    } else if (item.id === 1) {
-      this.setState(
-        {
-          loaderCompStatus: true,
-        },
-        () => this.viewFun(),
-      );
-    }
-  };
+  // flatListFun = item => {
+  //   const {basketId} = this.state;
+  //   if (item.id === 0) {
+  //     this.props.navigation.navigate('AddItemsOrderScreen', {
+  //       screen: 'Update',
+  //       basketId: basketId,
+  //     });
+  //   } else if (item.id === 1) {
+  //     this.setState(
+  //       {
+  //         loaderCompStatus: true,
+  //       },
+  //       () => this.viewFun(),
+  //     );
+  //   }
+  // };
 
   saveAndUpdateFun = () => {
     const {editStatus} = this.state;
@@ -999,7 +1032,7 @@ class Basket extends Component {
   descendingOrderFun = type => {
     const {modalData} = this.state;
 
-    console.log;
+    // console.log;
 
     if (type === 'NAME') {
       function dynamicSort(property) {
@@ -1042,16 +1075,57 @@ class Basket extends Component {
   };
 
   onPressFun = item => {
-    const {supplierValue, placedByValue, basketId} = this.state;
+    const {supplierValue, placedByValue, basketId, finalDataSec} = this.state;
+    console.log('finalDataSec-->', finalDataSec);
+    console.log('item-->', item);
+
     this.props.navigation.navigate('AddItemsOrderScreen', {
+      basketId: basketId,
+      supplierValue,
       departID: item.id,
       departName: item.name,
       screen: 'Update',
-      navigateType: 'EditDraft',
-      basketId: basketId,
-      supplierValue,
+      finalData: '',
+      navigateType: 'Add',
+      finalDataSec,
+      supplierName: finalDataSec.supplierName,
     });
   };
+
+  editModalQuantityFun = (type, value) => {
+    const {modalQuantity} = this.state;
+    // console.log('modalQuantity', modalQuantity);
+    // console.log('value', value);
+
+    if (type === 'minus' && modalQuantity !== 0) {
+      const valFinal = parseInt(modalQuantity) - parseInt(value);
+      // console.log('valFinal', valFinal);
+      this.setState({
+        modalQuantity: valFinal,
+      });
+    } else if (type === 'input') {
+      this.setState({
+        modalQuantity: value,
+      });
+    } else if (type === 'add') {
+      const valFinal = parseInt(modalQuantity) + parseInt(value);
+      // console.log('valFinal', valFinal);
+      this.setState({
+        modalQuantity: valFinal,
+      });
+    }
+  };
+
+  deleteModalItemFun = data => {
+    this.setState(
+      {
+        lineDetailsModalStatus: false,
+      },
+      () => this.deleteInventoryFun(data),
+    );
+  };
+
+  updateQuantityFun = () => {};
 
   render() {
     const {
@@ -1088,7 +1162,12 @@ class Basket extends Component {
       showMoreStatus,
       departmentData,
       buttonsLoader,
+      lineDetailsModalStatus,
+      modalQuantity,
+      lineData,
     } = this.state;
+
+    // console.log('lineData', lineData);
 
     return (
       <View style={styles.container}>
@@ -1572,12 +1651,67 @@ class Basket extends Component {
             <View style={{marginTop: hp('2%'), marginBottom: hp('2%')}}>
               {modalData &&
                 modalData.map((item, index) => {
-                  console.log('item--11-1-1-1>', item);
+                  // console.log('item--11-1-1-1>', item);
                   return (
                     <View
                       style={{
                         marginHorizontal: wp('6%'),
+                        marginBottom: 15,
                       }}>
+                      <View
+                        style={{
+                          position: 'absolute',
+                          flexDirection: 'row',
+                          borderRadius: 5,
+                          bottom: '95%',
+                          left: '5%',
+                          zIndex: 10,
+                          backgroundColor:
+                            item.inventoryMapping &&
+                            item.inventoryMapping.departmentName === 'Bar'
+                              ? '#B2B4B8'
+                              : item.inventoryMapping &&
+                                item.inventoryMapping.departmentName ===
+                                  'Kitchen'
+                              ? '#D448A7'
+                              : item.inventoryMapping &&
+                                item.inventoryMapping.departmentName ===
+                                  'Rental'
+                              ? '#E1A72E'
+                              : item.inventoryMapping &&
+                                item.inventoryMapping.departmentName === 'Other'
+                              ? '#85CF31'
+                              : null,
+                          padding: 5,
+                        }}>
+                        <View>
+                          <Image
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                            }}
+                            source={
+                              item.inventoryMapping &&
+                              item.inventoryMapping.departmentName === 'Bar'
+                                ? img.barIcon
+                                : item.inventoryMapping &&
+                                  item.inventoryMapping.departmentName ===
+                                    'Kitchen'
+                                ? img.kitchenIcon
+                                : item.inventoryMapping &&
+                                  item.inventoryMapping.departmentName ===
+                                    'Rental'
+                                ? img.retailIcon
+                                : item.inventoryMapping &&
+                                  item.inventoryMapping.departmentName ===
+                                    'Other'
+                                ? img.otherIcon
+                                : null
+                            }
+                          />
+                        </View>
+                      </View>
                       <View
                         style={{
                           flexDirection: 'row',
@@ -1590,7 +1724,13 @@ class Basket extends Component {
                           padding: 10,
                           flex: 1,
                         }}>
-                        <View
+                        <TouchableOpacity
+                          onPress={() =>
+                            this.setState({
+                              lineDetailsModalStatus: true,
+                              lineData: item,
+                            })
+                          }
                           style={{
                             flex: 3,
                           }}>
@@ -1598,7 +1738,7 @@ class Basket extends Component {
                             {item.inventoryMapping &&
                               item.inventoryMapping.inventoryName}
                           </Text>
-                        </View>
+                        </TouchableOpacity>
                         <View
                           style={{
                             flex: 1,
@@ -1772,7 +1912,7 @@ class Basket extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            {item.value.toFixed(2)}
+                            {Number(item.value).toFixed(2)}
                           </Text>
                         </View>
                         <View
@@ -1788,7 +1928,7 @@ class Basket extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            {item.calculatedQuantity}
+                            {item.calculatedQuantity} {item.unit}
                           </Text>
                         </View>
                       </View>
@@ -2336,6 +2476,322 @@ class Basket extends Component {
             </View>
           )} */}
 
+          <Modal isVisible={lineDetailsModalStatus} backdropOpacity={0.35}>
+            <View
+              style={{
+                width: wp('100%'),
+                height: hp('100%'),
+                backgroundColor: '#F0F4FE',
+                alignSelf: 'center',
+              }}>
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: '#f2efef',
+                }}>
+                <KeyboardAwareScrollView
+                  keyboardShouldPersistTaps="always"
+                  showsVerticalScrollIndicator={false}
+                  enableOnAndroid>
+                  <View style={styles.secondContainer}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        height: hp('15%'),
+                        marginHorizontal: wp('6%'),
+                        marginTop: hp('2%'),
+                      }}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.setState({
+                            lineDetailsModalStatus: false,
+                          })
+                        }
+                        style={{
+                          backgroundColor: '#fff',
+                          borderRadius: 100,
+                          padding: 5,
+                        }}>
+                        <Image
+                          source={img.backIcon}
+                          style={{
+                            height: 15,
+                            width: 15,
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      </TouchableOpacity>
+                      <View style={{marginLeft: 10}}>
+                        <Text style={styles.textStylingLogo}>
+                          {lineData.inventoryMapping &&
+                            lineData.inventoryMapping.inventoryName}
+                        </Text>
+                      </View>
+                    </View>
+                    <View>
+                      <View style={styles.insideContainer}>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text>
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.productName}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 1.5,
+                              alignItems: 'center',
+                              flexDirection: 'row',
+                            }}>
+                            <TouchableOpacity
+                              onPress={() =>
+                                this.editModalQuantityFun('minus', '1')
+                              }
+                              style={{
+                                width: wp('20%'),
+                                height: hp('5%'),
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 29,
+                                  fontWeight: 'bold',
+                                  color: '#5197C1',
+                                }}>
+                                -
+                              </Text>
+                            </TouchableOpacity>
+
+                            <TextInput
+                              value={String(modalQuantity)}
+                              keyboardType="numeric"
+                              style={{
+                                borderRadius: 6,
+                                padding: 10,
+                                width: wp('20%'),
+                                backgroundColor: '#fff',
+                              }}
+                              onChangeText={value =>
+                                this.editModalQuantityFun('input', value)
+                              }
+                            />
+                            <TouchableOpacity
+                              onPress={() =>
+                                this.editModalQuantityFun('add', '1')
+                              }
+                              style={{
+                                width: wp('10%'),
+                                height: hp('5%'),
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                              <Text
+                                style={{
+                                  color: '#5197C1',
+                                  fontSize: 20,
+                                  fontWeight: 'bold',
+                                }}>
+                                +
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            flex: 1,
+                            marginTop: hp('3%'),
+                          }}>
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              {translate('Package size')}.
+                            </Text>
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.packSize}{' '}
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.productUnit}
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              {translate('Ordered Val')}.
+                            </Text>
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              €{' '}
+                              {Number(
+                                lineData.inventoryMapping &&
+                                  lineData.inventoryMapping.productPrice *
+                                    modalQuantity *
+                                    (lineData.inventoryMapping &&
+                                      lineData.inventoryMapping.packSize),
+                              ).toFixed(2)}{' '}
+                            </Text>
+                          </View>
+                        </View>
+
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            flex: 1,
+                            marginTop: hp('2%'),
+                          }}>
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              Price
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.productPrice}{' '}
+                              €/
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.productUnit}
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                              }}>
+                              {translate('Ordered Qty')}.
+                            </Text>
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginTop: 10,
+                              }}>
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.volume *
+                                  modalQuantity}{' '}
+                              {lineData.inventoryMapping &&
+                                lineData.inventoryMapping.unit}
+                            </Text>
+                          </View>
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => this.deleteModalItemFun(lineData)}
+                          style={{
+                            height: hp('7%'),
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginTop: hp('25%'),
+                            width: wp('85%'),
+                            borderRadius: 10,
+                            alignSelf: 'center',
+                            flexDirection: 'row',
+                          }}>
+                          <Image
+                            source={img.deleteIcon}
+                            style={{
+                              width: 18,
+                              height: 18,
+                              resizeMode: 'contain',
+                            }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              color: 'red',
+                              fontFamily: 'Inter-SemiBold',
+                              fontWeight: 'bold',
+                              marginLeft: 10,
+                            }}>
+                            Delete item from the list
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          onPress={() => this.updateQuantityFun()}
+                          style={{
+                            height: hp('7%'),
+                            backgroundColor: '#5297C1',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: wp('85%'),
+                            borderRadius: 10,
+                            alignSelf: 'center',
+                          }}>
+                          <Text style={styles.signInStylingText}>
+                            Update quantites
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() =>
+                            this.setState({
+                              lineDetailsModalStatus: false,
+                            })
+                          }
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginTop: hp('2%'),
+                          }}>
+                          <Text style={{color: '#5297C1', fontWeight: 'bold'}}>
+                            Cancel
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                </KeyboardAwareScrollView>
+              </View>
+            </View>
+          </Modal>
+
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => this.previewPDFFun()}
@@ -2351,14 +2807,24 @@ class Basket extends Component {
               <View
                 style={{
                   alignItems: 'center',
+                  flexDirection: 'row',
                 }}>
+                <Image
+                  source={img.eyeOpenIcon}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    resizeMode: 'contain',
+                    tintColor: '#fff',
+                  }}
+                />
                 <Text
                   style={{
                     color: 'white',
                     marginLeft: 10,
                     fontFamily: 'Inter-SemiBold',
                   }}>
-                  {translate('Preview PDF')}
+                  Preview
                 </Text>
               </View>
             </TouchableOpacity>
@@ -2376,7 +2842,17 @@ class Basket extends Component {
               <View
                 style={{
                   alignItems: 'center',
+                  flexDirection: 'row',
                 }}>
+                <Image
+                  source={img.sendIcon}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    resizeMode: 'contain',
+                    tintColor: '#fff',
+                  }}
+                />
                 <Text
                   style={{
                     color: 'white',
@@ -2635,7 +3111,7 @@ class Basket extends Component {
                         <View
                           style={{
                             width: wp('68%'),
-                            height: hp('5%'),
+                            height: hp('7%'),
                             alignSelf: 'flex-end',
                             backgroundColor: '#5197C1',
                             justifyContent: 'center',
@@ -2649,7 +3125,7 @@ class Basket extends Component {
                           onPress={() => this.sendMailFun()}
                           style={{
                             width: wp('68%'),
-                            height: hp('5%'),
+                            height: hp('7%'),
                             backgroundColor: '#5197C1',
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -2669,7 +3145,7 @@ class Basket extends Component {
                         onPress={() => this.closeMailModal()}
                         style={{
                           width: wp('68%'),
-                          height: hp('5%'),
+                          height: hp('7%'),
                           alignSelf: 'flex-end',
                           justifyContent: 'center',
                           alignItems: 'center',

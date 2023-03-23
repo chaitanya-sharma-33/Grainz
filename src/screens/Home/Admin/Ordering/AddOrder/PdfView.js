@@ -15,6 +15,8 @@ import {connect} from 'react-redux';
 import SubHeader from '../../../../../components/SubHeader';
 import Header from '../../../../../components/Header';
 import {UserTokenAction} from '../../../../../redux/actions/UserTokenAction';
+import img from '../../../../../constants/images';
+
 import {
   getMyProfileApi,
   getSupplierProductsApi,
@@ -29,7 +31,7 @@ import {
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
-// import {WebView} from 'react-native-webview';
+import {WebView} from 'react-native-webview';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Modal from 'react-native-modal';
 import {
@@ -144,45 +146,45 @@ class PdfView extends Component {
     this.props.navigation.navigate('MyProfile');
   };
 
-  // isPermitted = async () => {
-  //   if (Platform.OS === 'android') {
-  //     try {
-  //       const granted = await PermissionsAndroid.request(
-  //         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-  //         {
-  //           title: 'External Storage Write Permission',
-  //           message: 'App needs access to Storage data',
-  //         },
-  //       );
-  //       return granted === PermissionsAndroid.RESULTS.GRANTED;
-  //     } catch (err) {
-  //       alert('Write permission err', err);
-  //       return false;
-  //     }
-  //   } else {
-  //     return true;
-  //   }
-  // };
+  isPermitted = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'External Storage Write Permission',
+            message: 'App needs access to Storage data',
+          },
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        alert('Write permission err', err);
+        return false;
+      }
+    } else {
+      return true;
+    }
+  };
 
-  // createPDF = async () => {
-  //   if (await this.isPermitted()) {
-  //     let options = {
-  //       //Content to print
-  //       html: this.state.htmlData,
-  //       //File Name
-  //       fileName: 'order',
-  //       //File directory
-  //       directory: 'docs',
-  //     };
-  //     let file = await RNHTMLtoPDF.convert(options);
-  //     Alert.alert('Grainz', `Pdf downloaded successfully - ${file.filePath}`, [
-  //       {
-  //         text: 'Okay',
-  //         onPress: () => this.props.navigation.navigate('HomeScreen'),
-  //       },
-  //     ]);
-  //   }
-  // };
+  createPDF = async () => {
+    if (await this.isPermitted()) {
+      let options = {
+        //Content to print
+        html: this.state.htmlData,
+        //File Name
+        fileName: 'order',
+        //File directory
+        directory: 'docs',
+      };
+      let file = await RNHTMLtoPDF.convert(options);
+      Alert.alert('Grainz', `Pdf downloaded successfully - ${file.filePath}`, [
+        {
+          text: 'Okay',
+          onPress: () => this.props.navigation.navigate('HomeScreen'),
+        },
+      ]);
+    }
+  };
 
   sendFun = () => {
     this.setState(
@@ -360,20 +362,18 @@ class PdfView extends Component {
         )} */}
         <LoaderComp loaderComp={loaderCompStatus} />
         <View style={styles.subContainer}>
-          <View style={styles.firstContainer}>
-            <View style={{flex: 1}}>
-              <Text style={styles.adminTextStyle}>Order Details</Text>
+          <TouchableOpacity
+            style={styles.firstContainer}
+            onPress={() => this.props.navigation.goBack()}>
+            <View style={styles.goBackContainer}>
+              <Image source={img.backIcon} style={styles.tileImageBack} />
             </View>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate('BasketOrderScreen')
-              }
-              style={styles.goBackContainer}>
-              <Text style={styles.goBackTextStyle}>Close</Text>
-            </TouchableOpacity>
-          </View>
+            <View style={styles.flex}>
+              <Text style={styles.adminTextStyle}>PDF</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-        {/* <View style={{flex: 3.5, backgroundColor: '#F0F4FE'}}>
+        <View style={{flex: 3.5, backgroundColor: '#F0F4FE'}}>
           <WebView
             startInLoadingState={true}
             renderLoading={() => {
@@ -390,24 +390,22 @@ class PdfView extends Component {
               backgroundColor: '#F0F4FE',
             }}
           />
-        </View> */}
+        </View>
         <View
           style={{
             flex: 1,
             alignItems: 'center',
           }}>
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          {/* <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => this.sendFun()}
               style={{
-                height: hp('6%'),
-                width: wp('80%'),
-                backgroundColor: '#94C036',
+                width: wp('78%'),
+                height: hp('7%'),
+                backgroundColor: '#5197C1',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginTop: hp('3%'),
-                borderRadius: 100,
-                marginBottom: hp('5%'),
+                borderRadius: 10,
               }}>
               <View
                 style={{
@@ -423,12 +421,28 @@ class PdfView extends Component {
                 </Text>
               </View>
             </TouchableOpacity>
-          </View>
-          {/* <View style={{}}>
-            <TouchableOpacity onPress={() => this.createPDF()}>
-              <Text style={styles.goBackTextStyle}>Download</Text>
-            </TouchableOpacity>
           </View> */}
+          <View style={{}}>
+            <TouchableOpacity
+              onPress={() => this.createPDF()}
+              style={{
+                width: wp('68%'),
+                height: hp('7%'),
+                backgroundColor: '#5197C1',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+              }}>
+              <Text
+                style={{
+                  color: '#fff',
+                  fontSize: 15,
+                  fontWeight: 'bold',
+                }}>
+                Download
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <Modal isVisible={mailModalVisible} backdropOpacity={0.35}>
           <View

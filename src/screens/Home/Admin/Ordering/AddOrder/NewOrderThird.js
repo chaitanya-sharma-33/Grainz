@@ -191,6 +191,8 @@ class NewOrderThird extends Component {
       screen: 'New',
       supplierName: finalData.supplierName,
       finalData,
+      finalDataSec: '',
+      basketId: '',
     });
   };
 

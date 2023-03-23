@@ -932,15 +932,37 @@ class ViewReviewOrder extends Component {
     console.log('data', data);
 
     const finalValue = value;
+    const volume = data.inventoryMapping && data.inventoryMapping.volume;
+    const modalQuantityOrdered = data.quantityOrdered;
+    const finalValueSec = value * volume;
+
+    const finalValueThird =
+      (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered;
 
     console.log('finalValue', finalValue);
 
-    if (valueType === 'Number') {
+    if (valueType === 'DeliveredNo') {
       let newArr = pageOrderItems.map((item, i) =>
         index === i
           ? {
               ...item,
               [type]: finalValue,
+              ['userQuantityDelivered']: finalValueSec,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+      this.setState({
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      });
+    } else if (valueType === 'DeliveredQty') {
+      let newArr = pageOrderItems.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: finalValue,
+              ['quantityDelivered']: finalValueThird,
               ['action']: 'Update',
             }
           : item,
@@ -964,6 +986,68 @@ class ViewReviewOrder extends Component {
         finalApiData: [...newArr],
       });
     }
+  };
+
+  processOrderFun = () => {
+    this.setState(
+      {
+        loaderCompStatus: true,
+      },
+      () => this.hitProcessOrderApi(),
+    );
+  };
+
+  hitProcessOrderApi = () => {
+    const {
+      apiDeliveryDate,
+      apiArrivalDate,
+      pageInvoiceNumber,
+      pageDeliveryNoteReference,
+      pageAmbientTemp,
+      pageChilledTemp,
+      pageFrozenTemp,
+      pageNotes,
+      pageData,
+      finalApiData,
+      productId,
+      isCheckedStatus,
+      switchValueAll,
+    } = this.state;
+    let payload = {
+      ambientTemp: pageAmbientTemp,
+      chilledTemp: pageChilledTemp,
+      deliveredDate: apiArrivalDate,
+      deliveryDate: apiDeliveryDate,
+      deliveryNoteReference: pageDeliveryNoteReference,
+      frozenTemp: pageFrozenTemp,
+      id: productId,
+      invoiceNumber: pageInvoiceNumber,
+      isAuditComplete: pageData.isAuditComplete,
+      notes: pageNotes,
+      orderDate: pageData.orderDate,
+      orderItems: finalApiData,
+      orderReference: pageData.orderReference,
+      placedBy: pageData.placedByNAme,
+      isChecked: switchValueAll,
+    };
+
+    console.log('PAYLOAD----->PRO', payload);
+
+    processPendingOrderApi(payload)
+      .then(res => {
+        this.setState({
+          loaderCompStatus: false,
+          checklistModalStatus: false,
+        });
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
   };
 
   render() {
@@ -3679,7 +3763,7 @@ class ViewReviewOrder extends Component {
                                         'quantityDelivered',
                                         value,
                                         item,
-                                        'Number',
+                                        'DeliveredNo',
                                       )
                                     }
                                   />
@@ -3718,7 +3802,7 @@ class ViewReviewOrder extends Component {
                                         'userQuantityDelivered',
                                         value,
                                         item,
-                                        'Number',
+                                        'DeliveredQty',
                                       )
                                     }
                                   />

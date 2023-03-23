@@ -121,30 +121,36 @@ class index extends Component {
             },
             {
               id: 1,
-              name: translate('Casual purchase'),
-              icon: img.CasualIcon,
-              // screen: 'ViewPurchaseScreen',
-              screen: '',
-            },
-            {
-              id: 2,
               name: translate('Suppliers'),
               icon: img.supplierIcon,
               screen: 'SupplierAdminScreen',
             },
-            {
-              id: 3,
-              name: translate('Reporting'),
-              icon: img.reportsIcon,
-              screen: 'ReportingAdminScreen',
-            },
+            // {
+            //   id: 1,
+            //   name: translate('Casual purchase'),
+            //   icon: img.CasualIcon,
+            //   // screen: 'ViewPurchaseScreen',
+            //   screen: '',
+            // },
+            // {
+            //   id: 2,
+            //   name: translate('Suppliers'),
+            //   icon: img.supplierIcon,
+            //   screen: 'SupplierAdminScreen',
+            // },
+            // {
+            //   id: 3,
+            //   name: translate('Reporting'),
+            //   icon: img.reportsIcon,
+            //   screen: 'ReportingAdminScreen',
+            // },
 
-            {
-              id: 4,
-              name: translate('Stock Take'),
-              icon: img.stokeTakeIcon,
-              screen: 'StockTakeScreen',
-            },
+            // {
+            //   id: 4,
+            //   name: translate('Stock Take'),
+            //   icon: img.stokeTakeIcon,
+            //   screen: 'StockTakeScreen',
+            // },
           ],
           buttonsSubHeader: [
             {name: translate('ADMIN')},

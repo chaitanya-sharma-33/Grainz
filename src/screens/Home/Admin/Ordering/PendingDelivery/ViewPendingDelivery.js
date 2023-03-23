@@ -825,9 +825,17 @@ class ViewPendingDelivery extends Component {
   };
 
   handleChoosePhoto() {
-    this.setState({
-      chooseImageModalStatus: true,
-    });
+    this.setState(
+      {
+        modalVisibleEditElement: false,
+      },
+      () =>
+        setTimeout(() => {
+          this.setState({
+            chooseImageModalStatus: true,
+          });
+        }, 300),
+    );
   }
 
   setModalVisibleImage = () => {
@@ -1073,15 +1081,37 @@ class ViewPendingDelivery extends Component {
     console.log('data', data);
 
     const finalValue = value;
+    const volume = data.inventoryMapping && data.inventoryMapping.volume;
+    const modalQuantityOrdered = data.quantityOrdered;
+    const finalValueSec = value * volume;
+
+    const finalValueThird =
+      (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered;
 
     console.log('finalValue', finalValue);
 
-    if (valueType === 'Number') {
+    if (valueType === 'DeliveredNo') {
       let newArr = pageOrderItems.map((item, i) =>
         index === i
           ? {
               ...item,
               [type]: finalValue,
+              ['userQuantityDelivered']: finalValueSec,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+      this.setState({
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      });
+    } else if (valueType === 'DeliveredQty') {
+      let newArr = pageOrderItems.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: finalValue,
+              ['quantityDelivered']: finalValueThird,
               ['action']: 'Update',
             }
           : item,
@@ -1169,6 +1199,7 @@ class ViewPendingDelivery extends Component {
       priceExpected,
       priceActual,
       orderValueExpected,
+      imageShow,
     } = this.state;
     console.log('flagStatus--->', flagStatus);
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
@@ -3667,7 +3698,7 @@ class ViewPendingDelivery extends Component {
                                         'quantityDelivered',
                                         value,
                                         item,
-                                        'Number',
+                                        'DeliveredNo',
                                       )
                                     }
                                   />
@@ -3706,7 +3737,7 @@ class ViewPendingDelivery extends Component {
                                         'userQuantityDelivered',
                                         value,
                                         item,
-                                        'Number',
+                                        'DeliveredQty',
                                       )
                                     }
                                   />
@@ -4377,6 +4408,9 @@ class ViewPendingDelivery extends Component {
                           alignItems: 'center',
                           marginTop: hp('2%'),
                           marginHorizontal: wp('7%'),
+                          borderBottomWidth: 0.5,
+                          paddingBottom: 10,
+                          borderBottomColor: 'grey',
                         }}>
                         <Image
                           source={img.flagIcon}
@@ -4396,6 +4430,56 @@ class ViewPendingDelivery extends Component {
                           Flagged
                         </Text>
                       </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={() => this.handleChoosePhoto()}
+                        style={{
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          marginHorizontal: wp('7%'),
+                          marginTop: hp('2%'),
+                        }}>
+                        <Image
+                          source={img.cameraIcon}
+                          style={{
+                            height: 20,
+                            width: 20,
+                            resizeMode: 'contain',
+                            marginRight: 10,
+                            tintColor: '#5297c1',
+                          }}
+                        />
+
+                        <Text
+                          style={{
+                            color: '#5297c1',
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                            textDecorationLine: 'underline',
+                          }}>
+                          {translate('Add image')}
+                        </Text>
+                      </TouchableOpacity>
+
+                      {imageShow ? (
+                        <TouchableOpacity
+                          style={{marginTop: 15}}
+                          onPress={() =>
+                            this.setState({
+                              imageModalStatus: true,
+                            })
+                          }>
+                          <Image
+                            style={{
+                              width: wp('60%'),
+                              height: 100,
+                              resizeMode: 'cover',
+                            }}
+                            source={{uri: imageData.path}}
+                          />
+                        </TouchableOpacity>
+                      ) : null}
+
                       <TouchableOpacity
                         onPress={() =>
                           this.setState({
@@ -5049,27 +5133,27 @@ class ViewPendingDelivery extends Component {
                 </View> */}
               </View>
             </Modal>
-            {/* <Modal isVisible={chooseImageModalStatus} backdropOpacity={0.35}>
+            <Modal isVisible={chooseImageModalStatus} backdropOpacity={0.35}>
               <View
                 style={{
                   width: wp('80%'),
-                  height: hp('25%'),
+                  height: hp('30%'),
                   backgroundColor: '#fff',
                   alignSelf: 'center',
+                  borderRadius: 10,
                 }}>
                 <View
                   style={{
-                    backgroundColor: '#412916',
                     height: hp('7%'),
                     flexDirection: 'row',
                   }}>
                   <View
                     style={{
-                      flex: 3,
+                      flex: 4,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
-                    <Text style={{fontSize: 16, color: '#fff'}}>
+                    <Text style={{fontSize: 16, color: 'black'}}>
                       {translate('Add image')}
                     </Text>
                   </View>
@@ -5086,58 +5170,55 @@ class ViewPendingDelivery extends Component {
                         style={{
                           height: 22,
                           width: 22,
-                          tintColor: 'white',
+                          tintColor: 'black',
                           resizeMode: 'contain',
                         }}
                       />
                     </TouchableOpacity>
                   </View>
                 </View>
-                <ScrollView>
-                  <View style={{padding: hp('3%')}}>
-                    <TouchableOpacity
-                      onPress={() => this.choosePhotoFun()}
+                <View style={{padding: hp('3%')}}>
+                  <TouchableOpacity
+                    onPress={() => this.choosePhotoFun()}
+                    style={{
+                      width: wp('70%'),
+                      height: hp('7%'),
+                      alignSelf: 'flex-end',
+                      backgroundColor: '#5297c1',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 6,
+                    }}>
+                    <Text
                       style={{
-                        width: wp('70%'),
-                        height: hp('5%'),
-                        alignSelf: 'flex-end',
-                        backgroundColor: 'red',
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        color: '#fff',
+                        fontSize: 15,
+                        fontWeight: 'bold',
                       }}>
-                      <Text
-                        style={{
-                          color: '#fff',
-                          fontSize: 15,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('Choose image from gallery')}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => this.clickPhotoFun()}
+                      {translate('Choose image from gallery')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => this.clickPhotoFun()}
+                    style={{
+                      width: wp('70%'),
+                      height: hp('7%'),
+                      alignSelf: 'flex-end',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text
                       style={{
-                        width: wp('70%'),
-                        height: hp('5%'),
-                        alignSelf: 'flex-end',
-                        backgroundColor: '#94C036',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginTop: 10,
+                        color: '#5297c1',
+                        fontSize: 15,
+                        fontWeight: 'bold',
                       }}>
-                      <Text
-                        style={{
-                          color: '#fff',
-                          fontSize: 15,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('Click Photo')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </ScrollView>
+                      {translate('Click Photo')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </Modal> */}
+            </Modal>
 
             {/* <Modal isVisible={imageModalStatus} backdropOpacity={0.35}>
               <View

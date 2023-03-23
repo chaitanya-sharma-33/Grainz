@@ -257,4 +257,5 @@ const styles = StyleSheet.create({
   },
   flex: {flex: 1, marginLeft: wp('3%')},
 });
+
 export default styles;

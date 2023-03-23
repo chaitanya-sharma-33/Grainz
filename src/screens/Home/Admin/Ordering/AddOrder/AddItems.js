@@ -199,16 +199,16 @@ class AddItems extends Component {
 
   createFirstData = () => {
     const {supplierId, mainDepartId} = this.state;
-    console.log('FIRST');
+    // console.log('FIRST');
     getInventoryBySupplierIdApi(supplierId)
       .then(res => {
-        console.log('resInventory-->', res);
+        // console.log('resInventory-->', res);
 
         var filteredArray = res.data.filter(function (itm) {
           return itm.departmentId === mainDepartId;
         });
 
-        console.log('filteredArray', filteredArray);
+        // console.log('filteredArray', filteredArray);
 
         let finalArray = filteredArray.map((item, index) => {
           return {
@@ -236,39 +236,44 @@ class AddItems extends Component {
 
   componentDidMount() {
     this.getData();
-    // this.props.navigation.addListener('focus', () => {
-    const {
-      supplierValue,
-      screen,
-      basketId,
-      navigateType,
-      supplierName,
-      departName,
-      departID,
-      finalData,
-    } = this.props.route && this.props.route.params;
-    this.setState(
-      {
-        supplierId: supplierValue,
-        supplierStatus: false,
-        inventoryStatus: true,
-        screenType: screen,
+    this.props.navigation.addListener('focus', () => {
+      const {
+        supplierValue,
+        screen,
         basketId,
         navigateType,
-        departmentName: departName,
         supplierName,
-        searchItemInventory: '',
-        searchItemSupplier: '',
-        listIndex: '',
-        SECTIONS: [],
-        modalData: [],
-        departmentId: departID,
+        departName,
+        departID,
         finalData,
-        mainDepartId: departID,
-      },
-      () => this.getManualLogsData(),
-    );
-    // });
+        finalDataSec,
+      } = this.props.route && this.props.route.params;
+
+      console.log('finalDataSec', finalDataSec);
+      this.setState(
+        {
+          supplierId: supplierValue,
+          supplierStatus: false,
+          inventoryStatus: true,
+          screenType: screen,
+          basketId,
+          navigateType,
+          departmentName: departName,
+          supplierName,
+          searchItemInventory: '',
+          searchItemSupplier: '',
+          listIndex: '',
+          SECTIONS: [],
+          modalData: [],
+          departmentId: departID,
+          finalData,
+          mainDepartId: departID,
+          finalBasketData: [],
+          finalDataSec,
+        },
+        () => this.getManualLogsData(),
+      );
+    });
   }
 
   myProfile = () => {
@@ -750,6 +755,7 @@ class AddItems extends Component {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={{backgroundColor: '#fff', width: wp('87%')}}>
           {section.content.map((item, index) => {
+            // console.log('item213242342342', item);
             return (
               <View
                 style={{
@@ -782,7 +788,7 @@ class AddItems extends Component {
                       alignItems: 'flex-end',
                     }}>
                     <View>
-                      {section.content[0] && section.content[0].deltaNew > 0 ? (
+                      {/* {section.content[0] && section.content[0].deltaNew > 0 ? (
                         <Text
                           numberOfLines={1}
                           style={{
@@ -806,14 +812,15 @@ class AddItems extends Component {
                           }}>
                           Δ 0 {section.content[0] && section.content[0].unit}
                         </Text>
-                      )}
+                      )} */}
                       <Text
                         numberOfLines={1}
                         style={{
                           marginTop: 10,
                           fontSize: 12,
                         }}>
-                        Qty: {item.volume} {item.unit}
+                        Qty: {item.quantityProduct ? item.quantityProduct : '0'}{' '}
+                        {item.unit}
                       </Text>
                     </View>
                   </View>
@@ -1037,7 +1044,7 @@ class AddItems extends Component {
       discountPriceValue: item.discount,
       sectionData: section,
       sectionIndex: index,
-      // modalQuantity: '0',
+      modalQuantity: item.quantityProduct ? item.quantityProduct : '0',
     });
   };
 
@@ -1181,7 +1188,7 @@ class AddItems extends Component {
   };
 
   filterDataDepartmentName = value => {
-    console.log('VALUE', value);
+    // console.log('VALUE', value);
     //passing the inserted text in textinput
     const newData = this.state.SECTIONS_SEC_INVEN.filter(function (item) {
       //applying filter for the inserted text in search bar
@@ -1234,7 +1241,7 @@ class AddItems extends Component {
       supplierName,
     } = this.state;
     if (screenType === 'New') {
-      console.log('NEWWW_HORIZONTAL');
+      // console.log('NEWWW_HORIZONTAL');
       let payload = {
         supplierId: supplierId,
         shopingBasketItemList: finalBasketData,
@@ -1266,7 +1273,7 @@ class AddItems extends Component {
         shopingBasketItemList: finalBasketData,
         id: basketId,
       };
-      console.log('UPDATEEE_HORIZONTAL');
+      // console.log('UPDATEEE_HORIZONTAL');
       // console.log('Payload--> ELSE', payload);
       updateBasketApi(payload)
         .then(res => {
@@ -1308,7 +1315,7 @@ class AddItems extends Component {
   navigateSubFun = item => {
     const {inventoryStatus, finalBasketData, supplierId} = this.state;
     if (finalBasketData.length > 0) {
-      console.log('addToBasketFunHorizontal-->');
+      // console.log('addToBasketFunHorizontal-->');
       this.addToBasketFunHorizontal();
     }
     if (inventoryStatus) {
@@ -1536,7 +1543,7 @@ class AddItems extends Component {
           customerNumber: finalData.customerNumber,
           channel: finalData.channel,
         };
-        console.log('Payload--> ADDITEMS', payload);
+        // console.log('Payload--> ADDITEMS', payload);
         addBasketApi(payload)
           .then(res => {
             this.setState(
@@ -1578,6 +1585,7 @@ class AddItems extends Component {
         updateBasketApi(payload)
           .then(res => {
             if (navigateType === 'EditDraft') {
+              console.log('EditDraft');
               this.setState(
                 {
                   basketLoader: false,
@@ -1585,6 +1593,8 @@ class AddItems extends Component {
                 () => this.navigateToEditDraft(res),
               );
             } else {
+              console.log('EditDraft->ELSE');
+
               this.setState(
                 {
                   basketLoader: false,
@@ -1696,17 +1706,23 @@ class AddItems extends Component {
       finalData,
       mainDepartId,
       departmentName,
+      finalDataSec,
     } = this.state;
+    console.log('FINALDATA', finalData);
+    console.log('finalDataSec', finalDataSec);
+    console.log('basketId-->navigateToBasket', basketId);
+
     if (closeStatus) {
       this.props.navigation.navigate('BasketOrderScreen', {
-        finalData: basketId,
+        finalData: finalData ? finalData : '',
         supplierId,
         itemType: 'Inventory',
         productId,
         supplierName,
-        finalDataSec: finalData,
+        finalDataSec: finalData ? finalData : finalDataSec,
         departmentName,
         mainDepartId,
+        basketId,
       });
     }
   };
@@ -1809,6 +1825,7 @@ class AddItems extends Component {
     this.setState(
       {
         closeStatus: true,
+        actionOpen: false,
       },
       () => this.closeBasketFunSec(),
     );
@@ -1823,16 +1840,23 @@ class AddItems extends Component {
       draftStatus,
       finalBasketData,
       finalData,
+      finalDataSec,
     } = this.state;
 
     if (draftStatus) {
+      console.log('finalDataSec', finalDataSec);
+      console.log('basketId->closeBasketFunSec', basketId);
+
       this.props.navigation.navigate('BasketOrderScreen', {
-        finalData: basketId,
+        finalData: finalData ? finalData : '',
         supplierId,
         itemType: 'Inventory',
         productId,
         supplierName,
         finalData,
+        modalQuantity: '0',
+        finalDataSec,
+        basketId,
       });
     } else {
       console.log('SAVEEEEE');
@@ -1863,9 +1887,9 @@ class AddItems extends Component {
       SECTIONS,
       activeSections,
     } = this.state;
-    console.log('sectIndex', sectionIndex);
-    console.log('sectionData', sectionData);
-    console.log('modalQuantity', modalQuantity);
+    // console.log('sectIndex', sectionIndex);
+    // console.log('sectionData', sectionData);
+    // console.log('modalQuantity', modalQuantity);
 
     // this.editQuantityFun(
     //   sectionIndex,
@@ -1880,10 +1904,10 @@ class AddItems extends Component {
     const valueType = 'input';
 
     const valueMinus = Number(modalQuantity);
-    console.log('valueMinus', valueMinus);
+    // console.log('valueMinus', valueMinus);
 
     const valueAdd = Number(modalQuantity);
-    console.log('valueAdd', valueAdd);
+    // console.log('valueAdd', valueAdd);
 
     const value = valueType === 'input' ? valueAdd : valueMinus;
     // console.log('Value', value);
@@ -1935,7 +1959,7 @@ class AddItems extends Component {
           },
     );
 
-    console.log('LastArr--> ', LastArr);
+    // console.log('LastArr--> ', LastArr);
 
     const finalArr = LastArr.map((item, index) => {
       const firstArr = item.content.filter(function (itm) {
@@ -1946,10 +1970,10 @@ class AddItems extends Component {
       return firstArr;
     });
 
-    console.log('finAAA', finalArr);
+    // console.log('finAAA', finalArr);
 
     var merged = [].concat.apply([], finalArr);
-    console.log('merged', merged);
+    // console.log('merged', merged);
 
     const basketArr = [];
     merged.map(item => {
@@ -1970,12 +1994,13 @@ class AddItems extends Component {
       });
     });
 
-    console.log('basketArr-->', basketArr);
+    // console.log('basketArr-->', basketArr);
 
     this.setState({
       SECTIONS: [...LastArr],
       finalBasketData: [...basketArr],
       draftStatus: false,
+      modalQuantity: '0',
     });
   };
 
@@ -1987,12 +2012,12 @@ class AddItems extends Component {
 
   editModalQuantityFun = (type, value) => {
     const {modalQuantity} = this.state;
-    console.log('modalQuantity', modalQuantity);
-    console.log('value', value);
+    // console.log('modalQuantity', modalQuantity);
+    // console.log('value', value);
 
     if (type === 'minus' && modalQuantity !== 0) {
       const valFinal = parseInt(modalQuantity) - parseInt(value);
-      console.log('valFinal', valFinal);
+      // console.log('valFinal', valFinal);
       this.setState({
         modalQuantity: valFinal,
       });
@@ -2002,7 +2027,7 @@ class AddItems extends Component {
       });
     } else if (type === 'add') {
       const valFinal = parseInt(modalQuantity) + parseInt(value);
-      console.log('valFinal', valFinal);
+      // console.log('valFinal', valFinal);
       this.setState({
         modalQuantity: valFinal,
       });
@@ -2070,8 +2095,8 @@ class AddItems extends Component {
       expandAllStatus,
     } = this.state;
 
-    console.log('PAGE DATA', pageData);
-    console.log('modalQuantity', modalQuantity);
+    // console.log('PAGE DATA', pageData);
+    // console.log('finalBasketData', finalBasketData);
 
     return (
       <View style={styles.container}>
@@ -3065,6 +3090,7 @@ class AddItems extends Component {
                         onPress={() =>
                           this.setState({
                             orderingThreeModal: false,
+                            modalQuantity: '0',
                           })
                         }
                         style={{
@@ -3133,7 +3159,12 @@ class AddItems extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              € {pageData.price}
+                              €{' '}
+                              {(
+                                pageData.productPrice *
+                                pageData.packSize *
+                                modalQuantity
+                              ).toFixed(2)}
                             </Text>
                           </View>
                         </View>
@@ -3182,9 +3213,7 @@ class AddItems extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              {pageData.quantityProduct
-                                ? pageData.quantityProduct
-                                : modalQuantity}
+                              {pageData.volume * modalQuantity} {pageData.unit}
                             </Text>
                           </View>
                           {/* <View
@@ -3315,9 +3344,9 @@ class AddItems extends Component {
                           style={{
                             justifyContent: 'center',
                             alignItems: 'center',
+                            marginTop: hp('2%'),
                           }}>
-                          <ActivityIndicator color="#fff" size="small" />
-                          <Text style={{color: '#5297C1'}}>
+                          <Text style={{color: '#5297C1', fontWeight: 'bold'}}>
                             {translate('Close')}
                           </Text>
                         </TouchableOpacity>
