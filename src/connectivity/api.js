@@ -3,21 +3,21 @@ import url from './Environment.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // let baseURL = url['STAGING'].BaseURL;
-// let baseURL = url['STAGING_TWO'].BaseURL;
-let baseURL = url['DEV'].BaseURL;
+let baseURL = url['STAGING_TWO'].BaseURL;
+// let baseURL = url['DEV'].BaseURL;
 
-export const loginApi = payload => {
-  return axios.post(
-    'https://grainzwebapid.azurewebsites.net/connect/token',
-    payload,
-    {
-      headers: {
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    },
-  );
-};
+// export const loginApi = payload => {
+//   return axios.post(
+//     'https://grainzwebapid.azurewebsites.net/connect/token',
+//     payload,
+//     {
+//       headers: {
+//         Accept: '*/*',
+//         'Content-Type': 'application/x-www-form-urlencoded',
+//       },
+//     },
+//   );
+// };
 
 // export const loginApi = payload => {
 //   return axios.post(
@@ -32,16 +32,16 @@ export const loginApi = payload => {
 //   );
 // };
 
-// export const loginApi = payload => {
-//   const url = 'https://grainzwebapia.azurewebsites.net/connect/token';
-//   console.log('URL', url);
-//   return axios.post(url, payload, {
-//     headers: {
-//       Accept: '*/*',
-//       'Content-Type': 'application/x-www-form-urlencoded',
-//     },
-//   });
-// };
+export const loginApi = payload => {
+  const url = 'https://grainzwebapia.azurewebsites.net/connect/token';
+  console.log('URL', url);
+  return axios.post(url, payload, {
+    headers: {
+      Accept: '*/*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+};
 
 export async function getMyProfileApi() {
   const token = await AsyncStorage.getItem('@appToken');
@@ -1533,4 +1533,15 @@ export const processDeliveredDateApi = async (
       },
     },
   );
+};
+
+export const uploadImageApi = async payload => {
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.post(baseURL + `/Order//upload images`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      LocationId: location,
+    },
+  });
 };

@@ -32,8 +32,9 @@ import {
   sendOrderApi,
   viewShoppingBasketApi,
   viewHTMLApi,
-  deleteOrderApi,
   lookupDepartmentsApi,
+  deleteOrderApi,
+  duplicateApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -43,6 +44,7 @@ import {translate} from '../../../../../utils/translations';
 import Modal from 'react-native-modal';
 import LoaderComp from '../../../../../components/Loader';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import SurePopUp from '../../../../../components/SurePopUp';
 
 const numColumns = 2;
 
@@ -87,6 +89,10 @@ class EditDraftOrder extends Component {
       lineDetailsModalStatus: false,
       modalQuantity: '0',
       lineData: '',
+      pickerModalStatus: false,
+      duplicateModalStatus: false,
+      deleteModalStatus: false,
+      totalHTVA: '',
     };
   }
 
@@ -315,7 +321,6 @@ class EditDraftOrder extends Component {
     this.getData();
     this.getSupplierListData();
     this.getUsersListData();
-    this.getDepartmentData();
     const {productId, basketId, finalData} =
       this.props.route && this.props.route.params;
     this.props.navigation.addListener('focus', () => {
@@ -661,8 +666,25 @@ class EditDraftOrder extends Component {
     getBasketApi(basketId)
       .then(res => {
         console.log('res-BASKETDATA', res);
+
+        let finalArray =
+          res.data &&
+          res.data.departmentsCount.map((item, index) => {
+            return {
+              id: item.id,
+              name: item.name,
+              count: item.count,
+            };
+          });
+        this.setState({
+          departmentData: finalArray,
+          buttonsLoader: false,
+        });
+
         this.setState(
           {
+            departmentData: finalArray,
+            buttonsLoader: false,
             draftsOrderData: res.data,
             inventoryData: res.data && res.data.shopingBasketItemList,
             modalLoaderDrafts: false,
@@ -682,6 +704,7 @@ class EditDraftOrder extends Component {
             placedByValue: res.data && res.data.placedBy,
             productId,
             channel: res.data.deliveryChannel,
+            totalHTVA: res.data.totalValue,
           },
           () => this.createApiData(),
         );
@@ -753,6 +776,8 @@ class EditDraftOrder extends Component {
       data.inventoryMapping.packSize *
       value;
 
+    console.log('inven-->', inventoryData);
+
     if (valueType === 'minus') {
       let newArr = inventoryData.map((item, i) =>
         index === i
@@ -768,6 +793,7 @@ class EditDraftOrder extends Component {
       this.setState({
         inventoryData: [...newArr],
         finalApiData: [...newArr],
+        totalHTVA: newArr.reduce((n, {value}) => n + value, 0),
       });
     } else if (valueType === 'input') {
       let newArr = inventoryData.map((item, i) =>
@@ -784,6 +810,7 @@ class EditDraftOrder extends Component {
       this.setState({
         inventoryData: [...newArr],
         finalApiData: [...newArr],
+        totalHTVA: newArr.reduce((n, {value}) => n + value, 0),
       });
     } else if (valueType === 'add') {
       let newArr = inventoryData.map((item, i) =>
@@ -797,9 +824,13 @@ class EditDraftOrder extends Component {
             }
           : item,
       );
+
+      console.log();
+
       this.setState({
         inventoryData: [...newArr],
         finalApiData: [...newArr],
+        totalHTVA: newArr.reduce((n, {value}) => n + value, 0),
       });
     }
   };
@@ -983,6 +1014,86 @@ class EditDraftOrder extends Component {
     }
   };
 
+  pickerFun = item => {
+    // console.log('item', item);
+    this.setState({
+      pickerModalStatus: true,
+      param: item,
+    });
+  };
+
+  duplicateModalFun = () => {
+    this.setState(
+      {
+        pickerModalStatus: false,
+      },
+      () =>
+        setTimeout(
+          () =>
+            this.setState({
+              duplicateModalStatus: true,
+            }),
+          1000,
+        ),
+    );
+  };
+
+  closeModalFun = () => {
+    this.setState({
+      pickerModalStatus: false,
+      duplicateModalStatus: false,
+      deleteModalStatus: false,
+    });
+  };
+
+  duplicateModalFunSec = () => {
+    // shopingBasketId = param.shopingBasketId
+    // this.setState({
+    //   duplicateModalStatus: false,
+    // });
+
+    const {param} = this.state;
+    this.setState(
+      {
+        recipeLoader: true,
+        duplicateModalStatus: false,
+      },
+      () =>
+        duplicateApi(param.id)
+          .then(res => {
+            console.log('Res', res);
+            this.setState(
+              {
+                recipeLoader: false,
+              },
+              () => this.props.navigation.goBack(),
+            );
+          })
+          .catch(error => {
+            this.setState({
+              deleteLoader: false,
+            });
+            console.warn('Duplicateerror', error.response);
+          }),
+    );
+  };
+
+  deleteModalFun = () => {
+    this.setState(
+      {
+        pickerModalStatus: false,
+      },
+      () =>
+        setTimeout(
+          () =>
+            this.setState({
+              deleteModalStatus: true,
+            }),
+          1000,
+        ),
+    );
+  };
+
   render() {
     const {
       buttonsSubHeader,
@@ -1020,9 +1131,13 @@ class EditDraftOrder extends Component {
       lineDetailsModalStatus,
       modalQuantity,
       lineData,
+      pickerModalStatus,
+      duplicateModalStatus,
+      deleteModalStatus,
+      totalHTVA,
     } = this.state;
 
-    console.log('lineData', lineData);
+    console.log('totalHTVA', totalHTVA);
 
     return (
       <View style={styles.container}>
@@ -1059,7 +1174,7 @@ class EditDraftOrder extends Component {
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => alert('DELETE')}
+                  onPress={() => this.pickerFun(finalData)}
                   style={{
                     flex: 1,
                     alignItems: 'flex-end',
@@ -1184,7 +1299,7 @@ class EditDraftOrder extends Component {
                 style={{
                   flex: 0.2,
                   backgroundColor: '#fff',
-                  height: hp('10.2%'),
+                  height: hp('9%'),
                   alignItems: 'center',
                   borderTopRightRadius: 6,
                 }}>
@@ -1606,13 +1721,7 @@ class EditDraftOrder extends Component {
                               color: '#fff',
                             }}
                             numberOfLines={1}>
-                            {item.name === 'Kitchen'
-                              ? '1 Selected'
-                              : item.name === 'Bar'
-                              ? '2 Selected'
-                              : item.name === 'Retail'
-                              ? '3 Selected'
-                              : '4 Selected'}
+                            {item.count}
                           </Text>
                         </View>
                       </View>
@@ -1907,20 +2016,19 @@ class EditDraftOrder extends Component {
                           fontWeight: 'bold',
                           color: 'black',
                         }}>
-                        {parseInt(finalData.htva).toFixed(2)} €
+                        {parseFloat(totalHTVA).toFixed(2)} €
                       </Text>
                     </View>
                   </View>
                 </View>
               </View>
 
-              <View
+              {/* <View
                 style={{
                   backgroundColor: '#fff',
                   borderRadius: 6,
                   padding: 12,
                   marginBottom: hp('2%'),
-                  height: hp('15%'),
                   marginHorizontal: wp('5%'),
                   borderRadius: 6,
                 }}>
@@ -1944,11 +2052,12 @@ class EditDraftOrder extends Component {
                       fontWeight: 'bold',
                       color: 'black',
                       width: '90%',
+                      height: hp('15%'),
                     }}
                     multiline
                   />
                 </View>
-              </View>
+              </View> */}
 
               {/* <ScrollView showsVerticalScrollIndicator={false}>
                 {modalLoaderDrafts ? (
@@ -2372,7 +2481,7 @@ class EditDraftOrder extends Component {
                     marginLeft: 10,
                     fontFamily: 'Inter-SemiBold',
                   }}>
-                  {translate('Preview PDF')}
+                  Preview
                 </Text>
               </View>
             </TouchableOpacity>
@@ -2466,6 +2575,119 @@ class EditDraftOrder extends Component {
               </View>
             </TouchableOpacity>
           </View>
+          <Modal
+            isVisible={pickerModalStatus}
+            backdropOpacity={0.35}
+            animationIn="bounceInRight">
+            <View
+              style={{
+                width: wp('80%'),
+                height: hp('20%'),
+                backgroundColor: '#fff',
+                alignSelf: 'center',
+                borderRadius: 6,
+              }}>
+              <View
+                style={{
+                  height: hp('5%'),
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <View
+                  style={{
+                    flex: 3,
+                  }}></View>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 1,
+                  }}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        pickerModalStatus: false,
+                      })
+                    }>
+                    <Image
+                      source={img.cancelIcon}
+                      style={{
+                        height: 22,
+                        width: 22,
+                        resizeMode: 'contain',
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <ScrollView>
+                <View style={{padding: hp('3%')}}>
+                  <TouchableOpacity
+                    onPress={() => this.duplicateModalFun()}
+                    style={{
+                      width: wp('70%'),
+                      height: hp('5%'),
+                      backgroundColor: '#5297c1',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 6,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Duplicate')}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => this.deleteModalFun()}
+                    style={{
+                      width: wp('90%'),
+                      height: hp('5%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: 'red',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Delete')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </Modal>
+
+          <SurePopUp
+            pickerModalStatus={duplicateModalStatus}
+            headingText={translate('Duplicate')}
+            crossFun={() => this.closeModalFun()}
+            bodyText="Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?"
+            cancelFun={() => this.closeModalFun()}
+            saveFun={() => this.duplicateModalFunSec()}
+            yesStatus
+          />
+          <SurePopUp
+            pickerModalStatus={deleteModalStatus}
+            headingText={translate('Delete')}
+            crossFun={() => this.closeModalFun()}
+            bodyText="Are you sure you want to delete this item from the list?"
+            cancelFun={() => this.closeModalFun()}
+            saveFun={() => this.deleteFun()}
+            yesStatus
+          />
           <Modal isVisible={lineDetailsModalStatus} backdropOpacity={0.35}>
             <View
               style={{

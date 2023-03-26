@@ -28,6 +28,7 @@ import {
   processPendingOrderItemApi,
   processDeliveredDateApi,
   flagApi,
+  uploadImageApi,
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
@@ -68,7 +69,6 @@ class ViewPendingDelivery extends Component {
       finalApiData: [],
       loaderCompStatus: false,
       allSwitchStatus: false,
-      arrivalDataStatus: false,
       modalVisibleEditElement: false,
       modalOrderedInventoryVolume: '',
       modalQuantityOrdered: '',
@@ -103,6 +103,7 @@ class ViewPendingDelivery extends Component {
       productName: '',
       productCode: '',
       notArrivedStatus: false,
+      flagAllStatus: false,
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -157,24 +158,24 @@ class ViewPendingDelivery extends Component {
 
   componentDidMount() {
     this.getData();
+
     const {productId, supplierId, supplierName, basketId, listId, finalData} =
       this.props.route && this.props.route.params;
 
-    // this.props.navigation.addListener('focus', () => {
-    this.setState(
-      {
-        productId: productId,
-        arrivalDataStatus: false,
-        loaderCompStatus: true,
-        supplierId: supplierId,
-        supplierName: supplierName,
-        basketId: basketId,
-        listId: listId,
-        finalData,
-      },
-      () => this.getOrderFun(),
-    );
-    // });
+    this.props.navigation.addListener('focus', () => {
+      this.setState(
+        {
+          productId: productId,
+          loaderCompStatus: true,
+          supplierId: supplierId,
+          supplierName: supplierName,
+          basketId: basketId,
+          listId: listId,
+          finalData,
+        },
+        () => this.getOrderFun(),
+      );
+    });
   }
 
   getInitialValues = () => {};
@@ -219,7 +220,7 @@ class ViewPendingDelivery extends Component {
   };
 
   createFinalData = () => {
-    const {pageOrderItems} = this.state;
+    const {pageOrderItems, pageData} = this.state;
     let finalArray = pageOrderItems.map((item, index) => {
       return {
         arrivedDate: item.arrivedDate,
@@ -239,24 +240,52 @@ class ViewPendingDelivery extends Component {
       };
     });
 
+    const finalStatus = pageData.orderItems.some((item, index) => {
+      return item.isFlagged === false;
+    });
+
+    const finalStatusSwitch = pageData.orderItems.some((item, index) => {
+      return item.isCorrect === false;
+    });
+
     const result = finalArray;
     this.setState(
       {
         finalApiData: [...result],
+        flagAllStatus: !finalStatus,
+        switchValueAll: !finalStatusSwitch,
       },
       () => this.isCheckedEditableStatusFun(),
     );
   };
 
   isCheckedEditableStatusFun = () => {
-    const {pageData} = this.state;
-    const finalStatus = pageData.orderItems.some((item, index) => {
-      return item.isCorrect === null;
-    });
-    this.setState({
-      isCheckedEditableStatus: finalStatus,
-      loaderCompStatus: false,
-    });
+    const {flagAllStatus} = this.state;
+    if (flagAllStatus) {
+      const {pageData} = this.state;
+      const finalStatus = pageData.orderItems.some((item, index) => {
+        return item.isFlagged === false;
+      });
+
+      console.log('finalStatus-->FLAG', finalStatus);
+      this.setState({
+        isCheckedEditableStatus: finalStatus,
+        loaderCompStatus: false,
+        flagAllStatus: !finalStatus,
+      });
+    } else {
+      const {pageData} = this.state;
+      const finalStatus = pageData.orderItems.some((item, index) => {
+        return item.isCorrect === false;
+      });
+
+      console.log('finalStatus--> SWITCH', finalStatus);
+      this.setState({
+        isCheckedEditableStatus: finalStatus,
+        loaderCompStatus: false,
+        switchValueAll: !finalStatus,
+      });
+    }
   };
 
   myProfile = () => {
@@ -303,19 +332,20 @@ class ViewPendingDelivery extends Component {
       orderItems: finalApiData,
       orderReference: pageData.orderReference,
       placedBy: pageData.placedByNAme,
-      isChecked: switchValueAll,
+      isChecked: false,
     };
 
-    console.log('PAYLOAD----->PRO', payload);
+    console.log('PAYLOAD----->PROCESS ORDER', payload);
 
     processPendingOrderApi(payload)
       .then(res => {
+        console.log('RES-PROCESS ORDER', res);
         this.setState(
           {
             loaderCompStatus: false,
             checklistModalStatus: false,
           },
-          () => this.navigateToOrderScreen(),
+          () => this.getOrderFun(),
         );
       })
       .catch(err => {
@@ -326,15 +356,6 @@ class ViewPendingDelivery extends Component {
           },
         ]);
       });
-  };
-
-  navigateToOrderScreen = () => {
-    const {arrivalDataStatus} = this.state;
-    if (arrivalDataStatus) {
-      this.getOrderFun();
-    } else {
-      this.props.navigation.navigate('OrderingAdminScreen');
-    }
   };
 
   deleteFun = item => {
@@ -441,7 +462,6 @@ class ViewPendingDelivery extends Component {
       {
         finalArrivalDate: newdate,
         apiArrivalDate,
-        arrivalDataStatus: true,
       },
       () =>
         setTimeout(() => {
@@ -659,16 +679,15 @@ class ViewPendingDelivery extends Component {
           this.setState(
             {
               loaderCompStatus: false,
-              arrivalDataStatus: true,
               allSwitchStatus: false,
               initialValueAllCorrect: finalValue,
               pageOrderItems: [],
             },
-            () => this.navigateToOrderScreen(value),
+            () => this.getOrderFun(value),
             // Alert.alert(`Grainz`, 'Order processed successfully', [
             //   {
             //     text: 'Okay',
-            //     onPress: () => this.navigateToOrderScreen(value),
+            //     onPress: () => this.getOrderFun(value),
             //   },
             // ]),
           );
@@ -697,36 +716,41 @@ class ViewPendingDelivery extends Component {
 
   showEditModal = (item, index) => {
     console.log('item123123123', item);
-    this.setState({
-      modalData: item,
-      modalVisibleEditElement: true,
-      modalOrderedInventoryVolume: item.grainzVolume,
-      modalQuantityOrdered: item.quantityOrdered,
-      modalQuantityDelivered: item.quantityDelivered,
-      modalUserQuantityDelivered: item.userQuantityDelivered,
-      modalQuantityInvoiced: item.quantityInvoiced,
-      priceExpected: item.priceExpected,
-      priceActual: item.priceActual,
-      orderValueExpected: item.orderValueExpected,
-      modalUserQuantityInvoiced: item.userQuantityInvoiced,
-      modalPricePaid: item.orderValue.toFixed(2),
-      modalNotes: item.notes,
-      finalArrivalDateSpecific:
-        item.arrivedDate && moment(item.arrivedDate).format('DD/MM/YYYY'),
-      apiArrivalDateSpecific: moment.utc(item.arrivedDate).format(),
-      volume: item.inventoryMapping
-        ? item.inventoryMapping.volume
-        : item.grainzVolume,
+    const {finalArrivedDate} = this.state;
+    if (finalArrivedDate) {
+      this.setState({
+        modalData: item,
+        modalVisibleEditElement: true,
+        modalOrderedInventoryVolume: item.grainzVolume,
+        modalQuantityOrdered: item.quantityOrdered,
+        modalQuantityDelivered: item.quantityDelivered,
+        modalUserQuantityDelivered: item.userQuantityDelivered,
+        modalQuantityInvoiced: item.quantityInvoiced,
+        priceExpected: item.priceExpected,
+        priceActual: item.priceActual,
+        orderValueExpected: item.orderValueExpected,
+        modalUserQuantityInvoiced: item.userQuantityInvoiced,
+        modalPricePaid: item.orderValue.toFixed(2),
+        modalNotes: item.notes,
+        finalArrivalDateSpecific:
+          item.arrivedDate && moment(item.arrivedDate).format('DD/MM/YYYY'),
+        apiArrivalDateSpecific: moment.utc(item.arrivedDate).format(),
+        volume: item.inventoryMapping
+          ? item.inventoryMapping.volume
+          : item.grainzVolume,
 
-      packSize: item.inventoryMapping
-        ? item.inventoryMapping.packSize
-        : item.packSize,
-      unitPrizeModal: item.unitPrice,
-      inventoryName: item.inventoryName,
-      productName: item.productName,
-      productCode: item.productCode,
-      flagStatus: item.isFlagged,
-    });
+        packSize: item.inventoryMapping
+          ? item.inventoryMapping.packSize
+          : item.packSize,
+        unitPrizeModal: item.unitPrice,
+        inventoryName: item.inventoryName,
+        productName: item.productName,
+        productCode: item.productCode,
+        flagStatus: item.isFlagged,
+      });
+    } else {
+      alert('Please select arrival date first.');
+    }
   };
 
   setModalVisibleFalse = () => {
@@ -834,7 +858,7 @@ class ViewPendingDelivery extends Component {
           this.setState({
             chooseImageModalStatus: true,
           });
-        }, 300),
+        }, 500),
     );
   }
 
@@ -858,9 +882,44 @@ class ViewPendingDelivery extends Component {
             includeBase64: true,
             cropping: true,
           }).then(image => {
+            console.log('image-FINAL', image);
+
+            const finalImageData = {
+              action: 'New',
+              description: '',
+              imageText: `data:image/png;base64,${image.data}`,
+              name: '',
+              path: image.path,
+              position: 1,
+              type: 'png',
+            };
+
+            console.log('image-finalImageData', finalImageData);
+
+            // const finalImageData = image.map((item, index) => {
+            //   console.log('itemImage', item);
+            //   return {
+            //     action: 'New',
+            //     description: '',
+            //     imageText: `data:image/png;base64,${item.data}`,
+            //     name: '',
+            //     path: item.path,
+            //     position: 1,
+            //     type: 'png',
+            //   };
+            // });
             this.setState({
-              imageModalStatus: true,
+              modalVisibleEditElement: true,
+              // imageModalStatus: true,
+              imageData: finalImageData,
+              imageShow: true,
+            });
+
+            this.setState({
+              modalVisibleEditElement: true,
+              // imageModalStatus: true,
               imageData: image,
+              imageShow: true,
             });
           });
         }, 500),
@@ -880,8 +939,10 @@ class ViewPendingDelivery extends Component {
             cropping: true,
           }).then(image => {
             this.setState({
-              imageModalStatus: true,
+              modalVisibleEditElement: true,
+              // imageModalStatus: true,
               imageData: image,
+              imageShow: true,
             });
           });
         }, 500),
@@ -955,9 +1016,18 @@ class ViewPendingDelivery extends Component {
   };
 
   checkAllItemFun = value => {
-    this.setState({
-      switchValueAll: value,
-    });
+    const {finalArrivedDate} = this.state;
+
+    if (finalArrivedDate) {
+      this.setState(
+        {
+          switchValueAll: value,
+        },
+        () => this.editStatusFun(value),
+      );
+    } else {
+      alert('Please select arrived date first.');
+    }
   };
 
   showDatePickerFunArrived = () => {
@@ -1137,6 +1207,106 @@ class ViewPendingDelivery extends Component {
     }
   };
 
+  deliveryChecklistFun = () => {
+    const {finalArrivedDate} = this.state;
+
+    if (finalArrivedDate) {
+      this.setState({
+        checklistModalStatus: true,
+      });
+    } else {
+      alert('Please enter arrived date first.');
+    }
+  };
+
+  editStatusFun = value => {
+    const {pageOrderItems} = this.state;
+
+    const finalValue = value;
+    const index = 0;
+
+    let newArr = pageOrderItems.map((item, i) =>
+      index === i
+        ? {
+            ...item,
+            ['isCorrect']: finalValue,
+          }
+        : {
+            ...item,
+            ['isCorrect']: finalValue,
+          },
+    );
+    this.setState(
+      {
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      },
+      () => this.processOrderFun(),
+    );
+  };
+
+  editStatusFlagFun = value => {
+    const {pageOrderItems, flagAllStatus} = this.state;
+
+    console.log('flagAllStatus', flagAllStatus);
+
+    const index = 0;
+
+    let newArr = pageOrderItems.map((item, i) =>
+      index === i
+        ? {
+            ...item,
+            ['isFlagged']: flagAllStatus,
+          }
+        : {
+            ...item,
+            ['isFlagged']: flagAllStatus,
+          },
+    );
+    this.setState(
+      {
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      },
+      () => this.processOrderFun(),
+    );
+  };
+
+  flagFunctionChecklistAll = () => {
+    this.setState(
+      {
+        flagAllStatus: !this.state.flagAllStatus,
+      },
+      () => this.editStatusFlagFun(),
+    );
+  };
+
+  uploadImageFun = () => {
+    let payload = {
+      images: [{}],
+      orderId: modalData.id,
+    };
+    uploadImageApi(payload)
+      .then(res => {
+        console.log('RES-PROCESS ORDER', res);
+        this.setState(
+          {
+            loaderCompStatus: false,
+            checklistModalStatus: false,
+          },
+          () => this.getOrderFun(),
+        );
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+  };
+
   render() {
     const {
       chooseImageModalStatus,
@@ -1200,8 +1370,9 @@ class ViewPendingDelivery extends Component {
       priceActual,
       orderValueExpected,
       imageShow,
+      flagAllStatus,
     } = this.state;
-    console.log('flagStatus--->', flagStatus);
+    console.log('pageOrderItems--->', pageOrderItems);
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
 
     return (
@@ -1270,7 +1441,9 @@ class ViewPendingDelivery extends Component {
                           }}>
                           <TextInput
                             placeholder="DD/MM/YY"
-                            placeholderTextColor="black"
+                            placeholderTextColor={
+                              finalArrivedDate ? 'black' : 'red'
+                            }
                             value={finalArrivedDate}
                             editable={false}
                             style={{
@@ -1372,11 +1545,7 @@ class ViewPendingDelivery extends Component {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() =>
-                    this.setState({
-                      checklistModalStatus: true,
-                    })
-                  }
+                  onPress={() => this.deliveryChecklistFun()}
                   style={{
                     height: hp('7%'),
                     width: wp('87%'),
@@ -3087,7 +3256,7 @@ class ViewPendingDelivery extends Component {
                   </View>
                 </View>
 
-                <View>
+                {/* <View>
                   <View
                     style={{
                       justifyContent: 'center',
@@ -3131,7 +3300,7 @@ class ViewPendingDelivery extends Component {
                       </View>
                     </TouchableOpacity>
                   </View>
-                </View>
+                </View> */}
 
                 <View>
                   <View
@@ -3157,7 +3326,7 @@ class ViewPendingDelivery extends Component {
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>
-                          Mark all as Checked
+                          Check all
                         </Text>
                       </View>
 
@@ -3173,6 +3342,56 @@ class ViewPendingDelivery extends Component {
                           value={switchValueAll}
                         />
                       </View>
+                    </View>
+                  </View>
+                </View>
+
+                <View>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      marginTop: hp('2%'),
+                      alignItems: 'center',
+                      marginTop: '5%',
+                      marginBottom: '5%',
+                    }}>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                      <View
+                        style={{
+                          flex: 1,
+                        }}>
+                        <Text
+                          style={{
+                            color: 'black',
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                          }}>
+                          Flag all
+                        </Text>
+                      </View>
+
+                      <TouchableOpacity
+                        onPress={() => this.flagFunctionChecklistAll()}
+                        style={{
+                          flex: 1,
+                          alignItems: 'flex-end',
+                        }}>
+                        <Image
+                          source={img.flagIcon}
+                          style={{
+                            width: 25,
+                            height: 25,
+                            resizeMode: 'contain',
+                            tintColor: flagAllStatus === false ? 'grey' : null,
+                          }}
+                        />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -3298,6 +3517,33 @@ class ViewPendingDelivery extends Component {
                           fontFamily: 'Inter-SemiBold',
                         }}>
                         {translate('Save')}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => this.processOrderFun()}
+                    style={{
+                      height: hp('7%'),
+                      width: wp('87%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginTop: hp('3%'),
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      borderColor: '#5197C1',
+                    }}>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        style={{
+                          color: '#5197C1',
+                          marginLeft: 10,
+                          fontFamily: 'Inter-SemiBold',
+                        }}>
+                        Move to review
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -3802,6 +4048,93 @@ class ViewPendingDelivery extends Component {
                         {translate('Cancel')}
                       </Text>
                     </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
+            <Modal isVisible={chooseImageModalStatus} backdropOpacity={0.35}>
+              <View
+                style={{
+                  width: wp('80%'),
+                  height: hp('30%'),
+                  backgroundColor: '#fff',
+                  alignSelf: 'center',
+                  borderRadius: 10,
+                }}>
+                <View
+                  style={{
+                    height: hp('7%'),
+                    flexDirection: 'row',
+                  }}>
+                  <View
+                    style={{
+                      flex: 4,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text style={{fontSize: 16, color: 'black'}}>
+                      {translate('Add image')}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <TouchableOpacity
+                      onPress={() => this.setModalVisibleImage(false)}>
+                      <Image
+                        source={img.cancelIcon}
+                        style={{
+                          height: 22,
+                          width: 22,
+                          tintColor: 'black',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View style={{padding: hp('3%')}}>
+                  <TouchableOpacity
+                    onPress={() => this.choosePhotoFun()}
+                    style={{
+                      width: wp('70%'),
+                      height: hp('7%'),
+                      alignSelf: 'flex-end',
+                      backgroundColor: '#5297c1',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 6,
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontSize: 15,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Choose image from gallery')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => this.clickPhotoFun()}
+                    style={{
+                      width: wp('70%'),
+                      height: hp('7%'),
+                      alignSelf: 'flex-end',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#5297c1',
+                        fontSize: 15,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Click Photo')}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -4463,7 +4796,7 @@ class ViewPendingDelivery extends Component {
 
                       {imageShow ? (
                         <TouchableOpacity
-                          style={{marginTop: 15}}
+                          style={{marginTop: 15, marginHorizontal: wp('6%')}}
                           onPress={() =>
                             this.setState({
                               imageModalStatus: true,
@@ -5133,94 +5466,8 @@ class ViewPendingDelivery extends Component {
                 </View> */}
               </View>
             </Modal>
-            <Modal isVisible={chooseImageModalStatus} backdropOpacity={0.35}>
-              <View
-                style={{
-                  width: wp('80%'),
-                  height: hp('30%'),
-                  backgroundColor: '#fff',
-                  alignSelf: 'center',
-                  borderRadius: 10,
-                }}>
-                <View
-                  style={{
-                    height: hp('7%'),
-                    flexDirection: 'row',
-                  }}>
-                  <View
-                    style={{
-                      flex: 4,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <Text style={{fontSize: 16, color: 'black'}}>
-                      {translate('Add image')}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <TouchableOpacity
-                      onPress={() => this.setModalVisibleImage(false)}>
-                      <Image
-                        source={img.cancelIcon}
-                        style={{
-                          height: 22,
-                          width: 22,
-                          tintColor: 'black',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View style={{padding: hp('3%')}}>
-                  <TouchableOpacity
-                    onPress={() => this.choosePhotoFun()}
-                    style={{
-                      width: wp('70%'),
-                      height: hp('7%'),
-                      alignSelf: 'flex-end',
-                      backgroundColor: '#5297c1',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: 6,
-                    }}>
-                    <Text
-                      style={{
-                        color: '#fff',
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('Choose image from gallery')}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => this.clickPhotoFun()}
-                    style={{
-                      width: wp('70%'),
-                      height: hp('7%'),
-                      alignSelf: 'flex-end',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        color: '#5297c1',
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('Click Photo')}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
 
-            {/* <Modal isVisible={imageModalStatus} backdropOpacity={0.35}>
+            <Modal isVisible={imageModalStatus} backdropOpacity={0.35}>
               <View
                 style={{
                   width: wp('80%'),
@@ -5354,7 +5601,7 @@ class ViewPendingDelivery extends Component {
                   </View>
                 </ScrollView>
               </View>
-            </Modal> */}
+            </Modal>
           </View>
         </View>
       </View>

@@ -103,26 +103,6 @@ class Basket extends Component {
     };
   }
 
-  getDepartmentData() {
-    lookupDepartmentsApi()
-      .then(res => {
-        // console.log('resss--> DEpartment', res.data);
-        let finalArray = res.data.map((item, index) => {
-          return {
-            id: item.id,
-            name: item.name,
-          };
-        });
-        this.setState({
-          departmentData: finalArray,
-          buttonsLoader: false,
-        });
-      })
-      .catch(error => {
-        console.log('err', error.response);
-      });
-  }
-
   getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@appToken');
@@ -177,7 +157,6 @@ class Basket extends Component {
   componentDidMount() {
     this.getData();
     this.getUsersListData();
-    this.getDepartmentData();
     const {
       finalData,
       supplierId,
@@ -200,6 +179,7 @@ class Basket extends Component {
         supplierName,
         finalDataSec,
         supplierValue: supplierId,
+        finalData,
       },
       () => this.getBasketDataFun(),
     );
@@ -212,6 +192,17 @@ class Basket extends Component {
     getBasketApi(basketId)
       .then(res => {
         console.log('res->GetBasketId', res);
+
+        let finalArray =
+          res.data &&
+          res.data.departmentsCount.map((item, index) => {
+            return {
+              id: item.id,
+              name: item.name,
+              count: item.count,
+            };
+          });
+
         this.setState(
           {
             modalData: res.data && res.data.shopingBasketItemList,
@@ -219,6 +210,8 @@ class Basket extends Component {
             totalHTVAVal: res.data && res.data.totalValue,
             placedByValue: res.data && res.data.placedBy,
             loaderCompStatus: false,
+            departmentData: finalArray,
+            buttonsLoader: false,
           },
           () => this.createApiData(),
         );
@@ -363,6 +356,7 @@ class Basket extends Component {
       this.setState({
         modalData: [...newArr],
         finalApiData: [...newArr],
+        totalHTVAVal: newArr.reduce((n, {value}) => n + value, 0),
       });
     } else if (valueType === 'input') {
       let newArr = modalData.map((item, i) =>
@@ -379,6 +373,7 @@ class Basket extends Component {
       this.setState({
         modalData: [...newArr],
         finalApiData: [...newArr],
+        totalHTVAVal: newArr.reduce((n, {value}) => n + value, 0),
       });
     } else if (valueType === 'add') {
       let newArr = modalData.map((item, i) =>
@@ -395,6 +390,7 @@ class Basket extends Component {
       this.setState({
         modalData: [...newArr],
         finalApiData: [...newArr],
+        totalHTVAVal: newArr.reduce((n, {value}) => n + value, 0),
       });
     }
   };
@@ -628,7 +624,7 @@ class Basket extends Component {
       customerNumber: finalDataSec.customerNumber,
       channel: finalDataSec.channel,
     };
-    // console.log('payload', payload);
+    console.log('payload -->saveDraftFun', payload);
     if (apiOrderDate && placedByValue && supplierId && finalApiData) {
       updateDraftOrderNewApi(payload)
         .then(res => {
@@ -1127,6 +1123,25 @@ class Basket extends Component {
 
   updateQuantityFun = () => {};
 
+  goBackFun = () => {
+    const {supplierValue, placedByValue, basketId, finalDataSec, finalData} =
+      this.state;
+    console.log('finalDataSec-->', finalDataSec);
+    console.log('finalData-->', finalData);
+
+    this.props.navigation.navigate('AddItemsOrderScreen', {
+      basketId: basketId,
+      supplierValue,
+      // departID: item.id,
+      // departName: item.name,
+      screen: 'Update',
+      finalData: '',
+      navigateType: 'Add',
+      finalDataSec,
+      supplierName: finalDataSec.supplierName,
+    });
+  };
+
   render() {
     const {
       buttonsSubHeader,
@@ -1187,7 +1202,7 @@ class Basket extends Component {
           <View style={styles.subContainer}>
             <TouchableOpacity
               style={styles.firstContainer}
-              onPress={() => this.props.navigation.goBack()}>
+              onPress={() => this.goBackFun()}>
               <View style={styles.goBackContainer}>
                 <Image source={img.backIcon} style={styles.tileImageBack} />
               </View>
@@ -1454,13 +1469,7 @@ class Basket extends Component {
                                 color: '#fff',
                               }}
                               numberOfLines={1}>
-                              {item.name === 'Kitchen'
-                                ? '1 Selected'
-                                : item.name === 'Bar'
-                                ? '2 Selected'
-                                : item.name === 'Retail'
-                                ? '3 Selected'
-                                : '4 Selected'}
+                              {item.count}
                             </Text>
                           </View>
                         </View>
@@ -1935,6 +1944,51 @@ class Basket extends Component {
                     </View>
                   );
                 })}
+
+              <View>
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    marginTop: hp('2%'),
+                    alignItems: 'center',
+                    marginTop: '5%',
+                    marginBottom: '5%',
+                    backgroundColor: '#fff',
+                    marginHorizontal: wp('5%'),
+                    borderRadius: 6,
+                  }}>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      width: wp('90%'),
+                      padding: 10,
+                    }}>
+                    <View>
+                      <Text
+                        style={{
+                          color: 'black',
+                          fontSize: 15,
+                          fontWeight: 'bold',
+                        }}>
+                        Total HTVA:
+                      </Text>
+                    </View>
+
+                    <View>
+                      <Text
+                        style={{
+                          fontWeight: 'bold',
+                          color: 'black',
+                        }}>
+                        {parseFloat(totalHTVAVal).toFixed(2)} €
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
 
               {/* <ScrollView showsVerticalScrollIndicator={false}>
                 {modalLoaderDrafts ? (

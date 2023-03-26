@@ -174,7 +174,8 @@ class PdfView extends Component {
         //File Name
         fileName: 'order',
         //File directory
-        directory: 'docs',
+        directory: 'Documents',
+        base64: true,
       };
       let file = await RNHTMLtoPDF.convert(options);
       Alert.alert('Grainz', `Pdf downloaded successfully - ${file.filePath}`, [

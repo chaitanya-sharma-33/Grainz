@@ -194,7 +194,7 @@ class index extends Component {
         });
 
         let defaultUser = res.data.map((item, index) => {
-          if (item.isCurrent === true) {
+          if (item.isDefault === true) {
             return item.id;
           }
         });

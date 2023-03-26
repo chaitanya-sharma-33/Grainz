@@ -33,6 +33,7 @@ import ModalDropdown from 'react-native-modal-dropdown';
 import {translate} from '../../../../utils/translations';
 import SurePopUp from '../../../../components/SurePopUp';
 import Modal from 'react-native-modal';
+import call from 'react-native-phone-call';
 
 class SupplierList extends Component {
   constructor(props) {
@@ -377,6 +378,29 @@ class SupplierList extends Component {
   //     );
   //   };
 
+  callSupplierFun = () => {
+    this.setState(
+      {
+        pickerModalStatus: false,
+      },
+      () =>
+        setTimeout(() => {
+          this.callSupplierFunSec();
+        }, 500),
+    );
+  };
+
+  callSupplierFunSec = () => {
+    const {param} = this.state;
+    console.log('param', param);
+    const args = {
+      number: param.telephone, // String value with the number to call
+      prompt: false, // Optional boolean property. Determines if the user should be prompted prior to the call
+      skipCanOpen: true, // Skip the canOpenURL check
+    };
+
+    call(args).catch(console.error);
+  };
   render() {
     const {
       recipeLoader,
@@ -664,7 +688,7 @@ class SupplierList extends Component {
                   <ScrollView>
                     <View style={{padding: hp('3%')}}>
                       <TouchableOpacity
-                        // onPress={() => this.duplicateModalFun()}
+                        onPress={() => this.callSupplierFun()}
                         style={{
                           width: wp('70%'),
                           height: hp('5%'),

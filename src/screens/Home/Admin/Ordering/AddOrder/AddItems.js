@@ -113,6 +113,7 @@ class AddItems extends Component {
       modalQuantity: '0',
       actionOpen: false,
       expandAllStatus: false,
+      navigateType: '',
     };
   }
 
@@ -2047,6 +2048,38 @@ class AddItems extends Component {
     }
   };
 
+  goBackFun = () => {
+    const {
+      supplierId,
+      productId,
+      supplierName,
+      basketId,
+      draftStatus,
+      finalBasketData,
+      finalData,
+      finalDataSec,
+    } = this.state;
+
+    if (basketId) {
+      console.log('finalDataSec', finalDataSec);
+      console.log('basketId->closeBasketFunSec', basketId);
+
+      this.props.navigation.navigate('BasketOrderScreen', {
+        finalData: finalData ? finalData : '',
+        supplierId,
+        itemType: 'Inventory',
+        productId,
+        supplierName,
+        finalData,
+        modalQuantity: '0',
+        finalDataSec,
+        basketId,
+      });
+    } else {
+      this.props.navigation.goBack();
+    }
+  };
+
   render() {
     const {
       recipeLoader,
@@ -2093,10 +2126,11 @@ class AddItems extends Component {
       modalQuantity,
       actionOpen,
       expandAllStatus,
+      navigateType,
     } = this.state;
 
     // console.log('PAGE DATA', pageData);
-    // console.log('finalBasketData', finalBasketData);
+    console.log('navigateType', navigateType);
 
     return (
       <View style={styles.container}>
@@ -2111,7 +2145,7 @@ class AddItems extends Component {
           <View style={styles.subContainer}>
             <TouchableOpacity
               style={styles.firstContainer}
-              onPress={() => this.props.navigation.goBack()}>
+              onPress={() => this.goBackFun()}>
               <View style={styles.goBackContainer}>
                 <Image source={img.backIcon} style={styles.tileImageBack} />
               </View>
