@@ -185,7 +185,9 @@ class ViewDraftOrders extends Component {
           {
             text: 'Okay',
             onPress: () =>
-              this.props.navigation.navigate('OrderingAdminScreen'),
+              this.props.navigation.navigate('OrderingAdminScreen', {
+                item: '',
+              }),
           },
         ]);
       })

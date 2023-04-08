@@ -219,6 +219,7 @@ class ViewReviewOrder extends Component {
         quantityOrdered: item.quantityOrdered,
         userQuantityDelivered: item.userQuantityDelivered,
         userQuantityInvoiced: item.userQuantityInvoiced,
+        isFlagged: item.isFlagged,
       };
     });
 
@@ -321,7 +322,9 @@ class ViewReviewOrder extends Component {
       //   () => this.getOrderFun(),
       // );
     } else {
-      this.props.navigation.navigate('OrderingAdminScreen');
+      this.props.navigation.navigate('OrderingAdminScreen', {
+        item: '',
+      });
     }
   };
 
@@ -601,6 +604,7 @@ class ViewReviewOrder extends Component {
         quantityOrdered: item.quantityOrdered,
         userQuantityDelivered: item.userQuantityDelivered,
         userQuantityInvoiced: item.userQuantityInvoiced,
+        isFlagged: item.isFlagged,
       };
     });
 
@@ -719,6 +723,9 @@ class ViewReviewOrder extends Component {
       productName: item.productName,
       productCode: item.productCode,
       flagStatus: item.isFlagged,
+      orderValueExpected: item.orderValueExpected,
+      priceExpected: item.priceExpected,
+      priceActual: item.priceActual,
     });
   };
 
@@ -763,31 +770,31 @@ class ViewReviewOrder extends Component {
     });
   };
 
-  saveFunInventoryItem = () => {
+  saveFunInventoryItem = flagStatus => {
     this.setState(
       {
         listIndex: '',
       },
       () =>
         setTimeout(() => {
-          this.saveFunInventoryItemSec();
+          this.saveFunInventoryItemSec(flagStatus);
         }, 500),
     );
   };
 
-  saveFunInventoryItemSec = () => {
+  saveFunInventoryItemSec = flagStatus => {
     this.setState(
       {
         loaderCompStatus: true,
       },
       () =>
         setTimeout(() => {
-          this.saveFunInventoryItemThird();
+          this.saveFunInventoryItemThird(flagStatus);
         }, 300),
     );
   };
 
-  saveFunInventoryItemThird = () => {
+  saveFunInventoryItemThird = flagStatus => {
     const {
       finalArrivalDateSpecific,
       modalData,
@@ -819,6 +826,7 @@ class ViewReviewOrder extends Component {
       quantityOrdered: modalQuantityOrdered,
       userQuantityDelivered: Number(modalUserQuantityDelivered),
       userQuantityInvoiced: Number(modalUserQuantityInvoiced),
+      isFlagged: flagStatus,
     };
     console.log('payload', payload);
     processPendingOrderItemApi(payload)
@@ -2021,6 +2029,27 @@ class ViewReviewOrder extends Component {
                                   </Text>
                                 </TouchableOpacity>
 
+                                {item.notes ? (
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      this.showEditModal(item, index)
+                                    }
+                                    style={{
+                                      flex: 1,
+                                      alignItems: 'center',
+                                    }}>
+                                    <Image
+                                      source={img.messageIcon}
+                                      style={{
+                                        width: 18,
+                                        height: 18,
+                                        resizeMode: 'contain',
+                                        tintColor: 'black',
+                                      }}
+                                    />
+                                  </TouchableOpacity>
+                                ) : null}
+
                                 <TouchableOpacity
                                   onPress={() => this.deleteFun(item, index)}
                                   style={{
@@ -2869,7 +2898,7 @@ class ViewReviewOrder extends Component {
                   </View>
                 </View>
 
-                <View>
+                {/* <View>
                   <View
                     style={{
                       justifyContent: 'center',
@@ -2913,7 +2942,7 @@ class ViewReviewOrder extends Component {
                       </View>
                     </TouchableOpacity>
                   </View>
-                </View>
+                </View> */}
 
                 <View>
                   <View
@@ -2995,7 +3024,7 @@ class ViewReviewOrder extends Component {
                             fontWeight: 'bold',
                             color: 'black',
                           }}>
-                          {parseInt(finalData.htva).toFixed(2)} €
+                          {parseFloat(finalData.htva).toFixed(2)} €
                         </Text>
                       </View>
                     </View>
@@ -3922,9 +3951,9 @@ class ViewReviewOrder extends Component {
                           style={{
                             flex: 4,
                           }}>
-                          <Text style={styles.textStylingLogo}>
+                          {/* <Text style={styles.textStylingLogo}>
                             {inventoryName}
-                          </Text>
+                          </Text> */}
                         </View>
                       </View>
 
@@ -4524,7 +4553,7 @@ class ViewReviewOrder extends Component {
                         </View>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        onPress={() => this.saveFunInventoryItem()}
+                        onPress={() => this.saveFunInventoryItem(flagStatus)}
                         style={{
                           height: hp('7%'),
                           width: wp('87%'),

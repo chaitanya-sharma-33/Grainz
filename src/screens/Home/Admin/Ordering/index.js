@@ -39,6 +39,7 @@ class index extends Component {
       selectedTextUser: 'All Suppliers',
       countData: '',
       supplierData: '',
+      clearStatus: false,
     };
   }
 
@@ -107,20 +108,30 @@ class index extends Component {
 
   componentDidMount() {
     this.getData();
+
     this.props.navigation.addListener('focus', () => {
+      const {clearStatus} = this.state;
       const {item} = this.props.route && this.props.route.params;
-      this.getOrderingData();
-      if (item) {
-        this.setState({
-          supplierData: item,
-        });
+      console.log('item', item);
+
+      if (item && clearStatus === false) {
+        this.setState(
+          {
+            supplierData: item,
+          },
+          () => this.getOrderingData(),
+        );
+      } else {
+        this.getOrderingData();
       }
     });
     this.setLanguage();
   }
 
   getOrderingData = () => {
-    getOrderingCountApi()
+    const {supplierData} = this.state;
+    console.log('supplierData---->', supplierData.id);
+    getOrderingCountApi(supplierData.id)
       .then(res => {
         this.setState({
           countData: res.data,
@@ -147,6 +158,7 @@ class index extends Component {
   };
 
   onPressFun = item => {
+    const {supplierData} = this.state;
     const listId =
       item.id === 1
         ? 1
@@ -159,7 +171,18 @@ class index extends Component {
         : null;
     this.props.navigation.navigate(item.screen, {
       listId,
+      supplierData,
     });
+  };
+
+  clearSelectionFun = () => {
+    this.setState(
+      {
+        supplierData: '',
+        clearStatus: true,
+      },
+      () => this.getOrderingData(),
+    );
   };
 
   render() {
@@ -170,9 +193,10 @@ class index extends Component {
       selectedTextUser,
       countData,
       supplierData,
+      clearStatus,
     } = this.state;
 
-    console.log('supplierData', supplierData);
+    console.log('clearStatus', clearStatus);
 
     return (
       <View style={styles.container}>
@@ -204,9 +228,15 @@ class index extends Component {
             <View style={{marginHorizontal: wp('4%'), marginBottom: hp('2%')}}>
               <TouchableOpacity
                 onPress={() =>
-                  this.props.navigation.navigate('NewOrderScreen', {
-                    ScreenType: '',
-                  })
+                  this.setState(
+                    {
+                      clearStatus: false,
+                    },
+                    () =>
+                      this.props.navigation.navigate('NewOrderScreen', {
+                        ScreenType: '',
+                      }),
+                  )
                 }
                 style={{
                   backgroundColor: '#fff',
@@ -242,17 +272,39 @@ class index extends Component {
                     }}>
                     {supplierData ? supplierData.name : selectedTextUser}
                   </Text>
-                  <Image
-                    source={img.listIcon}
+                  <View
                     style={{
-                      height: 20,
-                      width: 20,
-                      resizeMode: 'contain',
-                      tintColor: 'grey',
-                      marginRight: 10,
-                      marginTop: 10,
-                    }}
-                  />
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
+                    {supplierData ? (
+                      <TouchableOpacity
+                        onPress={() => this.clearSelectionFun()}>
+                        <Text
+                          style={{
+                            fontSize: 14,
+                            fontFamily: 'Inter-Regular',
+                            fontWeight: 'bold',
+                            marginRight: 10,
+                            color: '#5297c1',
+                            marginTop: 10,
+                          }}>
+                          Clear
+                        </Text>
+                      </TouchableOpacity>
+                    ) : null}
+                    <Image
+                      source={img.listIcon}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        resizeMode: 'contain',
+                        tintColor: 'grey',
+                        marginRight: 10,
+                        marginTop: 10,
+                      }}
+                    />
+                  </View>
                 </View>
               </TouchableOpacity>
             </View>

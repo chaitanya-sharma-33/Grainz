@@ -72,4 +72,6 @@ export default {
   listIcon: require('../assests/Images/listIcon.png'),
   tickIcon: require('../assests/Images/tickIcon.png'),
   sendIcon: require('../assests/Images/sendIcon.png'),
+  inStockIcon: require('../assests/Images/inStockIcon.png'),
+  outStockIcon: require('../assests/Images/outStockIcon.png'),
 };

@@ -93,6 +93,8 @@ class DraftOrder extends Component {
     this.props.navigation.addListener('focus', () => {
       const {route} = this.props;
       const filterData = route.params.filterData;
+      const supplierData = route.params.supplierData;
+      console.log('supplierData', supplierData);
 
       if (filterData) {
         this.setState(
@@ -102,7 +104,7 @@ class DraftOrder extends Component {
           () => this.filterDataFun(filterData),
         );
       } else {
-        this.getDraftOrderData();
+        this.getDraftOrderData(supplierData);
       }
       this.getData();
     });
@@ -116,7 +118,7 @@ class DraftOrder extends Component {
     });
   };
 
-  getDraftOrderData = () => {
+  getDraftOrderData = supplierData => {
     const {selectedPage, pageSize, loadMoreStatus, draftsOrderData} =
       this.state;
 
@@ -124,7 +126,10 @@ class DraftOrder extends Component {
       status: 'Draft',
       selectedPage: selectedPage,
       pageSize: pageSize,
+      supplierId: supplierData ? supplierData.id : '',
     };
+
+    console.log('payload', payload);
     orderByStatusApi(payload)
       .then(res => {
         console.log('res-->ORDER', res);

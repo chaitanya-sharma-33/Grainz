@@ -22,7 +22,6 @@ import {UserTokenAction} from '../../../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
   draftOrderingApi,
-  deleteOrderApi,
   duplicateApi,
   orderByStatusApi,
   getSupplierListApi,
@@ -52,7 +51,6 @@ class SupplierList extends Component {
       pickerModalStatus: false,
       param: '',
       duplicateModalStatus: false,
-      deleteModalStatus: false,
       pageSize: '10',
       selectedPage: '1',
       loadMoreStatus: false,
@@ -261,32 +259,6 @@ class SupplierList extends Component {
     }
   };
 
-  deleteFun = () => {
-    const {param} = this.state;
-    this.setState(
-      {
-        recipeLoader: true,
-        deleteModalStatus: false,
-      },
-      () =>
-        deleteOrderApi(param.id)
-          .then(res => {
-            this.setState(
-              {
-                recipeLoader: false,
-              },
-              () => this.getDraftOrderData(),
-            );
-          })
-          .catch(error => {
-            this.setState({
-              deleteLoader: false,
-            });
-            console.warn('DELETEerror', error.response);
-          }),
-    );
-  };
-
   myProfileFun = () => {
     this.props.navigation.navigate('MyProfile');
   };
@@ -295,7 +267,6 @@ class SupplierList extends Component {
     this.setState({
       pickerModalStatus: false,
       duplicateModalStatus: false,
-      deleteModalStatus: false,
     });
   };
 
@@ -333,32 +304,13 @@ class SupplierList extends Component {
             );
           })
           .catch(error => {
-            this.setState({
-              deleteLoader: false,
-            });
             console.warn('Duplicateerror', error.response);
           }),
     );
   };
 
-  deleteModalFun = () => {
-    this.setState(
-      {
-        pickerModalStatus: false,
-      },
-      () =>
-        setTimeout(
-          () =>
-            this.setState({
-              deleteModalStatus: true,
-            }),
-          1000,
-        ),
-    );
-  };
-
   pickerFun = item => {
-    // console.log('item', item);
+    console.log('item-->', item);
     this.setState({
       pickerModalStatus: true,
       param: item,
@@ -401,6 +353,21 @@ class SupplierList extends Component {
 
     call(args).catch(console.error);
   };
+
+  seeOrdersFun = () => {
+    const {param} = this.state;
+    this.setState(
+      {
+        pickerModalStatus: false,
+      },
+      () =>
+        setTimeout(() => {
+          this.props.navigation.navigate('OrderingAdminScreen', {
+            item: param,
+          });
+        }, 100),
+    );
+  };
   render() {
     const {
       recipeLoader,
@@ -409,7 +376,6 @@ class SupplierList extends Component {
       searchItem,
       pickerModalStatus,
       duplicateModalStatus,
-      deleteModalStatus,
     } = this.state;
 
     return (
@@ -710,7 +676,7 @@ class SupplierList extends Component {
                       </TouchableOpacity>
 
                       <TouchableOpacity
-                        // onPress={() => this.deleteModalFun()}
+                        onPress={() => this.seeOrdersFun()}
                         style={{
                           width: wp('90%'),
                           height: hp('5%'),
@@ -740,15 +706,6 @@ class SupplierList extends Component {
                 bodyText="Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?"
                 cancelFun={() => this.closeModalFun()}
                 saveFun={() => this.duplicateModalFunSec()}
-                yesStatus
-              />
-              <SurePopUp
-                pickerModalStatus={deleteModalStatus}
-                headingText={translate('Delete')}
-                crossFun={() => this.closeModalFun()}
-                bodyText="Are you sure you want to delete this item from the list?"
-                cancelFun={() => this.closeModalFun()}
-                saveFun={() => this.deleteFun()}
                 yesStatus
               />
 

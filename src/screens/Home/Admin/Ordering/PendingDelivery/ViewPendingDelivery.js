@@ -237,6 +237,7 @@ class ViewPendingDelivery extends Component {
         quantityOrdered: item.quantityOrdered,
         userQuantityDelivered: item.userQuantityDelivered,
         userQuantityInvoiced: item.userQuantityInvoiced,
+        isFlagged: item.isFlagged,
       };
     });
 
@@ -624,6 +625,7 @@ class ViewPendingDelivery extends Component {
         quantityOrdered: item.quantityOrdered,
         userQuantityDelivered: item.userQuantityDelivered,
         userQuantityInvoiced: item.userQuantityInvoiced,
+        isFlagged: item.isFlagged,
       };
     });
 
@@ -2323,6 +2325,27 @@ class ViewPendingDelivery extends Component {
                                   </Text>
                                 </TouchableOpacity>
 
+                                {item.notes ? (
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      this.showEditModal(item, index)
+                                    }
+                                    style={{
+                                      flex: 1,
+                                      alignItems: 'center',
+                                    }}>
+                                    <Image
+                                      source={img.messageIcon}
+                                      style={{
+                                        width: 18,
+                                        height: 18,
+                                        resizeMode: 'contain',
+                                        tintColor: 'black',
+                                      }}
+                                    />
+                                  </TouchableOpacity>
+                                ) : null}
+
                                 <TouchableOpacity
                                   onPress={() => this.deleteFun(item, index)}
                                   style={{
@@ -2399,7 +2422,7 @@ class ViewPendingDelivery extends Component {
                                       fontWeight: 'bold',
                                     }}>
                                     {/* {item.value.toFixed(2)} */}
-                                    {item.orderValue}
+                                    {item.orderValue} €
                                   </Text>
                                 </View>
                                 <View
@@ -4550,7 +4573,10 @@ class ViewPendingDelivery extends Component {
                                   marginTop: 5,
                                   fontWeight: 'bold',
                                 }}
-                                value={modalPricePaid && String(modalPricePaid)}
+                                value={
+                                  modalPricePaid &&
+                                  String(modalPricePaid) + ' € '
+                                }
                                 onChangeText={value =>
                                   this.setState({
                                     modalPricePaid: value,

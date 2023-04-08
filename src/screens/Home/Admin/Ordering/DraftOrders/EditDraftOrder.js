@@ -86,6 +86,7 @@ class EditDraftOrder extends Component {
       buttonsLoader: true,
       channel: '',
       pageNotes: '',
+      itemNotes: '',
       lineDetailsModalStatus: false,
       modalQuantity: '0',
       lineData: '',
@@ -93,6 +94,7 @@ class EditDraftOrder extends Component {
       duplicateModalStatus: false,
       deleteModalStatus: false,
       totalHTVA: '',
+      isFreemium: '',
     };
   }
 
@@ -119,11 +121,13 @@ class EditDraftOrder extends Component {
   getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@appToken');
+      const userStatus = await AsyncStorage.getItem('@isFreemium');
       if (value !== null) {
         this.setState(
           {
             token: value,
             recipeLoader: true,
+            isFreemium: userStatus,
           },
           () => this.getProfileData(),
         );
@@ -194,7 +198,7 @@ class EditDraftOrder extends Component {
         .catch(err => {
           Alert.alert(
             `Error - ${err.response.status}`,
-            'Something went wrong',
+            'Something went wrong-1',
             [
               {
                 text: 'Okay',
@@ -270,11 +274,15 @@ class EditDraftOrder extends Component {
         });
       })
       .catch(err => {
-        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-          {
-            text: 'Okay',
-          },
-        ]);
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-2',
+          [
+            {
+              text: 'Okay',
+            },
+          ],
+        );
       });
   };
 
@@ -454,7 +462,7 @@ class EditDraftOrder extends Component {
         .catch(err => {
           Alert.alert(
             `Error - ${err.response.status}`,
-            'Something went wrong',
+            'Something went wrong-3',
             [
               {
                 text: 'Okay',
@@ -484,11 +492,15 @@ class EditDraftOrder extends Component {
         );
       })
       .catch(err => {
-        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-          {
-            text: 'Okay',
-          },
-        ]);
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-4',
+          [
+            {
+              text: 'Okay',
+            },
+          ],
+        );
       });
   };
 
@@ -651,11 +663,15 @@ class EditDraftOrder extends Component {
         );
       })
       .catch(err => {
-        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-          {
-            text: 'Okay',
-          },
-        ]);
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-5',
+          [
+            {
+              text: 'Okay',
+            },
+          ],
+        );
       });
   };
 
@@ -710,15 +726,19 @@ class EditDraftOrder extends Component {
         );
       })
       .catch(err => {
-        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-          {
-            text: 'Okay',
-            onPress: () =>
-              this.setState({
-                modalLoaderDrafts: false,
-              }),
-          },
-        ]);
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-6',
+          [
+            {
+              text: 'Okay',
+              onPress: () =>
+                this.setState({
+                  modalLoaderDrafts: false,
+                }),
+            },
+          ],
+        );
       });
   };
 
@@ -736,6 +756,7 @@ class EditDraftOrder extends Component {
         unit: item.unit,
         action: item.action,
         value: item.value,
+        notes: item.notes,
       });
     });
     this.setState(
@@ -864,12 +885,16 @@ class EditDraftOrder extends Component {
         );
       })
       .catch(err => {
-        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-          {
-            text: 'Okay',
-            onPress: () => this.props.navigation.goBack(),
-          },
-        ]);
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-7',
+          [
+            {
+              text: 'Okay',
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ],
+        );
       });
   };
 
@@ -913,15 +938,22 @@ class EditDraftOrder extends Component {
             loaderCompStatus: false,
             mailModalVisible: false,
           },
-          () => this.props.navigation.navigate('OrderingAdminScreen'),
+          () =>
+            this.props.navigation.navigate('OrderingAdminScreen', {
+              item: '',
+            }),
         );
       })
       .catch(err => {
-        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-          {
-            text: 'Okay',
-          },
-        ]);
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-8',
+          [
+            {
+              text: 'Okay',
+            },
+          ],
+        );
       });
   };
 
@@ -979,7 +1011,26 @@ class EditDraftOrder extends Component {
     });
   };
 
-  updateQuantityFun = () => {};
+  saveNoteFun = () => {
+    const {inventoryData, itemNotes, lineIndex} = this.state;
+    console.log('lineIndex', lineIndex);
+    let newArr = inventoryData.map((item, i) =>
+      lineIndex === i
+        ? {
+            ...item,
+            ['notes']: itemNotes,
+          }
+        : item,
+    );
+    this.setState(
+      {
+        inventoryData: [...newArr],
+        finalApiData: [...newArr],
+        lineDetailsModalStatus: false,
+      },
+      () => this.updateBasketFun(),
+    );
+  };
 
   deleteModalItemFun = data => {
     this.setState(
@@ -1094,6 +1145,10 @@ class EditDraftOrder extends Component {
     );
   };
 
+  goBackFun = () => {
+    this.props.navigation.navigate('DraftOrderAdminScreen');
+  };
+
   render() {
     const {
       buttonsSubHeader,
@@ -1128,6 +1183,7 @@ class EditDraftOrder extends Component {
       buttonsLoader,
       departmentData,
       pageNotes,
+      itemNotes,
       lineDetailsModalStatus,
       modalQuantity,
       lineData,
@@ -1135,9 +1191,11 @@ class EditDraftOrder extends Component {
       duplicateModalStatus,
       deleteModalStatus,
       totalHTVA,
+      isFreemium,
     } = this.state;
 
-    console.log('totalHTVA', totalHTVA);
+    console.log('finalData', finalData);
+    console.log('finalApidata', finalApiData);
 
     return (
       <View style={styles.container}>
@@ -1163,7 +1221,7 @@ class EditDraftOrder extends Component {
                     alignItems: 'center',
                     flex: 4,
                   }}
-                  onPress={() => this.props.navigation.goBack()}>
+                  onPress={() => this.goBackFun()}>
                   <View style={styles.goBackContainer}>
                     <Image source={img.backIcon} style={styles.tileImageBack} />
                   </View>
@@ -1219,8 +1277,8 @@ class EditDraftOrder extends Component {
                 <View
                   style={{
                     backgroundColor: '#fff',
-                    padding: 15,
                     borderTopLeftRadius: 6,
+                    padding: 15,
                   }}>
                   <View style={{}}>
                     <Text
@@ -1246,13 +1304,17 @@ class EditDraftOrder extends Component {
                   </View>
                 </View>
               </View>
-              <View style={{flex: 1}}>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  backgroundColor: '#fff',
+                  padding: 15,
+                  borderTopRightRadius: 6,
+                }}>
                 <TouchableOpacity
                   onPress={() => this.showDatePickerDeliveryDate()}
-                  style={{
-                    backgroundColor: '#fff',
-                    padding: 15,
-                  }}>
+                  style={{flex: 2}}>
                   <View
                     style={{
                       flexDirection: 'row',
@@ -1282,6 +1344,29 @@ class EditDraftOrder extends Component {
                     />
                   </View>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    this.setState({
+                      showMoreStatus: !showMoreStatus,
+                    })
+                  }
+                  style={{
+                    flex: 0.5,
+                  }}>
+                  <Image
+                    source={
+                      showMoreStatus === false
+                        ? img.arrowDownIcon
+                        : img.upArrowIcon
+                    }
+                    style={{
+                      width: 15,
+                      height: 15,
+                      resizeMode: 'contain',
+                      marginRight: 10,
+                    }}
+                  />
+                </TouchableOpacity>
                 <DateTimePickerModal
                   isVisible={isDatePickerVisibleDeliveryDate}
                   mode={'date'}
@@ -1290,7 +1375,8 @@ class EditDraftOrder extends Component {
                   minimumDate={finalOrderMinDate}
                 />
               </View>
-              <TouchableOpacity
+
+              {/* <TouchableOpacity
                 onPress={() =>
                   this.setState({
                     showMoreStatus: !showMoreStatus,
@@ -1299,7 +1385,6 @@ class EditDraftOrder extends Component {
                 style={{
                   flex: 0.2,
                   backgroundColor: '#fff',
-                  height: hp('9%'),
                   alignItems: 'center',
                   borderTopRightRadius: 6,
                 }}>
@@ -1314,10 +1399,9 @@ class EditDraftOrder extends Component {
                     height: 15,
                     resizeMode: 'contain',
                     marginRight: 10,
-                    marginTop: hp('2%'),
                   }}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             {showMoreStatus ? (
               <View
@@ -1332,7 +1416,6 @@ class EditDraftOrder extends Component {
                     style={{
                       backgroundColor: '#fff',
                       padding: 15,
-                      marginBottom: hp('3%'),
                       borderBottomLeftRadius: 6,
                     }}>
                     <View style={{}}>
@@ -1345,7 +1428,7 @@ class EditDraftOrder extends Component {
                     </View>
                     <View style={{marginTop: 10}}>
                       <TextInput
-                        value={finalData.placedBy}
+                        value={finalData.placedByNAme}
                         editable={false}
                         style={{
                           fontSize: 14,
@@ -1370,13 +1453,62 @@ class EditDraftOrder extends Component {
                   </View>
                 </View>
 
-                <View style={{flex: 1}}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    backgroundColor: '#fff',
+                    padding: 15,
+                    borderBottomRightRadius: 6,
+                  }}>
+                  <View style={{flex: 2}}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                        }}>
+                        {translate('Order date')}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 10,
+                      }}>
+                      <TextInput
+                        value={moment(finalData.orderDate).format('DD/MM/YYYY')}
+                        editable={false}
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          color: 'black',
+                        }}
+                      />
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        showMoreStatus: !showMoreStatus,
+                      })
+                    }
+                    style={{
+                      flex: 0.5,
+                    }}></TouchableOpacity>
+                </View>
+
+                {/* <View style={{flex: 1}}>
                   <View
                     style={{
                       backgroundColor: '#fff',
                       padding: 15,
                       marginBottom: hp('3%'),
-                      borderBottomRightRadius: 6,
+                      borderBottomRightRadius: 6,''
                     }}>
                     <View style={{}}>
                       <Text
@@ -1397,7 +1529,7 @@ class EditDraftOrder extends Component {
                         }}
                       />
                     </View>
-                    {/* <TouchableOpacity
+                    <TouchableOpacity
                       style={{
                         marginTop: 10,
                       }}>
@@ -1405,9 +1537,9 @@ class EditDraftOrder extends Component {
                         style={{
                           fontWeight: 'bold',
                         }}></Text>
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                   </View>
-                </View>
+                </View> */}
               </View>
             ) : null}
             {/* <View
@@ -1744,18 +1876,69 @@ class EditDraftOrder extends Component {
                   return (
                     <View
                       style={{
-                        marginHorizontal: wp('7%'),
+                        marginHorizontal: wp('6%'),
                         marginBottom: 10,
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        borderColor: 'grey',
                       }}>
                       <View
                         style={{
+                          position: 'absolute',
                           flexDirection: 'row',
-                          borderTopWidth: 1,
-                          borderLeftWidth: 1,
-                          borderRightWidth: 1,
-                          borderColor: 'grey',
-                          borderTopLeftRadius: 6,
-                          borderTopRightRadius: 6,
+                          borderRadius: 5,
+                          bottom: '95%',
+                          left: '5%',
+                          zIndex: 10,
+                          backgroundColor:
+                            item.inventoryMapping &&
+                            item.inventoryMapping.departmentName === 'Bar'
+                              ? '#B2B4B8'
+                              : item.inventoryMapping &&
+                                item.inventoryMapping.departmentName ===
+                                  'Kitchen'
+                              ? '#D448A7'
+                              : item.inventoryMapping &&
+                                item.inventoryMapping.departmentName ===
+                                  'Rental'
+                              ? '#E1A72E'
+                              : item.inventoryMapping &&
+                                item.inventoryMapping.departmentName === 'Other'
+                              ? '#85CF31'
+                              : null,
+                          padding: 5,
+                        }}>
+                        <View>
+                          <Image
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                            }}
+                            source={
+                              item.inventoryMapping &&
+                              item.inventoryMapping.departmentName === 'Bar'
+                                ? img.barIcon
+                                : item.inventoryMapping &&
+                                  item.inventoryMapping.departmentName ===
+                                    'Kitchen'
+                                ? img.kitchenIcon
+                                : item.inventoryMapping &&
+                                  item.inventoryMapping.departmentName ===
+                                    'Rental'
+                                ? img.retailIcon
+                                : item.inventoryMapping &&
+                                  item.inventoryMapping.departmentName ===
+                                    'Other'
+                                ? img.otherIcon
+                                : null
+                            }
+                          />
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
                           padding: 10,
                           flex: 1,
                         }}>
@@ -1764,6 +1947,8 @@ class EditDraftOrder extends Component {
                             this.setState({
                               lineDetailsModalStatus: true,
                               lineData: item,
+                              lineIndex: index,
+                              itemNotes: item.notes,
                             })
                           }
                           style={{
@@ -1774,21 +1959,31 @@ class EditDraftOrder extends Component {
                               item.inventoryMapping.inventoryName}
                           </Text>
                         </TouchableOpacity>
-                        <View
-                          style={{
-                            flex: 1,
-                            alignItems: 'center',
-                          }}>
-                          <Image
-                            source={img.messageIcon}
+                        {item.notes ? (
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.setState({
+                                lineDetailsModalStatus: true,
+                                lineData: item,
+                                lineIndex: index,
+                                itemNotes: item.notes,
+                              })
+                            }
                             style={{
-                              width: 18,
-                              height: 18,
-                              resizeMode: 'contain',
-                              tintColor: 'black',
-                            }}
-                          />
-                        </View>
+                              flex: 1,
+                              alignItems: 'center',
+                            }}>
+                            <Image
+                              source={img.messageIcon}
+                              style={{
+                                width: 18,
+                                height: 18,
+                                resizeMode: 'contain',
+                                tintColor: 'black',
+                              }}
+                            />
+                          </TouchableOpacity>
+                        ) : null}
                         <TouchableOpacity
                           onPress={() => this.deleteFunOrder(item, index)}
                           style={{
@@ -1810,26 +2005,28 @@ class EditDraftOrder extends Component {
                         style={{
                           flex: 1,
                           flexDirection: 'row',
-                          borderLeftWidth: 1,
-                          borderRightWidth: 1,
                           borderBottomWidth: 1,
                           borderColor: 'grey',
                           padding: 10,
                         }}>
-                        <View
-                          style={{
-                            flex: 1,
-                          }}>
-                          <Text style={{}}>
-                            {item.inventoryMapping &&
-                              item.inventoryMapping.productName}
-                          </Text>
-                        </View>
+                        {isFreemium === 'false' ? (
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text style={{}}>
+                              {item.inventoryMapping &&
+                                item.inventoryMapping.productName}
+                            </Text>
+                          </View>
+                        ) : null}
                         <View
                           style={{
                             flex: 1,
                             alignItems: 'center',
                             flexDirection: 'row',
+                            justifyContent:
+                              isFreemium === 'false' ? null : 'center',
                           }}>
                           <TouchableOpacity
                             onPress={() =>
@@ -1914,12 +2111,6 @@ class EditDraftOrder extends Component {
                         style={{
                           flex: 1,
                           flexDirection: 'row',
-                          borderLeftWidth: 1,
-                          borderRightWidth: 1,
-                          borderBottomWidth: 1,
-                          borderColor: 'grey',
-                          borderBottomLeftRadius: 6,
-                          borderBottomRightRadius: 6,
                           padding: 10,
                         }}>
                         <View
@@ -1954,7 +2145,7 @@ class EditDraftOrder extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            {Number(item.value).toFixed(2)}
+                            {Number(item.value).toFixed(2)} €
                           </Text>
                         </View>
                         <View
@@ -1970,7 +2161,7 @@ class EditDraftOrder extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            {item.calculatedQuantity}
+                            {item.calculatedQuantity} {item.unit}
                           </Text>
                         </View>
                       </View>
@@ -2706,7 +2897,12 @@ class EditDraftOrder extends Component {
                   showsVerticalScrollIndicator={false}
                   enableOnAndroid>
                   <View style={styles.secondContainer}>
-                    <View
+                    <TouchableOpacity
+                      onPress={() =>
+                        this.setState({
+                          lineDetailsModalStatus: false,
+                        })
+                      }
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -2714,12 +2910,7 @@ class EditDraftOrder extends Component {
                         marginHorizontal: wp('6%'),
                         marginTop: hp('2%'),
                       }}>
-                      <TouchableOpacity
-                        onPress={() =>
-                          this.setState({
-                            lineDetailsModalStatus: false,
-                          })
-                        }
+                      <View
                         style={{
                           backgroundColor: '#fff',
                           borderRadius: 100,
@@ -2733,17 +2924,17 @@ class EditDraftOrder extends Component {
                             resizeMode: 'contain',
                           }}
                         />
-                      </TouchableOpacity>
+                      </View>
                       <View style={{marginLeft: 10}}>
-                        <Text style={styles.textStylingLogo}>
+                        {/* <Text style={styles.textStylingLogo}>
                           {lineData.inventoryMapping &&
                             lineData.inventoryMapping.inventoryName}
-                        </Text>
+                        </Text> */}
                       </View>
-                    </View>
+                    </TouchableOpacity>
                     <View>
                       <View style={styles.insideContainer}>
-                        <View
+                        {/* <View
                           style={{
                             flexDirection: 'row',
                             alignItems: 'center',
@@ -2816,7 +3007,7 @@ class EditDraftOrder extends Component {
                               </Text>
                             </TouchableOpacity>
                           </View>
-                        </View>
+                        </View> */}
 
                         <View
                           style={{
@@ -2866,14 +3057,7 @@ class EditDraftOrder extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              €{' '}
-                              {Number(
-                                lineData.inventoryMapping &&
-                                  lineData.inventoryMapping.productPrice *
-                                    modalQuantity *
-                                    (lineData.inventoryMapping &&
-                                      lineData.inventoryMapping.packSize),
-                              ).toFixed(2)}{' '}
+                              {Number(lineData.value).toFixed(2)} €
                             </Text>
                           </View>
                         </View>
@@ -2926,15 +3110,46 @@ class EditDraftOrder extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              {lineData.inventoryMapping &&
-                                lineData.inventoryMapping.volume *
-                                  modalQuantity}{' '}
-                              {lineData.inventoryMapping &&
-                                lineData.inventoryMapping.unit}
+                              {lineData.calculatedQuantity} {lineData.unit}
                             </Text>
                           </View>
                         </View>
-                        <TouchableOpacity
+
+                        <View
+                          style={{
+                            backgroundColor: '#fff',
+                            borderRadius: 6,
+                            padding: 12,
+                            borderRadius: 6,
+                            marginTop: hp('3%'),
+                          }}>
+                          <View style={{}}>
+                            <Text style={{}}>Note</Text>
+                          </View>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              marginTop: 10,
+                            }}>
+                            <TextInput
+                              value={itemNotes}
+                              onChangeText={value =>
+                                this.setState({
+                                  itemNotes: value,
+                                })
+                              }
+                              style={{
+                                fontWeight: 'bold',
+                                color: 'black',
+                                width: '90%',
+                                height: hp('10%'),
+                              }}
+                              multiline
+                            />
+                          </View>
+                        </View>
+                        {/* <TouchableOpacity
                           onPress={() => this.deleteModalItemFun(lineData)}
                           style={{
                             height: hp('7%'),
@@ -2964,10 +3179,10 @@ class EditDraftOrder extends Component {
                             }}>
                             Delete item from the list
                           </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                         <TouchableOpacity
-                          onPress={() => this.updateQuantityFun()}
+                          onPress={() => this.saveNoteFun()}
                           style={{
                             height: hp('7%'),
                             backgroundColor: '#5297C1',
@@ -2976,10 +3191,9 @@ class EditDraftOrder extends Component {
                             width: wp('85%'),
                             borderRadius: 10,
                             alignSelf: 'center',
+                            marginTop: hp('20%'),
                           }}>
-                          <Text style={styles.signInStylingText}>
-                            Update quantites
-                          </Text>
+                          <Text style={styles.signInStylingText}>Save</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() =>

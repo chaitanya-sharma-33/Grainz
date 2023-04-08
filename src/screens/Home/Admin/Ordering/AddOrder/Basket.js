@@ -100,17 +100,21 @@ class Basket extends Component {
       lineDetailsModalStatus: false,
       modalQuantity: '0',
       lineData: '',
+      itemNotes: '',
+      isFreemium: '',
     };
   }
 
   getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@appToken');
+      const userStatus = await AsyncStorage.getItem('@isFreemium');
       if (value !== null) {
         this.setState(
           {
             token: value,
             recipeLoader: true,
+            isFreemium: userStatus,
           },
           () => this.getProfileData(),
         );
@@ -239,6 +243,7 @@ class Basket extends Component {
         quantity: item.quantity,
         action: 'string',
         value: item.value,
+        notes: item.notes,
       });
     });
     this.setState({
@@ -514,7 +519,10 @@ class Basket extends Component {
               mailModalVisible: false,
               loaderCompStatus: false,
             },
-            () => this.props.navigation.navigate('OrderingAdminScreen'),
+            () =>
+              this.props.navigation.navigate('OrderingAdminScreen', {
+                item: '',
+              }),
           );
         })
         .catch(err => {
@@ -632,7 +640,11 @@ class Basket extends Component {
             {
               loaderCompStatus: false,
             },
-            () => this.props.navigation.navigate('OrderingAdminScreen'),
+            // ,
+            // () =>
+            //   this.props.navigation.navigate('OrderingAdminScreen', {
+            //     item: '',
+            //   }),
           );
         })
         .catch(err => {
@@ -712,6 +724,8 @@ class Basket extends Component {
       channel: finalDataSec.channel,
     };
 
+    console.log('VIEWFUN--payload', payload);
+
     if (
       apiDeliveryDate &&
       placedByValue &&
@@ -749,8 +763,11 @@ class Basket extends Component {
   viewFunSec = () => {
     const {basketId} = this.state;
 
+    console.log('basketId', basketId);
+
     viewHTMLApi(basketId)
       .then(res => {
+        console.log('res', res);
         this.setState(
           {
             loaderCompStatus: false,
@@ -903,7 +920,10 @@ class Basket extends Component {
             mailModalVisible: false,
             loaderCompStatus: false,
           },
-          () => this.props.navigation.navigate('OrderingAdminScreen'),
+          () =>
+            this.props.navigation.navigate('OrderingAdminScreen', {
+              item: '',
+            }),
         );
       })
       .catch(err => {
@@ -921,7 +941,10 @@ class Basket extends Component {
       {
         mailModalVisible: false,
       },
-      () => this.props.navigation.navigate('OrderingAdminScreen'),
+      () =>
+        this.props.navigation.navigate('OrderingAdminScreen', {
+          item: '',
+        }),
     );
   };
 
@@ -1121,7 +1144,26 @@ class Basket extends Component {
     );
   };
 
-  updateQuantityFun = () => {};
+  saveNotesFun = () => {
+    const {modalData, itemNotes, lineIndex} = this.state;
+    console.log('lineIndex', lineIndex);
+    let newArr = modalData.map((item, i) =>
+      lineIndex === i
+        ? {
+            ...item,
+            ['notes']: itemNotes,
+          }
+        : item,
+    );
+    this.setState(
+      {
+        modalData: [...newArr],
+        finalApiData: [...newArr],
+        lineDetailsModalStatus: false,
+      },
+      () => this.saveDraftFunGreen(),
+    );
+  };
 
   goBackFun = () => {
     const {supplierValue, placedByValue, basketId, finalDataSec, finalData} =
@@ -1180,9 +1222,11 @@ class Basket extends Component {
       lineDetailsModalStatus,
       modalQuantity,
       lineData,
+      itemNotes,
+      isFreemium,
     } = this.state;
 
-    // console.log('lineData', lineData);
+    console.log('finalDataSec', finalDataSec);
 
     return (
       <View style={styles.container}>
@@ -1666,6 +1710,9 @@ class Basket extends Component {
                       style={{
                         marginHorizontal: wp('6%'),
                         marginBottom: 15,
+                        borderWidth: 1,
+                        borderColor: 'grey',
+                        borderRadius: 6,
                       }}>
                       <View
                         style={{
@@ -1724,12 +1771,6 @@ class Basket extends Component {
                       <View
                         style={{
                           flexDirection: 'row',
-                          borderTopWidth: 1,
-                          borderLeftWidth: 1,
-                          borderRightWidth: 1,
-                          borderColor: 'grey',
-                          borderTopLeftRadius: 6,
-                          borderTopRightRadius: 6,
                           padding: 10,
                           flex: 1,
                         }}>
@@ -1738,6 +1779,8 @@ class Basket extends Component {
                             this.setState({
                               lineDetailsModalStatus: true,
                               lineData: item,
+                              lineIndex: index,
+                              itemNotes: item.notes,
                             })
                           }
                           style={{
@@ -1748,21 +1791,31 @@ class Basket extends Component {
                               item.inventoryMapping.inventoryName}
                           </Text>
                         </TouchableOpacity>
-                        <View
-                          style={{
-                            flex: 1,
-                            alignItems: 'center',
-                          }}>
-                          <Image
-                            source={img.messageIcon}
+                        {item.notes ? (
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.setState({
+                                lineDetailsModalStatus: true,
+                                lineData: item,
+                                lineIndex: index,
+                                itemNotes: item.notes,
+                              })
+                            }
                             style={{
-                              width: 18,
-                              height: 18,
-                              resizeMode: 'contain',
-                              tintColor: 'black',
-                            }}
-                          />
-                        </View>
+                              flex: 1,
+                              alignItems: 'center',
+                            }}>
+                            <Image
+                              source={img.messageIcon}
+                              style={{
+                                width: 18,
+                                height: 18,
+                                resizeMode: 'contain',
+                                tintColor: 'black',
+                              }}
+                            />
+                          </TouchableOpacity>
+                        ) : null}
                         <TouchableOpacity
                           onPress={() => this.deleteInventoryFun(item, index)}
                           style={{
@@ -1784,26 +1837,29 @@ class Basket extends Component {
                         style={{
                           flex: 1,
                           flexDirection: 'row',
-                          borderLeftWidth: 1,
-                          borderRightWidth: 1,
+
                           borderBottomWidth: 1,
                           borderColor: 'grey',
                           padding: 10,
                         }}>
-                        <View
-                          style={{
-                            flex: 1,
-                          }}>
-                          <Text style={{}}>
-                            {item.inventoryMapping &&
-                              item.inventoryMapping.productName}
-                          </Text>
-                        </View>
+                        {isFreemium === 'false' ? (
+                          <View
+                            style={{
+                              flex: 1,
+                            }}>
+                            <Text style={{}}>
+                              {item.inventoryMapping &&
+                                item.inventoryMapping.productName}
+                            </Text>
+                          </View>
+                        ) : null}
                         <View
                           style={{
                             flex: 1,
                             alignItems: 'center',
                             flexDirection: 'row',
+                            justifyContent:
+                              isFreemium === 'false' ? null : 'center',
                           }}>
                           <TouchableOpacity
                             onPress={() =>
@@ -1881,12 +1937,7 @@ class Basket extends Component {
                         style={{
                           flex: 1,
                           flexDirection: 'row',
-                          borderLeftWidth: 1,
-                          borderRightWidth: 1,
-                          borderBottomWidth: 1,
-                          borderColor: 'grey',
-                          borderBottomLeftRadius: 6,
-                          borderBottomRightRadius: 6,
+
                           padding: 10,
                         }}>
                         <View
@@ -1921,7 +1972,7 @@ class Basket extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            {Number(item.value).toFixed(2)}
+                            {Number(item.value).toFixed(2)} €
                           </Text>
                         </View>
                         <View
@@ -2548,7 +2599,12 @@ class Basket extends Component {
                   showsVerticalScrollIndicator={false}
                   enableOnAndroid>
                   <View style={styles.secondContainer}>
-                    <View
+                    <TouchableOpacity
+                      onPress={() =>
+                        this.setState({
+                          lineDetailsModalStatus: false,
+                        })
+                      }
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -2556,12 +2612,7 @@ class Basket extends Component {
                         marginHorizontal: wp('6%'),
                         marginTop: hp('2%'),
                       }}>
-                      <TouchableOpacity
-                        onPress={() =>
-                          this.setState({
-                            lineDetailsModalStatus: false,
-                          })
-                        }
+                      <View
                         style={{
                           backgroundColor: '#fff',
                           borderRadius: 100,
@@ -2575,17 +2626,17 @@ class Basket extends Component {
                             resizeMode: 'contain',
                           }}
                         />
-                      </TouchableOpacity>
-                      <View style={{marginLeft: 10}}>
+                      </View>
+                      {/* <View style={{marginLeft: 10}}>
                         <Text style={styles.textStylingLogo}>
                           {lineData.inventoryMapping &&
                             lineData.inventoryMapping.inventoryName}
                         </Text>
-                      </View>
-                    </View>
+                      </View> */}
+                    </TouchableOpacity>
                     <View>
                       <View style={styles.insideContainer}>
-                        <View
+                        {/* <View
                           style={{
                             flexDirection: 'row',
                             alignItems: 'center',
@@ -2658,7 +2709,7 @@ class Basket extends Component {
                               </Text>
                             </TouchableOpacity>
                           </View>
-                        </View>
+                        </View> */}
 
                         <View
                           style={{
@@ -2708,14 +2759,7 @@ class Basket extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              €{' '}
-                              {Number(
-                                lineData.inventoryMapping &&
-                                  lineData.inventoryMapping.productPrice *
-                                    modalQuantity *
-                                    (lineData.inventoryMapping &&
-                                      lineData.inventoryMapping.packSize),
-                              ).toFixed(2)}{' '}
+                              € {Number(lineData.value).toFixed(2)}{' '}
                             </Text>
                           </View>
                         </View>
@@ -2768,15 +2812,46 @@ class Basket extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 10,
                               }}>
-                              {lineData.inventoryMapping &&
-                                lineData.inventoryMapping.volume *
-                                  modalQuantity}{' '}
-                              {lineData.inventoryMapping &&
-                                lineData.inventoryMapping.unit}
+                              {lineData.calculatedQuantity} {lineData.unit}
                             </Text>
                           </View>
                         </View>
-                        <TouchableOpacity
+
+                        <View
+                          style={{
+                            backgroundColor: '#fff',
+                            borderRadius: 6,
+                            padding: 12,
+                            borderRadius: 6,
+                            marginTop: hp('3%'),
+                          }}>
+                          <View style={{}}>
+                            <Text style={{}}>Note</Text>
+                          </View>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              marginTop: 10,
+                            }}>
+                            <TextInput
+                              value={itemNotes}
+                              onChangeText={value =>
+                                this.setState({
+                                  itemNotes: value,
+                                })
+                              }
+                              style={{
+                                fontWeight: 'bold',
+                                color: 'black',
+                                width: '90%',
+                                height: hp('10%'),
+                              }}
+                              multiline
+                            />
+                          </View>
+                        </View>
+                        {/* <TouchableOpacity
                           onPress={() => this.deleteModalItemFun(lineData)}
                           style={{
                             height: hp('7%'),
@@ -2806,10 +2881,10 @@ class Basket extends Component {
                             }}>
                             Delete item from the list
                           </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                         <TouchableOpacity
-                          onPress={() => this.updateQuantityFun()}
+                          onPress={() => this.saveNotesFun()}
                           style={{
                             height: hp('7%'),
                             backgroundColor: '#5297C1',
@@ -2818,10 +2893,9 @@ class Basket extends Component {
                             width: wp('85%'),
                             borderRadius: 10,
                             alignSelf: 'center',
+                            marginTop: hp('20%'),
                           }}>
-                          <Text style={styles.signInStylingText}>
-                            Update quantites
-                          </Text>
+                          <Text style={styles.signInStylingText}>Save</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() =>
@@ -2946,7 +3020,9 @@ class Basket extends Component {
 
             <TouchableOpacity
               onPress={() =>
-                this.props.navigation.navigate('OrderingAdminScreen')
+                this.props.navigation.navigate('OrderingAdminScreen', {
+                  item: '',
+                })
               }
               style={{
                 height: hp('7%'),

@@ -219,17 +219,21 @@ class index extends Component {
     setCurrentLocation(finalLocation)
       .then(res => {
         console.log('res-SETLOC', res);
-        this.storeLocationFun();
+
+        this.storeLocationFun(res);
       })
       .catch(err => {
         console.warn('ERr', err);
       });
   };
 
-  storeLocationFun = async () => {
+  storeLocationFun = async res => {
     const {finalLocation} = this.state;
     console.log('res-STORE', finalLocation);
     await AsyncStorage.setItem('@location', finalLocation);
+    const finalData = (res.data && res.data.isFreemium).toString();
+    console.log('final', finalData);
+    await AsyncStorage.setItem('@isFreemium', finalData);
   };
 
   setLanguage = async () => {

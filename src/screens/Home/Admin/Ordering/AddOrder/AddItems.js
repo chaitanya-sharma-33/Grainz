@@ -114,16 +114,19 @@ class AddItems extends Component {
       actionOpen: false,
       expandAllStatus: false,
       navigateType: '',
+      isFreemium: '',
     };
   }
 
   getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@appToken');
+      const userStatus = await AsyncStorage.getItem('@isFreemium');
       if (value !== null) {
         this.setState(
           {
             token: value,
+            isFreemium: userStatus,
           },
           () => this.getProfileData(),
         );
@@ -136,6 +139,7 @@ class AddItems extends Component {
   getProfileData = () => {
     getMyProfileApi()
       .then(res => {
+        console.log('res', res);
         this.setState({
           firstName: res.data.firstName,
           buttonsSubHeader: [
@@ -235,8 +239,9 @@ class AddItems extends Component {
       });
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this.getData();
+
     this.props.navigation.addListener('focus', () => {
       const {
         supplierValue,
@@ -286,7 +291,7 @@ class AddItems extends Component {
   };
 
   _renderHeader = (section, index, isActive) => {
-    const {innerIndex} = this.state;
+    const {innerIndex, isFreemium} = this.state;
     // console.log('innerIndex', innerIndex);
 
     const finalAmt = section.content.reduce(
@@ -296,79 +301,82 @@ class AddItems extends Component {
     // console.log('finalAmt', finalAmt);
 
     return (
-      <View
-        style={{
-          backgroundColor: '#F2F2F2',
-          flexDirection: 'row',
-          borderTopWidth: 1,
-          borderLeftWidth: 1,
-          borderTopColor: '#F0F0F0',
-          borderLeftColor: '#F0F0F0',
-          borderRightWidth: 1,
-          borderRightColor: '#F0F0F0',
-          height: 60,
-          width: wp('87%'),
-          // marginTop: hp('1.5%'),
-          alignItems: 'center',
-          // borderRadius: 6,
-          justifyContent: 'space-around',
-        }}>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <Text
+      <View>
+        {isFreemium === 'false' ? (
+          <View
             style={{
-              color: '#492813',
-              fontSize: 14,
-              marginLeft: wp('2%'),
-              fontFamily: 'Inter-Regular',
+              backgroundColor: '#F2F2F2',
+              flexDirection: 'row',
+              borderTopWidth: 1,
+              borderLeftWidth: 1,
+              borderTopColor: '#F0F0F0',
+              borderLeftColor: '#F0F0F0',
+              borderRightWidth: 1,
+              borderRightColor: '#F0F0F0',
+              height: 60,
+              width: wp('87%'),
+              // marginTop: hp('1.5%'),
+              alignItems: 'center',
+              // borderRadius: 6,
+              justifyContent: 'space-around',
             }}>
-            {section.title}
-          </Text>
-          <Image
-            style={{
-              height: 15,
-              width: 15,
-              resizeMode: 'contain',
-              marginRight: wp('3%'),
-              tintColor: 'black',
-            }}
-            source={img.arrowDownIcon}
-          />
-        </View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <Text
+                style={{
+                  color: '#492813',
+                  fontSize: 14,
+                  marginLeft: wp('2%'),
+                  fontFamily: 'Inter-Regular',
+                }}>
+                {section.title}
+              </Text>
+              <Image
+                style={{
+                  height: 15,
+                  width: 15,
+                  resizeMode: 'contain',
+                  marginRight: wp('3%'),
+                  tintColor: 'black',
+                }}
+                source={img.arrowDownIcon}
+              />
+            </View>
 
-        {/* <View
-          style={{
-            flex: 1,
-          }}>
-          {section.content[0] && section.content[0].deltaNew > 0 ? (
-            <Text
-              numberOfLines={1}
+            {/* <View
               style={{
-                color: 'red',
-                fontSize: 12,
-                marginRight: wp('3%'),
-                alignSelf: 'flex-end',
+                flex: 1,
               }}>
-              Δ {section.content[0] && section.content[0].deltaNew.toFixed(2)}{' '}
-              {section.content[0] && section.content[0].unit}
-            </Text>
-          ) : (
-            <Text
-              style={{
-                color: 'black',
-                marginRight: wp('3%'),
-                fontSize: 12,
-                alignSelf: 'flex-end',
-              }}>
-              Δ 0 {section.content[0] && section.content[0].unit}
-            </Text>
-          )}
-        </View> */}
-        {/* <View
+              {section.content[0] && section.content[0].deltaNew > 0 ? (
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    color: 'red',
+                    fontSize: 12,
+                    marginRight: wp('3%'),
+                    alignSelf: 'flex-end',
+                  }}>
+                  Δ{' '}
+                  {section.content[0] && section.content[0].deltaNew.toFixed(2)}{' '}
+                  {section.content[0] && section.content[0].unit}
+                </Text>
+              ) : (
+                <Text
+                  style={{
+                    color: 'black',
+                    marginRight: wp('3%'),
+                    fontSize: 12,
+                    alignSelf: 'flex-end',
+                  }}>
+                  Δ 0 {section.content[0] && section.content[0].unit}
+                </Text>
+              )}
+            </View> */}
+            {/* <View
           style={{
             flex: 0.8,
           }}>
@@ -384,6 +392,8 @@ class AddItems extends Component {
             {section.content[0] && section.content[0].unit}
           </Text>
         </View> */}
+          </View>
+        ) : null}
       </View>
     );
   };
@@ -756,7 +766,7 @@ class AddItems extends Component {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={{backgroundColor: '#fff', width: wp('87%')}}>
           {section.content.map((item, index) => {
-            // console.log('item213242342342', item);
+            console.log('item213242342342', item);
             return (
               <View
                 style={{
@@ -771,6 +781,31 @@ class AddItems extends Component {
                     flex: 1,
                     marginVertical: 10,
                   }}>
+                  <View
+                    style={{
+                      flex: 0.5,
+                      marginTop: 10,
+                    }}>
+                    {item.isInStock ? (
+                      <Image
+                        source={img.inStockIcon}
+                        style={{
+                          height: 15,
+                          width: 15,
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    ) : (
+                      <Image
+                        source={img.outStockIcon}
+                        style={{
+                          height: 15,
+                          width: 15,
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </View>
                   <View style={{marginTop: 10, flex: 3}}>
                     <TouchableOpacity
                       onPress={() => this.openModalFun(item, section, index)}
@@ -1684,11 +1719,7 @@ class AddItems extends Component {
 
   navigateToEditDraft = res => {
     const {basketId, productId, supplierName} = this.state;
-    this.props.navigation.navigate('EditDraftOrderScreen', {
-      productId,
-      basketId,
-      supplierName,
-    });
+    this.props.navigation.navigate('EditDraftOrderScreen');
   };
 
   closeBasketLoader = () => {
@@ -2058,12 +2089,12 @@ class AddItems extends Component {
       finalBasketData,
       finalData,
       finalDataSec,
+      navigateType,
     } = this.state;
 
-    if (basketId) {
-      console.log('finalDataSec', finalDataSec);
-      console.log('basketId->closeBasketFunSec', basketId);
-
+    if (navigateType === 'EditDraft') {
+      this.navigateToEditDraft();
+    } else {
       this.props.navigation.navigate('BasketOrderScreen', {
         finalData: finalData ? finalData : '',
         supplierId,
@@ -2075,9 +2106,15 @@ class AddItems extends Component {
         finalDataSec,
         basketId,
       });
-    } else {
-      this.props.navigation.goBack();
     }
+
+    // if (basketId) {
+    //   console.log('finalDataSec', finalDataSec);
+    //   console.log('basketId->closeBasketFunSec', basketId);
+
+    // } else {
+    //   this.props.navigation.goBack();
+    // }
   };
 
   render() {
@@ -2127,6 +2164,7 @@ class AddItems extends Component {
       actionOpen,
       expandAllStatus,
       navigateType,
+      isFreemium,
     } = this.state;
 
     // console.log('PAGE DATA', pageData);

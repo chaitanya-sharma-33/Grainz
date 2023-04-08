@@ -307,7 +307,10 @@ class PdfView extends Component {
             mailModalVisible: false,
             loaderCompStatus: false,
           },
-          () => this.props.navigation.navigate('OrderingAdminScreen'),
+          () =>
+            this.props.navigation.navigate('OrderingAdminScreen', {
+              item: '',
+            }),
         );
       })
       .catch(err => {

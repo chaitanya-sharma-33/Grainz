@@ -108,6 +108,8 @@ class PendingDelivery extends Component {
     this.props.navigation.addListener('focus', () => {
       const {listId} = this.props.route && this.props.route.params;
       const {filterData} = this.props.route && this.props.route.params;
+      const {supplierData} = this.props.route && this.props.route.params;
+
       console.log('filterData', filterData);
       if (filterData) {
         this.setState({
@@ -121,24 +123,24 @@ class PendingDelivery extends Component {
             listId,
             modalLoaderDrafts: true,
           },
-          () => this.getFinalData(),
+          () => this.getFinalData(supplierData),
         );
       }
     });
   }
 
-  getFinalData = () => {
+  getFinalData = supplierData => {
     const {listId} = this.state;
     if (listId === 2) {
-      this.getDeliveryPendingData();
+      this.getDeliveryPendingData(supplierData);
     } else if (listId === 3) {
-      this.getReviewOrdersData();
+      this.getReviewOrdersData(supplierData);
     } else if (listId === 4) {
-      this.getHistoryOrdersData();
+      this.getHistoryOrdersData(supplierData);
     }
   };
 
-  getDeliveryPendingData = () => {
+  getDeliveryPendingData = supplierData => {
     const {selectedPage, pageSize, loadMoreStatus, deliveryPendingData} =
       this.state;
 
@@ -146,7 +148,10 @@ class PendingDelivery extends Component {
       status: 'Pending',
       selectedPage: selectedPage,
       pageSize: pageSize,
+      supplierId: supplierData ? supplierData.id : '',
     };
+
+    console.log('PAYLOAD-PENDING', payload);
     orderByStatusApi(payload)
       .then(res => {
         console.log('res-->Pending', res);
@@ -166,14 +171,17 @@ class PendingDelivery extends Component {
       });
   };
 
-  getReviewOrdersData = () => {
+  getReviewOrdersData = supplierData => {
     const {selectedPage, pageSize, loadMoreStatus, deliveryPendingData} =
       this.state;
     let payload = {
       status: 'Review',
       selectedPage: selectedPage,
       pageSize: pageSize,
+      supplierId: supplierData ? supplierData.id : '',
     };
+
+    console.log('PAYLOAD-REVIEW', payload);
     orderByStatusApi(payload)
       .then(res => {
         console.log('res-->Pending', res);
@@ -193,14 +201,17 @@ class PendingDelivery extends Component {
       });
   };
 
-  getHistoryOrdersData = () => {
+  getHistoryOrdersData = supplierData => {
     const {selectedPage, pageSize, loadMoreStatus, deliveryPendingData} =
       this.state;
     let payload = {
       status: 'History',
       selectedPage: selectedPage,
       pageSize: pageSize,
+      supplierId: supplierData ? supplierData.id : '',
     };
+
+    console.log('PAYLOAD-HISTORY', payload);
     orderByStatusApi(payload)
       .then(res => {
         console.log('res-->Pending', res);

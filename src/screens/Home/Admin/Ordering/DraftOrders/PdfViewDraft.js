@@ -308,7 +308,10 @@ class PdfViewDraft extends Component {
           {
             mailModalVisible: false,
           },
-          () => this.props.navigation.navigate('OrderingAdminScreen'),
+          () =>
+            this.props.navigation.navigate('OrderingAdminScreen', {
+              item: '',
+            }),
         );
       })
       .catch(err => {

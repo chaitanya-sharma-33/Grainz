@@ -302,7 +302,7 @@
 //       //   () => this.getOrderFun(),
 //       // );
 //     } else {
-//       this.props.navigation.navigate('OrderingAdminScreen');
+//       this.props.navigation.navigate('OrderingAdminScreen',);
 //     }
 //   };
 
@@ -3312,6 +3312,7 @@ class ViewHistoryOrder extends Component {
         quantityOrdered: item.quantityOrdered,
         userQuantityDelivered: item.userQuantityDelivered,
         userQuantityInvoiced: item.userQuantityInvoiced,
+        isFlagged: item.isFlagged,
       };
     });
 
@@ -3413,7 +3414,9 @@ class ViewHistoryOrder extends Component {
       //   () => this.getOrderFun(),
       // );
     } else {
-      this.props.navigation.navigate('OrderingAdminScreen');
+      this.props.navigation.navigate('OrderingAdminScreen', {
+        item: '',
+      });
     }
   };
 
@@ -3711,6 +3714,7 @@ class ViewHistoryOrder extends Component {
         quantityOrdered: item.quantityOrdered,
         userQuantityDelivered: item.userQuantityDelivered,
         userQuantityInvoiced: item.userQuantityInvoiced,
+        isFlagged: item.isFlagged,
       };
     });
 
@@ -4955,6 +4959,27 @@ class ViewHistoryOrder extends Component {
                                       item.inventoryMapping.inventoryName}
                                   </Text>
                                 </View>
+
+                                {/* {item.notes ? (
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      this.showEditModal(item, index)
+                                    }
+                                    style={{
+                                      flex: 1,
+                                      alignItems: 'center',
+                                    }}>
+                                    <Image
+                                      source={img.messageIcon}
+                                      style={{
+                                        width: 18,
+                                        height: 18,
+                                        resizeMode: 'contain',
+                                        tintColor: 'black',
+                                      }}
+                                    />
+                                  </TouchableOpacity>
+                                ) : null} */}
                                 {/* 
                                 <TouchableOpacity
                                   onPress={() => this.deleteFun(item, index)}
