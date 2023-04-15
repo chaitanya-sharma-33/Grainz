@@ -161,32 +161,36 @@ class Basket extends Component {
   componentDidMount() {
     this.getData();
     this.getUsersListData();
-    const {
-      finalData,
-      supplierId,
-      itemType,
-      productId,
-      supplierName,
-      finalDataSec,
-      basketId,
-    } = this.props.route && this.props.route.params;
-    this.setState(
-      {
+
+    this.props.navigation.addListener('focus', () => {
+      const {
+        finalData,
         supplierId,
         itemType,
-        basketId,
-        modalLoader: true,
-        finalOrderDate: moment(new Date()).format('DD-MM-YY'),
-        finalOrderMinDate: new Date(),
-        apiOrderDate: new Date().toISOString(),
         productId,
         supplierName,
         finalDataSec,
-        supplierValue: supplierId,
-        finalData,
-      },
-      () => this.getBasketDataFun(),
-    );
+        basketId,
+      } = this.props.route && this.props.route.params;
+
+      this.setState(
+        {
+          supplierId,
+          itemType,
+          basketId,
+          modalLoader: true,
+          finalOrderDate: moment(new Date()).format('DD-MM-YY'),
+          finalOrderMinDate: new Date(),
+          apiOrderDate: new Date().toISOString(),
+          productId,
+          supplierName,
+          finalDataSec,
+          supplierValue: supplierId,
+          finalData,
+        },
+        () => this.getBasketDataFun(),
+      );
+    });
   }
 
   getBasketDataFun = () => {
@@ -1244,18 +1248,19 @@ class Basket extends Component {
           style={{marginBottom: hp('2%')}}
           showsVerticalScrollIndicator={false}>
           <View style={styles.subContainer}>
-            <TouchableOpacity
+            <View
               style={styles.firstContainer}
-              onPress={() => this.goBackFun()}>
-              <View style={styles.goBackContainer}>
+              // onPress={() => this.goBackFun()}
+            >
+              {/* <View style={styles.goBackContainer}>
                 <Image source={img.backIcon} style={styles.tileImageBack} />
-              </View>
+              </View> */}
               <View style={styles.flex}>
                 <Text style={styles.adminTextStyle}>
                   {translate('Items of New order')}
                 </Text>
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
 
           <View style={{marginHorizontal: wp('3%')}}>

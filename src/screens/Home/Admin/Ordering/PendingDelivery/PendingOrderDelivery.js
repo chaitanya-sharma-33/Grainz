@@ -29,6 +29,9 @@ import {UserTokenAction} from '../../../../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
   deliveredDateUpdateApi,
+  uploadImageApi,
+  getImageApi,
+  deleteImageApi,
 } from '../../../../../connectivity/api';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -81,6 +84,7 @@ class PendingOrderDelivery extends Component {
       chooseImageModalStatus: false,
       imageModalStatus: false,
       imageData: '',
+      itemId: '',
     };
   }
 
@@ -114,10 +118,25 @@ class PendingOrderDelivery extends Component {
       });
   };
 
+  getImageFun = id => {
+    getImageApi(id)
+      .then(res => {
+        console.log('res,image', res);
+        this.setState({
+          imageData: res.data,
+        });
+      })
+      .catch(err => {
+        console.warn('ERr', err);
+      });
+  };
+
   async componentDidMount() {
     // this.props.navigation.addListener('focus', () => {
     const {route} = this.props;
     const finalData = route.params.finalData;
+    console.log('finalData', finalData);
+
     this.setState({
       finalData,
       finalOrderDate: moment(finalData.orderDate).format('DD/MM/YYYY'),
@@ -131,8 +150,10 @@ class PendingOrderDelivery extends Component {
       finalArrivedDate:
         finalData.deliveredDate &&
         moment(finalData.deliveredDate).format('DD/MM/YYYY'),
+      itemId: finalData.id,
     });
     this.getProfileDataFun();
+    this.getImageFun(finalData.id);
     // });
   }
 
@@ -298,10 +319,27 @@ class PendingOrderDelivery extends Component {
             includeBase64: true,
             cropping: true,
           }).then(image => {
-            this.setState({
-              imageModalStatus: true,
-              imageData: image,
-            });
+            const finalImageData = [
+              {
+                action: 'New',
+                description: '',
+                imageText: `data:image/png;base64,${image.data}`,
+                name: '',
+                path: image.path,
+                position: 1,
+                type: 'png',
+              },
+            ];
+
+            this.uploadImageApiFun(finalImageData);
+
+            // this.setState(
+            //   {
+            //     // imageModalStatus: true,
+            //     imageData: finalImageData,
+            //   },
+            //   () => this.uploadImageApiFun(),
+            // );
           });
         }, 500),
     );
@@ -319,29 +357,101 @@ class PendingOrderDelivery extends Component {
             height: 400,
             cropping: true,
           }).then(image => {
-            this.setState({
-              imageModalStatus: true,
-              imageData: image,
-            });
+            const finalImageData = [
+              {
+                action: 'New',
+                description: '',
+                imageText: `data:image/png;base64,${image.data}`,
+                name: '',
+                path: image.path,
+                position: 1,
+                type: 'png',
+              },
+            ];
+
+            this.uploadImageApiFun(finalImageData);
+
+            // this.setState(
+            //   {
+            //     // imageModalStatus: true,
+            //     imageData: finalImageData,
+            //   },
+            //   () => this.uploadImageApiFun(finalImageData),
+            // );
           });
         }, 500),
     );
   };
 
-  deleteImageFun = () => {
-    this.setState({
-      imageModalStatus: false,
-      imageData: '',
-      imageShow: false,
-      imageName: '',
-      imageDesc: '',
-    });
+  uploadImageApiFun = finalImageData => {
+    const {itemId, imageData, finalData} = this.state;
+
+    let payload = {
+      itemId: itemId,
+      images: finalImageData,
+    };
+
+    console.log('payload', payload);
+    uploadImageApi(payload)
+      .then(res => {
+        console.log('RES-IMAGE', res);
+        this.getImageFun(finalData.id);
+      })
+      .catch(err => {
+        console.log('err', err);
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+  };
+
+  deleteImageFun = item => {
+    Alert.alert(`Delete`, 'Do you really want to delete this image?', [
+      {
+        text: 'Yes',
+        onPress: () => this.deleteImageFunSec(item),
+      },
+      {
+        text: 'No',
+      },
+    ]);
+  };
+
+  deleteImageFunSec = item => {
+    const {finalData} = this.state;
+
+    let payload = {};
+
+    console.log('payload', payload);
+    deleteImageApi(item.id, payload)
+      .then(res => {
+        this.getImageFun(finalData.id);
+        console.log('DELTEIMAGE', res);
+      })
+      .catch(err => {
+        console.log('err', err);
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+
+    // this.setState({
+    //   imageModalStatus: false,
+    //   imageData: '',
+    //   imageName: '',
+    //   imageDesc: '',
+    // });
   };
 
   saveImageFun = () => {
     this.setState({
       imageModalStatus: false,
-      imageShow: true,
     });
   };
 
@@ -372,7 +482,6 @@ class PendingOrderDelivery extends Component {
       imageData,
       imageName,
       imageDesc,
-      imageShow,
     } = this.state;
     // console.log('finalData', finalData);
     return (
@@ -886,24 +995,51 @@ class PendingOrderDelivery extends Component {
                   </Text>
                 </TouchableOpacity>
 
-                {imageShow ? (
-                  <TouchableOpacity
-                    style={{marginTop: 15}}
-                    onPress={() =>
-                      this.setState({
-                        imageModalStatus: true,
-                      })
-                    }>
-                    <Image
-                      style={{
-                        width: wp('60%'),
-                        height: 100,
-                        resizeMode: 'cover',
-                      }}
-                      source={{uri: imageData.path}}
-                    />
-                  </TouchableOpacity>
-                ) : null}
+                {imageData
+                  ? imageData &&
+                    imageData.map((item, index) => {
+                      return (
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <View
+                            style={{marginTop: 15}}
+                            onPress={() =>
+                              this.setState({
+                                imageModalStatus: true,
+                              })
+                            }>
+                            <Image
+                              style={{
+                                width: wp('60%'),
+                                height: 100,
+                                resizeMode: 'contain',
+                              }}
+                              source={{uri: item.imageText}}
+                            />
+                          </View>
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: 'red',
+                              padding: 10,
+                              borderRadius: 6,
+                            }}
+                            onPress={() => this.deleteImageFun(item)}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                color: '#fff',
+                                fontWeight: 'bold',
+                              }}>
+                              Delete
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    })
+                  : null}
               </View>
             </View>
           </View>
@@ -996,7 +1132,7 @@ class PendingOrderDelivery extends Component {
           </View>
         </Modal>
 
-        <Modal isVisible={imageModalStatus} backdropOpacity={0.35}>
+        {/* <Modal isVisible={imageModalStatus} backdropOpacity={0.35}>
           <View
             style={{
               width: wp('80%'),
@@ -1130,7 +1266,7 @@ class PendingOrderDelivery extends Component {
               </View>
             </ScrollView>
           </View>
-        </Modal>
+        </Modal> */}
         <View style={{}}>
           <View
             style={{

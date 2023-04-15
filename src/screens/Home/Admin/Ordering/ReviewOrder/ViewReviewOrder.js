@@ -147,21 +147,21 @@ class ViewReviewOrder extends Component {
     const {productId, supplierId, supplierName, basketId, listId, finalData} =
       this.props.route && this.props.route.params;
 
-    // this.props.navigation.addListener('focus', () => {
-    this.setState(
-      {
-        productId: productId,
-        arrivalDataStatus: false,
-        loaderCompStatus: true,
-        supplierId: supplierId,
-        supplierName: supplierName,
-        basketId: basketId,
-        listId: listId,
-        finalData,
-      },
-      () => this.getOrderFun(),
-    );
-    // });
+    this.props.navigation.addListener('focus', () => {
+      this.setState(
+        {
+          productId: productId,
+          arrivalDataStatus: false,
+          loaderCompStatus: true,
+          supplierId: supplierId,
+          supplierName: supplierName,
+          basketId: basketId,
+          listId: listId,
+          finalData,
+        },
+        () => this.getOrderFun(),
+      );
+    });
   }
 
   getOrderFun = () => {
@@ -183,6 +183,7 @@ class ViewReviewOrder extends Component {
             apiDeliveryDate: data.deliveryDate,
             pageOrderItems: data.orderItems,
             apiArrivalDate: data.deliveredDate,
+            emailDetails: data.emailDetails,
             finalArrivalDate: moment(data.deliveredDate).format('DD-MM-YYYY'),
             loaderCompStatus: false,
             totalValue: data.htva.toFixed(2),
@@ -1056,6 +1057,22 @@ class ViewReviewOrder extends Component {
           },
         ]);
       });
+  };
+
+  requestCredtiNoteFun = () => {
+    const {modalData, emailDetails} = this.state;
+    this.setState(
+      {
+        modalVisibleEditElement: false,
+      },
+      () =>
+        setTimeout(() => {
+          this.props.navigation.navigate('RequestCreditNoteScreen', {
+            modalData,
+            emailDetails,
+          });
+        }, 200),
+    );
   };
 
   render() {
@@ -4521,37 +4538,62 @@ class ViewReviewOrder extends Component {
                           Flagged
                         </Text>
                       </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() =>
-                          this.setState({
-                            modalVisibleEditElement: false,
-                          })
-                        }
-                        style={{
-                          height: hp('7%'),
-                          width: wp('87%'),
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          borderRadius: 10,
-                          alignSelf: 'center',
-                          marginTop: hp('3%'),
-                          borderWidth: 1,
-                          borderColor: '#5197C1',
-                        }}>
-                        <View
+                      {modalData.hasCreditNote > 0 ? (
+                        <TouchableOpacity
+                          onPress={() => this.requestCredtiNoteFun()}
                           style={{
+                            height: hp('7%'),
+                            width: wp('87%'),
+                            justifyContent: 'center',
                             alignItems: 'center',
+                            borderRadius: 10,
+                            alignSelf: 'center',
+                            marginTop: hp('3%'),
+                            backgroundColor: '#DCDCDC',
                           }}>
-                          <Text
+                          <View
                             style={{
-                              color: '#5197C1',
-                              marginLeft: 10,
-                              fontFamily: 'Inter-SemiBold',
+                              alignItems: 'center',
                             }}>
-                            Request credit note
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
+                            <Text
+                              style={{
+                                color: '#fff',
+                                marginLeft: 10,
+                                fontFamily: 'Inter-SemiBold',
+                              }}>
+                              Credit note Requested
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => this.requestCredtiNoteFun()}
+                          style={{
+                            height: hp('7%'),
+                            width: wp('87%'),
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 10,
+                            alignSelf: 'center',
+                            marginTop: hp('3%'),
+                            borderWidth: 1,
+                            borderColor: '#5197C1',
+                          }}>
+                          <View
+                            style={{
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                color: '#5197C1',
+                                marginLeft: 10,
+                                fontFamily: 'Inter-SemiBold',
+                              }}>
+                              Request credit note
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      )}
                       <TouchableOpacity
                         onPress={() => this.saveFunInventoryItem(flagStatus)}
                         style={{

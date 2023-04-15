@@ -297,6 +297,50 @@ class NewOrderSec extends Component {
             </View>
             <View style={{marginHorizontal: wp('6%'), marginTop: hp('2%')}}>
               <View>
+                <TouchableOpacity
+                  onPress={() =>
+                    this.props.navigation.navigate('NewOrderScreen', {
+                      ScreenType: 'NewOrderSec',
+                      item: '',
+                    })
+                  }
+                  style={{
+                    backgroundColor: '#fff',
+                    borderRadius: 6,
+                    padding: 12,
+                    marginBottom: hp('2%'),
+                  }}>
+                  <View style={{}}>
+                    <Text style={{}}>{translate('Supplier')}</Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      marginTop: 10,
+                    }}>
+                    <Text
+                      style={{
+                        color: '#4A4C55',
+                        fontSize: 14,
+                        fontFamily: 'Inter-Regular',
+                        fontWeight: 'bold',
+                      }}>
+                      {supplierName ? supplierName : selectedTextUser}
+                    </Text>
+                    <Image
+                      source={img.calenderIcon}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        resizeMode: 'contain',
+                        tintColor: 'grey',
+                        marginRight: 10,
+                      }}
+                    />
+                  </View>
+                </TouchableOpacity>
+
                 <View style={{}}>
                   <TouchableOpacity
                     onPress={() => this.showDatePickerFunOrder()}
@@ -398,7 +442,6 @@ class NewOrderSec extends Component {
                     backgroundColor: '#fff',
                     borderRadius: 6,
                     padding: 12,
-                    marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
                     <Text style={{}}>Placed By</Text>
@@ -439,7 +482,6 @@ class NewOrderSec extends Component {
                       backgroundColor: '#fff',
                       borderRadius: 6,
                       padding: 12,
-                      marginBottom: hp('2%'),
                     }}>
                     <View style={{}}>
                       <Text style={{}}>Customer Number</Text>
@@ -474,48 +516,6 @@ class NewOrderSec extends Component {
                     </View>
                   </View>
                 ) : null}
-                <TouchableOpacity
-                  onPress={() =>
-                    this.props.navigation.navigate('NewOrderScreen', {
-                      ScreenType: 'NewOrderSec',
-                      item: '',
-                    })
-                  }
-                  style={{
-                    backgroundColor: '#fff',
-                    borderRadius: 6,
-                    padding: 12,
-                  }}>
-                  <View style={{}}>
-                    <Text style={{}}>{translate('Supplier')}</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginTop: 10,
-                    }}>
-                    <Text
-                      style={{
-                        color: '#4A4C55',
-                        fontSize: 14,
-                        fontFamily: 'Inter-Regular',
-                        fontWeight: 'bold',
-                      }}>
-                      {supplierName ? supplierName : selectedTextUser}
-                    </Text>
-                    <Image
-                      source={img.calenderIcon}
-                      style={{
-                        height: 20,
-                        width: 20,
-                        resizeMode: 'contain',
-                        tintColor: 'grey',
-                        marginRight: 10,
-                      }}
-                    />
-                  </View>
-                </TouchableOpacity>
               </View>
             </View>
           </View>

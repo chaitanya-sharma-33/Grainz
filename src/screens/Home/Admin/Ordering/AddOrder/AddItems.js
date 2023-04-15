@@ -255,7 +255,7 @@ class AddItems extends Component {
         finalDataSec,
       } = this.props.route && this.props.route.params;
 
-      console.log('finalDataSec', finalDataSec);
+      console.log('screen', screen);
       this.setState(
         {
           supplierId: supplierValue,
@@ -2090,22 +2090,29 @@ class AddItems extends Component {
       finalData,
       finalDataSec,
       navigateType,
+      screenType,
     } = this.state;
+
+    console.log('screem', screenType);
 
     if (navigateType === 'EditDraft') {
       this.navigateToEditDraft();
     } else {
-      this.props.navigation.navigate('BasketOrderScreen', {
-        finalData: finalData ? finalData : '',
-        supplierId,
-        itemType: 'Inventory',
-        productId,
-        supplierName,
-        finalData,
-        modalQuantity: '0',
-        finalDataSec,
-        basketId,
-      });
+      if (screenType === 'New') {
+        this.props.navigation.goBack();
+      } else {
+        this.props.navigation.navigate('BasketOrderScreen', {
+          finalData: finalData ? finalData : '',
+          supplierId,
+          itemType: 'Inventory',
+          productId,
+          supplierName,
+          finalData,
+          modalQuantity: '0',
+          finalDataSec,
+          basketId,
+        });
+      }
     }
 
     // if (basketId) {

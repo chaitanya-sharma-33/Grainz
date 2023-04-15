@@ -29,6 +29,9 @@ import {UserTokenAction} from '../../../../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
   deliveredDateUpdateApi,
+  uploadImageApi,
+  getImageApi,
+  deleteImageApi,
 } from '../../../../../connectivity/api';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -78,6 +81,8 @@ class ReviewOrderDelivery extends Component {
       pageChilledTemp: '',
       pageFrozenTemp: '',
       pageNotes: '',
+      imageData: '',
+      chooseImageModalStatus: false,
     };
   }
 
@@ -111,6 +116,19 @@ class ReviewOrderDelivery extends Component {
       });
   };
 
+  getImageFun = id => {
+    getImageApi(id)
+      .then(res => {
+        console.log('res,image', res);
+        this.setState({
+          imageData: res.data,
+        });
+      })
+      .catch(err => {
+        console.warn('ERr', err);
+      });
+  };
+
   async componentDidMount() {
     // this.props.navigation.addListener('focus', () => {
     const {route} = this.props;
@@ -128,8 +146,11 @@ class ReviewOrderDelivery extends Component {
       finalArrivedDate:
         finalData.deliveredDate &&
         moment(finalData.deliveredDate).format('DD/MM/YYYY'),
+      itemId: finalData.id,
     });
     this.getProfileDataFun();
+    this.getImageFun(finalData.id);
+
     // });
   }
 
@@ -269,6 +290,168 @@ class ReviewOrderDelivery extends Component {
       });
   }
 
+  handleChoosePhoto() {
+    this.setState({
+      chooseImageModalStatus: true,
+    });
+  }
+
+  setModalVisibleImage = () => {
+    this.setState({
+      imageModalStatus: false,
+      chooseImageModalStatus: false,
+    });
+  };
+
+  choosePhotoFun = () => {
+    this.setState(
+      {
+        chooseImageModalStatus: false,
+      },
+      () =>
+        setTimeout(() => {
+          ImagePicker.openPicker({
+            width: 300,
+            height: 400,
+            includeBase64: true,
+            cropping: true,
+          }).then(image => {
+            const finalImageData = [
+              {
+                action: 'New',
+                description: '',
+                imageText: `data:image/png;base64,${image.data}`,
+                name: '',
+                path: image.path,
+                position: 1,
+                type: 'png',
+              },
+            ];
+
+            this.uploadImageApiFun(finalImageData);
+
+            // this.setState(
+            //   {
+            //     // imageModalStatus: true,
+            //     imageData: finalImageData,
+            //   },
+            //   () => this.uploadImageApiFun(),
+            // );
+          });
+        }, 500),
+    );
+  };
+
+  clickPhotoFun = () => {
+    this.setState(
+      {
+        chooseImageModalStatus: false,
+      },
+      () =>
+        setTimeout(() => {
+          ImagePicker.openCamera({
+            width: 300,
+            height: 400,
+            cropping: true,
+          }).then(image => {
+            const finalImageData = [
+              {
+                action: 'New',
+                description: '',
+                imageText: `data:image/png;base64,${image.data}`,
+                name: '',
+                path: image.path,
+                position: 1,
+                type: 'png',
+              },
+            ];
+
+            this.uploadImageApiFun(finalImageData);
+
+            // this.setState(
+            //   {
+            //     // imageModalStatus: true,
+            //     imageData: finalImageData,
+            //   },
+            //   () => this.uploadImageApiFun(finalImageData),
+            // );
+          });
+        }, 500),
+    );
+  };
+
+  uploadImageApiFun = finalImageData => {
+    const {itemId, imageData, finalData} = this.state;
+
+    let payload = {
+      itemId: itemId,
+      images: finalImageData,
+    };
+
+    console.log('payload', payload);
+    uploadImageApi(payload)
+      .then(res => {
+        console.log('RES-IMAGE', res);
+        this.getImageFun(finalData.id);
+      })
+      .catch(err => {
+        console.log('err', err);
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+  };
+
+  deleteImageFun = item => {
+    Alert.alert(`Delete`, 'Do you really want to delete this image?', [
+      {
+        text: 'Yes',
+        onPress: () => this.deleteImageFunSec(item),
+      },
+      {
+        text: 'No',
+      },
+    ]);
+  };
+
+  deleteImageFunSec = item => {
+    const {finalData} = this.state;
+
+    let payload = {};
+
+    console.log('payload', payload);
+    deleteImageApi(item.id, payload)
+      .then(res => {
+        this.getImageFun(finalData.id);
+        console.log('DELTEIMAGE', res);
+      })
+      .catch(err => {
+        console.log('err', err);
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+
+    // this.setState({
+    //   imageModalStatus: false,
+    //   imageData: '',
+    //   imageName: '',
+    //   imageDesc: '',
+    // });
+  };
+
+  saveImageFun = () => {
+    this.setState({
+      imageModalStatus: false,
+    });
+  };
+
   render() {
     const {
       isDatePickerVisibleOrder,
@@ -291,6 +474,8 @@ class ReviewOrderDelivery extends Component {
       pageFrozenTemp,
       pageChilledTemp,
       pageAmbientTemp,
+      imageData,
+      chooseImageModalStatus,
     } = this.state;
     // console.log('finalData', finalData);
     return (
@@ -775,10 +960,171 @@ class ReviewOrderDelivery extends Component {
                     />
                   </View>
                 </View>
+                <TouchableOpacity
+                  onPress={() => this.handleChoosePhoto()}
+                  style={{
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                  }}>
+                  <Image
+                    source={img.cameraIcon}
+                    style={{
+                      height: 20,
+                      width: 20,
+                      resizeMode: 'contain',
+                      marginRight: 10,
+                      tintColor: '#5297c1',
+                    }}
+                  />
+
+                  <Text
+                    style={{
+                      color: '#5297c1',
+                      fontSize: 15,
+                      fontWeight: 'bold',
+                      textDecorationLine: 'underline',
+                    }}>
+                    {translate('Add image')}
+                  </Text>
+                </TouchableOpacity>
+
+                {imageData
+                  ? imageData &&
+                    imageData.map((item, index) => {
+                      return (
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <View
+                            style={{marginTop: 15}}
+                            onPress={() =>
+                              this.setState({
+                                imageModalStatus: true,
+                              })
+                            }>
+                            <Image
+                              style={{
+                                width: wp('60%'),
+                                height: 100,
+                                resizeMode: 'contain',
+                              }}
+                              source={{uri: item.imageText}}
+                            />
+                          </View>
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: 'red',
+                              padding: 10,
+                              borderRadius: 6,
+                            }}
+                            onPress={() => this.deleteImageFun(item)}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                color: '#fff',
+                                fontWeight: 'bold',
+                              }}>
+                              Delete
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    })
+                  : null}
               </View>
             </View>
           </View>
         </ScrollView>
+
+        <Modal isVisible={chooseImageModalStatus} backdropOpacity={0.35}>
+          <View
+            style={{
+              width: wp('80%'),
+              height: hp('30%'),
+              backgroundColor: '#fff',
+              alignSelf: 'center',
+              borderRadius: 10,
+            }}>
+            <View
+              style={{
+                height: hp('7%'),
+                flexDirection: 'row',
+              }}>
+              <View
+                style={{
+                  flex: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text style={{fontSize: 16, color: 'black'}}>
+                  {translate('Add image')}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <TouchableOpacity
+                  onPress={() => this.setModalVisibleImage(false)}>
+                  <Image
+                    source={img.cancelIcon}
+                    style={{
+                      height: 22,
+                      width: 22,
+                      tintColor: 'black',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={{padding: hp('3%')}}>
+              <TouchableOpacity
+                onPress={() => this.choosePhotoFun()}
+                style={{
+                  width: wp('70%'),
+                  height: hp('7%'),
+                  alignSelf: 'flex-end',
+                  backgroundColor: '#5297c1',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 6,
+                }}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('Choose image from gallery')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => this.clickPhotoFun()}
+                style={{
+                  width: wp('70%'),
+                  height: hp('7%'),
+                  alignSelf: 'flex-end',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#5297c1',
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('Click Photo')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         <View style={{}}>
           <View
             style={{

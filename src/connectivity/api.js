@@ -3,21 +3,21 @@ import url from './Environment.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // let baseURL = url['STAGING'].BaseURL;
-// let baseURL = url['STAGING_TWO'].BaseURL;
-let baseURL = url['DEV'].BaseURL;
+let baseURL = url['STAGING_TWO'].BaseURL;
+// let baseURL = url['DEV'].BaseURL;
 
-export const loginApi = payload => {
-  return axios.post(
-    'https://grainzwebapid.azurewebsites.net/connect/token',
-    payload,
-    {
-      headers: {
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    },
-  );
-};
+// export const loginApi = payload => {
+//   return axios.post(
+//     'https://grainzwebapid.azurewebsites.net/connect/token',
+//     payload,
+//     {
+//       headers: {
+//         Accept: '*/*',
+//         'Content-Type': 'application/x-www-form-urlencoded',
+//       },
+//     },
+//   );
+// };
 
 // export const loginApi = payload => {
 //   return axios.post(
@@ -32,16 +32,16 @@ export const loginApi = payload => {
 //   );
 // };
 
-// export const loginApi = payload => {
-//   const url = 'https://grainzwebapia.azurewebsites.net/connect/token';
-//   console.log('URL', url);
-//   return axios.post(url, payload, {
-//     headers: {
-//       Accept: '*/*',
-//       'Content-Type': 'application/x-www-form-urlencoded',
-//     },
-//   });
-// };
+export const loginApi = payload => {
+  const url = 'https://grainzwebapia.azurewebsites.net/connect/token';
+  console.log('URL', url);
+  return axios.post(url, payload, {
+    headers: {
+      Accept: '*/*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+};
 
 export async function getMyProfileApi() {
   const token = await AsyncStorage.getItem('@appToken');
@@ -370,6 +370,35 @@ export const getOrderByIdApi = async id => {
       LocationId: location,
     },
   });
+};
+
+export const viewCreditNoteApi = async id => {
+  let url =
+    baseURL +
+    `/SupplierCreditNoteRequest/view credit note request?OrderItemId=${id}`;
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      LocationId: location,
+    },
+  });
+};
+
+export const creditCreditNoteApi = async payload => {
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.post(
+    baseURL + '/SupplierCreditNoteRequest/create credit note request',
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        LocationId: location,
+      },
+    },
+  );
 };
 
 export const getInventoryByIdApi = async id => {
@@ -1545,7 +1574,31 @@ export const processDeliveredDateApi = async (
 export const uploadImageApi = async payload => {
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
-  return axios.post(baseURL + `/Order//upload images`, payload, {
+  return axios.post(baseURL + `/Order/upload images`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      LocationId: location,
+    },
+  });
+};
+
+export const getImageApi = async id => {
+  console.log('ID--->', id);
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.get(baseURL + `/Order/order images by id?Id=${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      LocationId: location,
+    },
+  });
+};
+
+export const deleteImageApi = async (id, payload) => {
+  console.log('ID--->', id);
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.post(baseURL + `/Order/delete image?Id=${id}`, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
       LocationId: location,

@@ -28,6 +28,7 @@ import OrderingThreeAdminScreen from '../screens/Home/Admin/Ordering/OrderingThr
 import DraftOrderAdminScreen from '../screens/Home/Admin/Ordering/DraftOrders/DraftOrder';
 import ViewDraftOrdersScreen from '../screens/Home/Admin/Ordering/DraftOrders/ViewDraftOrders';
 import PendingDeliveryAdminScreen from '../screens/Home/Admin/Ordering/PendingDelivery/PendingDelivery';
+import RequestCreditNoteScreen from '../screens/Home/Admin/Ordering/PendingDelivery/RequestCreditNote';
 import ViewPendingDeliveryScreen from '../screens/Home/Admin/Ordering/PendingDelivery/ViewPendingDelivery';
 import PendingOrderDeliveryScreen from '../screens/Home/Admin/Ordering/PendingDelivery/PendingOrderDelivery';
 import HistoryOrderDeliveryScreen from '../screens/Home/Admin/Ordering/HistoryOrder/HistoryOrderDelivery';
@@ -123,6 +124,12 @@ export default function AppNavFun() {
         name="CategoryStockScreen"
         component={CategoryStockScreen}
       />
+
+      <AppNav.Screen
+        name="RequestCreditNoteScreen"
+        component={RequestCreditNoteScreen}
+      />
+
       <AppNav.Screen name="AddManualLogScreen" component={AddManualLogScreen} />
       <AppNav.Screen
         name="SupplierListNewOrderLineScreen"
