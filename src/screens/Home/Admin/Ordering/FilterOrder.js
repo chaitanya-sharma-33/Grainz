@@ -34,6 +34,8 @@ minTime.setHours(0);
 minTime.setMinutes(0);
 minTime.setMilliseconds(0);
 
+let todayDateProd = moment.utc(new Date()).format();
+
 var querystring = require('querystring');
 
 class FilterOrder extends Component {
@@ -62,6 +64,7 @@ class FilterOrder extends Component {
       selectedPage: '1',
       pageSize: '15',
       screenType: '',
+      creditNoteValue: false,
     };
   }
 
@@ -95,23 +98,7 @@ class FilterOrder extends Component {
     }
   };
 
-  applyFilters = () => {
-    const {
-      supplierId,
-      toProductionDate,
-      fromProductionDate,
-      flagStatus,
-      selectedPage,
-      pageSize,
-    } = this.state;
-    if (toProductionDate === '' || fromProductionDate === '') {
-      alert('Please select dates first.');
-    } else {
-      this.applyFiltersSec();
-    }
-  };
-
-  applyFiltersSec = async () => {
+  applyFilters = async () => {
     const {
       supplierId,
       toProductionDate,
@@ -120,13 +107,15 @@ class FilterOrder extends Component {
       selectedPage,
       pageSize,
       screenType,
+      creditNoteValue,
     } = this.state;
     let payload = {
       suppliers: supplierId ? [supplierId] : [],
-      startDate: fromProductionDate,
-      endDate: toProductionDate,
+      startDate: fromProductionDate ? fromProductionDate : null,
+      endDate: toProductionDate ? toProductionDate : todayDateProd,
       flagged: flagStatus,
       selectedPage: selectedPage,
+      hasCreditNote: creditNoteValue,
       pageSize: pageSize,
       status:
         screenType === 'Draft'
@@ -147,18 +136,22 @@ class FilterOrder extends Component {
         if (screenType === 'Draft') {
           this.props.navigation.navigate('DraftOrderAdminScreen', {
             filterData: res.data,
+            payloadData: payload,
           });
         } else if (screenType === 'Pending') {
           this.props.navigation.navigate('PendingDeliveryAdminScreen', {
             filterData: res.data,
+            payloadData: payload,
           });
         } else if (screenType === 'Review') {
           this.props.navigation.navigate('PendingDeliveryAdminScreen', {
             filterData: res.data,
+            payloadData: payload,
           });
         } else if (screenType === 'History') {
           this.props.navigation.navigate('PendingDeliveryAdminScreen', {
             filterData: res.data,
+            payloadData: payload,
           });
         }
       })
@@ -198,18 +191,22 @@ class FilterOrder extends Component {
 
   handleConfirmFromDate = date => {
     let newdate = moment(date).format('DD-MM-YYYY');
+    let fromDateProduction = moment.utc(date).format();
+
     this.setState({
       fromDate: newdate,
-      fromProductionDate: date,
+      fromProductionDate: fromDateProduction,
     });
 
     this.hideDatePickerFromDate();
   };
   handleConfirmToDate = date => {
     let newdate = moment(date).format('DD-MM-YYYY');
+    let toDateProduction = moment.utc(date).format();
+
     this.setState({
       toDate: newdate,
-      toProductionDate: date,
+      toProductionDate: toDateProduction,
     });
 
     this.hideDatePickerToDate();
@@ -240,12 +237,36 @@ class FilterOrder extends Component {
   };
 
   clearFiltersFun = () => {
-    this.setState({
-      toDate: '',
-      fromDate: '',
-      toProductionDate: '',
-      fromProductionDate: '',
-    });
+    this.setState(
+      {
+        toDate: '',
+        fromDate: '',
+        toProductionDate: '',
+        fromProductionDate: '',
+      },
+      () => this.navigateFun(),
+    );
+  };
+
+  navigateFun = () => {
+    const {screenType} = this.state;
+    if (screenType === 'Draft') {
+      this.props.navigation.navigate('DraftOrderAdminScreen', {
+        filterData: '',
+      });
+    } else if (screenType === 'Pending') {
+      this.props.navigation.navigate('PendingDeliveryAdminScreen', {
+        filterData: '',
+      });
+    } else if (screenType === 'Review') {
+      this.props.navigation.navigate('PendingDeliveryAdminScreen', {
+        filterData: '',
+      });
+    } else if (screenType === 'History') {
+      this.props.navigation.navigate('PendingDeliveryAdminScreen', {
+        filterData: '',
+      });
+    }
   };
 
   selectUserNameFun = item => {
@@ -264,6 +285,13 @@ class FilterOrder extends Component {
     });
   };
 
+  creditNoteFun = () => {
+    const {creditNoteValue} = this.state;
+    this.setState({
+      creditNoteValue: !creditNoteValue,
+    });
+  };
+
   render() {
     const {
       loader,
@@ -274,6 +302,8 @@ class FilterOrder extends Component {
       toDate,
       isDatePickerVisibleToDate,
       supplierName,
+      screenType,
+      creditNoteValue,
     } = this.state;
     console.log('switchValueRemember', switchValueRemember);
     return (
@@ -490,6 +520,32 @@ class FilterOrder extends Component {
                     {translate('Show only flagged purchases')}
                   </Text>
                 </TouchableOpacity>
+
+                {screenType !== 'Draft' ? (
+                  <TouchableOpacity
+                    style={{flexDirection: 'row', marginTop: 15}}
+                    onPress={() => this.creditNoteFun()}>
+                    <View>
+                      <CheckBox
+                        value={creditNoteValue}
+                        style={{
+                          height: 18,
+                          width: 18,
+                          marginRight: 10,
+                        }}
+                        disabled={true}
+                      />
+                    </View>
+                    <Text
+                      style={{
+                        color: '#222526',
+                        fontSize: 14,
+                        fontFamily: 'Inter-Regular',
+                      }}>
+                      Orders with credit Note
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
                 <TouchableOpacity
                   onPress={() => this.applyFilters()}
                   style={styles.signInStyling}>

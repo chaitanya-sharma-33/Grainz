@@ -178,7 +178,8 @@ class PdfView extends Component {
         base64: true,
       };
       let file = await RNHTMLtoPDF.convert(options);
-      Alert.alert('Grainz', `Pdf downloaded successfully - ${file.filePath}`, [
+      Alert.alert('Grainz', `Pdf downloaded successfully`, [
+        // Alert.alert('Grainz', `Pdf downloaded successfully - ${file.filePath}`, [
         {
           text: 'Okay',
           onPress: () => this.props.navigation.navigate('HomeScreen'),

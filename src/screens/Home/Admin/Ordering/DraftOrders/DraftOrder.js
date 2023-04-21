@@ -25,6 +25,7 @@ import {
   deleteOrderApi,
   duplicateApi,
   orderByStatusApi,
+  getfilteredOrderDataApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -54,6 +55,7 @@ class DraftOrder extends Component {
       pageSize: '10',
       selectedPage: '1',
       loadMoreStatus: false,
+      payloadFilter: '',
     };
   }
 
@@ -93,8 +95,13 @@ class DraftOrder extends Component {
     this.props.navigation.addListener('focus', () => {
       const {route} = this.props;
       const filterData = route.params.filterData;
+      const payloadData = route.params.payloadData;
       const supplierData = route.params.supplierData;
       console.log('supplierData', supplierData);
+      this.setState({
+        filterData,
+        payloadFilter: payloadData,
+      });
 
       if (filterData) {
         this.setState(
@@ -104,7 +111,14 @@ class DraftOrder extends Component {
           () => this.filterDataFun(filterData),
         );
       } else {
-        this.getDraftOrderData(supplierData);
+        this.setState(
+          {
+            draftsOrderData: [],
+            draftsOrderDataBackup: [],
+            selectedPage: '1',
+          },
+          () => this.getDraftOrderData(supplierData),
+        );
       }
       this.getData();
     });
@@ -408,17 +422,84 @@ class DraftOrder extends Component {
     });
   };
 
+  addFilteredData = res => {
+    const {draftsOrderData} = this.state;
+
+    const finalArr = [...draftsOrderData, ...res.data];
+
+    this.setState({
+      draftsOrderData: finalArr,
+      draftsOrderDataBackup: finalArr,
+      modalLoaderDrafts: false,
+    });
+  };
+
+  getFilteredData = async () => {
+    const {payloadFilter, selectedPage} = this.state;
+    const {
+      suppliers,
+      startDate,
+      endDate,
+      flagged,
+      hasCreditNote,
+      pageSize,
+      status,
+    } = payloadFilter;
+    let payload = {
+      suppliers: suppliers ? suppliers : [],
+      startDate: startDate,
+      endDate: endDate,
+      flagged: flagged,
+      selectedPage: selectedPage,
+      hasCreditNote: hasCreditNote,
+      pageSize: pageSize,
+      status: status,
+    };
+    console.log('payload', payload);
+
+    getfilteredOrderDataApi(payload)
+      .then(res => {
+        console.log('res', res);
+
+        this.addFilteredData(res);
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - Filter ${err.response.status}`,
+          'Something went wrong',
+          [
+            {
+              text: 'Okay',
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ],
+        );
+      });
+  };
+
   addMoreFun = () => {
     const {selectedPage} = this.state;
     const newPageNumber = parseInt(selectedPage) + 1;
-    this.setState(
-      {
-        selectedPage: newPageNumber,
-        modalLoaderDrafts: true,
-        loadMoreStatus: true,
-      },
-      () => this.getDraftOrderData(),
-    );
+    const {filterData} = this.state;
+    if (filterData) {
+      this.setState(
+        {
+          selectedPage: newPageNumber,
+          modalLoaderDrafts: true,
+          loadMoreStatus: true,
+        },
+        () => this.getFilteredData(),
+      );
+    } else {
+      this.setState(
+        {
+          selectedPage: newPageNumber,
+          modalLoaderDrafts: true,
+          loadMoreStatus: true,
+        },
+        () => this.getDraftOrderData(),
+      );
+    }
   };
 
   render() {

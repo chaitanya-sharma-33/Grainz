@@ -26,6 +26,7 @@ import {
   duplicateApi,
   orderByStatusApi,
   updateOrderStatusApi,
+  getfilteredOrderDataApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -109,7 +110,12 @@ class PendingDelivery extends Component {
       const {listId} = this.props.route && this.props.route.params;
       const {filterData} = this.props.route && this.props.route.params;
       const {supplierData} = this.props.route && this.props.route.params;
+      const {payloadData} = this.props.route && this.props.route.params;
 
+      this.setState({
+        filterData,
+        payloadFilter: payloadData,
+      });
       console.log('filterData', filterData);
       if (filterData) {
         this.setState({
@@ -122,6 +128,9 @@ class PendingDelivery extends Component {
           {
             listId,
             modalLoaderDrafts: true,
+            deliveryPendingData: [],
+            deliveryPendingDataBackup: [],
+            selectedPage: '1',
           },
           () => this.getFinalData(supplierData),
         );
@@ -546,17 +555,85 @@ class PendingDelivery extends Component {
     );
   };
 
+  addFilteredData = res => {
+    const {deliveryPendingData} = this.state;
+
+    const finalArr = [...deliveryPendingData, ...res.data];
+
+    console.log('res-->finalArr', finalArr);
+
+    this.setState({
+      deliveryPendingData: finalArr,
+      deliveryPendingDataBackup: finalArr,
+      modalLoaderDrafts: false,
+    });
+  };
+
+  getFilteredData = async () => {
+    const {payloadFilter, selectedPage} = this.state;
+    const {
+      suppliers,
+      startDate,
+      endDate,
+      flagged,
+      hasCreditNote,
+      pageSize,
+      status,
+    } = payloadFilter;
+    let payload = {
+      suppliers: suppliers ? suppliers : [],
+      startDate: startDate,
+      endDate: endDate,
+      flagged: flagged,
+      selectedPage: selectedPage,
+      hasCreditNote: hasCreditNote,
+      pageSize: pageSize,
+      status: status,
+    };
+    console.log('payload', payload);
+
+    getfilteredOrderDataApi(payload)
+      .then(res => {
+        console.log('res', res);
+
+        this.addFilteredData(res);
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - Filter ${err.response.status}`,
+          'Something went wrong',
+          [
+            {
+              text: 'Okay',
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ],
+        );
+      });
+  };
+
   addMoreFun = () => {
-    const {selectedPage} = this.state;
+    const {selectedPage, filterData} = this.state;
     const newPageNumber = parseInt(selectedPage) + 1;
-    this.setState(
-      {
-        selectedPage: newPageNumber,
-        modalLoaderDrafts: true,
-        loadMoreStatus: true,
-      },
-      () => this.getFinalData(),
-    );
+    if (filterData) {
+      this.setState(
+        {
+          selectedPage: newPageNumber,
+          modalLoaderDrafts: true,
+          loadMoreStatus: true,
+        },
+        () => this.getFilteredData(),
+      );
+    } else {
+      this.setState(
+        {
+          selectedPage: newPageNumber,
+          modalLoaderDrafts: true,
+          loadMoreStatus: true,
+        },
+        () => this.getFinalData(),
+      );
+    }
   };
 
   pendingFun = () => {

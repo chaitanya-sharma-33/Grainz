@@ -179,7 +179,7 @@ class PdfViewDraft extends Component {
         directory: 'docs',
       };
       let file = await RNHTMLtoPDF.convert(options);
-      Alert.alert('Grainz', `Pdf downloaded successfully - ${file.filePath}`, [
+      Alert.alert('Grainz', `Pdf downloaded successfully`, [
         {
           text: 'Okay',
           onPress: () => this.props.navigation.navigate('HomeScreen'),
