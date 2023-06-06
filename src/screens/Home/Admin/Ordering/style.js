@@ -173,7 +173,6 @@ const styles = StyleSheet.create({
   },
   secondContainer: {
     flex: 1,
-    justifyContent: 'center',
   },
   imageContainer: {
     flex: 1,
@@ -194,6 +193,7 @@ const styles = StyleSheet.create({
   },
   insideContainer: {
     marginHorizontal: wp('5%'),
+    flex: 1,
   },
   textStyling: {
     fontSize: 14,
@@ -226,10 +226,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#5297C1',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: hp('25%'),
     width: wp('85%'),
     borderRadius: 10,
     alignSelf: 'center',
+    marginTop: '50%',
   },
   forgotPassStyling: {
     justifyContent: 'center',

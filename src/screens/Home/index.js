@@ -13,6 +13,8 @@ import {connect} from 'react-redux';
 import img from '../../constants/images';
 import SubHeader from '../../components/SubHeader';
 import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+
 import {UserTokenAction} from '../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
@@ -198,13 +200,23 @@ class index extends Component {
             return item.id;
           }
         });
+        let defaultUserName = res.data.map((item, index) => {
+          if (item.isDefault === true) {
+            return item.name;
+          }
+        });
         let finalData = defaultUser.filter(function (element) {
+          return element !== undefined;
+        });
+
+        let finalDataName = defaultUserName.filter(function (element) {
           return element !== undefined;
         });
         this.setState(
           {
             locationArr: finalUsersList,
             finalLocation: finalData[0],
+            // finalLocationName: finalDataName[0],
           },
           () => this.setCurrentLocFun(),
         );
@@ -319,6 +331,10 @@ class index extends Component {
             />
           </View>
         )}
+        {/* <Footer
+          logoutFun={this.myProfile}
+          logoFun={() => this.props.navigation.navigate('HomeScreen')}
+        /> */}
       </View>
     );
   }

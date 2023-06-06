@@ -284,6 +284,10 @@ class index extends Component {
 
       pickerModalStatus,
     } = this.state;
+
+    console.log('locationArr', locationArr);
+    console.log('finalLocation', finalLocation);
+
     return (
       <View style={styles.container}>
         <Header

@@ -64,6 +64,8 @@ class PendingDelivery extends Component {
       pageSize: '10',
       selectedPage: '1',
       pickerModalStatusOption: false,
+      supplierData: '',
+      filterData: [],
     };
   }
 
@@ -112,6 +114,8 @@ class PendingDelivery extends Component {
       const {supplierData} = this.props.route && this.props.route.params;
       const {payloadData} = this.props.route && this.props.route.params;
 
+      console.log('filterData', filterData);
+
       this.setState({
         filterData,
         payloadFilter: payloadData,
@@ -122,6 +126,7 @@ class PendingDelivery extends Component {
           deliveryPendingData: filterData,
           deliveryPendingDataBackup: filterData,
           modalLoaderDrafts: false,
+          supplierData,
         });
       } else {
         this.setState(
@@ -131,6 +136,7 @@ class PendingDelivery extends Component {
             deliveryPendingData: [],
             deliveryPendingDataBackup: [],
             selectedPage: '1',
+            supplierData,
           },
           () => this.getFinalData(supplierData),
         );
@@ -150,8 +156,13 @@ class PendingDelivery extends Component {
   };
 
   getDeliveryPendingData = supplierData => {
-    const {selectedPage, pageSize, loadMoreStatus, deliveryPendingData} =
-      this.state;
+    const {
+      selectedPage,
+      pageSize,
+      loadMoreStatus,
+      deliveryPendingData,
+      filterData,
+    } = this.state;
 
     let payload = {
       status: 'Pending',
@@ -699,6 +710,8 @@ class PendingDelivery extends Component {
       duplicateModalStatus,
       deleteModalStatus,
       pickerModalStatusOption,
+      filterData,
+      supplierData,
     } = this.state;
 
     return (
@@ -793,7 +806,7 @@ class PendingDelivery extends Component {
                 />
               </View>
             </View>
-            <TouchableOpacity
+            <View
               style={{
                 width: wp('29%'),
                 marginLeft: 10,
@@ -801,35 +814,61 @@ class PendingDelivery extends Component {
                 flexDirection: 'row',
                 alignItems: 'center',
                 borderRadius: 5,
-              }}
-              onPress={() =>
-                this.props.navigation.navigate('FilterOrderScreen', {
-                  item: '',
-                  screenType: 'Pending',
-                })
-              }>
-              <View>
-                <Image
-                  style={{
-                    width: 18,
-                    height: 18,
-                    resizeMode: 'contain',
-                    marginLeft: 10,
-                    tintColor: 'grey',
-                  }}
-                  source={img.filterIcon}
-                />
-              </View>
-              <View>
-                <Text
-                  style={{
-                    padding: 12,
-                    color: 'grey',
-                  }}>
-                  Filter
-                </Text>
-              </View>
-            </TouchableOpacity>
+              }}>
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('FilterOrderScreen', {
+                    item: '',
+                    screenType: 'Pending',
+                  })
+                }
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <View>
+                  <Image
+                    style={{
+                      width: 18,
+                      height: 18,
+                      resizeMode: 'contain',
+                      marginLeft: 10,
+                      tintColor: 'grey',
+                    }}
+                    source={img.filterIcon}
+                  />
+                </View>
+                <View>
+                  <Text
+                    style={{
+                      padding: 12,
+                      color: 'grey',
+                    }}>
+                    Filter
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              {filterData ? (
+                <TouchableOpacity
+                  onPress={() =>
+                    this.setState(
+                      {
+                        filterData: undefined,
+                      },
+                      () => this.getFinalData(supplierData),
+                    )
+                  }>
+                  <Image
+                    style={{
+                      width: 18,
+                      height: 18,
+                      resizeMode: 'contain',
+                    }}
+                    source={img.deleteIcon}
+                  />
+                </TouchableOpacity>
+              ) : null}
+            </View>
           </View>
 
           {/* <View
@@ -1067,7 +1106,7 @@ class PendingDelivery extends Component {
                                         <Text
                                           style={{
                                             textAlign: 'center',
-                                            color: item.isRed ? 'red' : 'black',
+                                            color: item.flaggedCount > 0 ? 'red' : 'black',
                                           }}
                                           numberOfLines={1}>
                                           {item.orderReference}
@@ -1084,7 +1123,10 @@ class PendingDelivery extends Component {
                                     }}>
                                     <Text
                                       style={{
-                                        color: item.isRed ? 'red' : 'black',
+                                        color:
+                                          item.flaggedCount > 0
+                                            ? 'red'
+                                            : 'black',
                                         fontSize: 14,
                                       }}>
                                       {type === 'Pending'
@@ -1107,17 +1149,46 @@ class PendingDelivery extends Component {
                                       flex: 1,
                                       justifyContent: 'center',
                                       alignItems: 'center',
-                                      // width: wp('30%'),
-                                      // alignItems: 'center',
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      marginLeft: 10,
                                     }}>
-                                    <Text
-                                      numberOfLines={1}
-                                      style={{
-                                        color: item.isRed ? 'red' : 'black',
-                                        fontSize: 14,
-                                      }}>
-                                      {item.supplierName}
-                                    </Text>
+                                    <View style={{}}>
+                                      <Text
+                                        style={{
+                                          color:
+                                            item.flaggedCount > 0
+                                              ? 'red'
+                                              : 'black',
+                                          fontSize: 14,
+                                        }}>
+                                        {item.supplierName}
+                                      </Text>
+                                    </View>
+                                    {/* {item.flaggedCount > 0 ? (
+                                      <Image
+                                        source={img.flagIcon}
+                                        style={{
+                                          width: 25,
+                                          height: 25,
+                                          resizeMode: 'contain',
+                                        }}
+                                      />
+                                    ) : null} */}
+                                    <View>
+                                      {item.creditNotesCount > 0 ? (
+                                        <Image
+                                          source={img.messageIcon}
+                                          style={{
+                                            width: 15,
+                                            height: 15,
+                                            resizeMode: 'contain',
+                                            tintColor: 'black',
+                                            marginLeft: 2,
+                                          }}
+                                        />
+                                      ) : null}
+                                    </View>
                                   </View>
                                   <View
                                     style={{
@@ -1129,7 +1200,10 @@ class PendingDelivery extends Component {
                                     }}>
                                     <Text
                                       style={{
-                                        color: item.isRed ? 'red' : 'black',
+                                        color:
+                                          item.flaggedCount > 0
+                                            ? 'red'
+                                            : 'black',
                                         fontSize: 14,
                                       }}>
                                       € {item && Number(item.htva).toFixed(2)}
@@ -1172,6 +1246,26 @@ class PendingDelivery extends Component {
                             );
                           })
                         : null}
+                      {deliveryPendingData.length > 5 ? (
+                        <TouchableOpacity
+                          onPress={() => this.addMoreFun()}
+                          style={{
+                            marginTop: hp('4%'),
+                            alignSelf: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              fontFamily: 'Inter-SemiBold',
+                              color: 'black',
+                              color: '#5297c1',
+                              fontWeight: 'bold',
+                              textDecorationLine: 'underline',
+                            }}>
+                            {translate('Load more')}
+                          </Text>
+                        </TouchableOpacity>
+                      ) : null}
                     </View>
                   </View>
                 )}
@@ -1485,7 +1579,7 @@ class PendingDelivery extends Component {
                 saveFun={() => this.deleteFun()}
                 yesStatus
               /> */}
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() =>
                   this.props.navigation.navigate('NewOrderSecScreen', {
                     ScreenType: '',
@@ -1522,25 +1616,7 @@ class PendingDelivery extends Component {
                   }}>
                   {translate('New Order')}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => this.addMoreFun()}
-                style={{
-                  marginTop: hp('4%'),
-                  alignSelf: 'center',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontFamily: 'Inter-SemiBold',
-                    color: 'black',
-                    color: '#5297c1',
-                    fontWeight: 'bold',
-                    textDecorationLine: 'underline',
-                  }}>
-                  {translate('Load more')}
-                </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           )}
         </View>

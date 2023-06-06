@@ -497,29 +497,31 @@ class FilterOrder extends Component {
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={{flexDirection: 'row'}}
-                  onPress={() => this.flagFun()}>
-                  <View>
-                    <CheckBox
-                      value={switchValueRemember}
+                {screenType !== 'Draft' ? (
+                  <TouchableOpacity
+                    style={{flexDirection: 'row'}}
+                    onPress={() => this.flagFun()}>
+                    <View>
+                      <CheckBox
+                        value={switchValueRemember}
+                        style={{
+                          height: 18,
+                          width: 18,
+                          marginRight: 10,
+                        }}
+                        disabled={true}
+                      />
+                    </View>
+                    <Text
                       style={{
-                        height: 18,
-                        width: 18,
-                        marginRight: 10,
-                      }}
-                      disabled={true}
-                    />
-                  </View>
-                  <Text
-                    style={{
-                      color: '#222526',
-                      fontSize: 14,
-                      fontFamily: 'Inter-Regular',
-                    }}>
-                    {translate('Show only flagged purchases')}
-                  </Text>
-                </TouchableOpacity>
+                        color: '#222526',
+                        fontSize: 14,
+                        fontFamily: 'Inter-Regular',
+                      }}>
+                      {translate('Show only flagged purchases')}
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
 
                 {screenType !== 'Draft' ? (
                   <TouchableOpacity

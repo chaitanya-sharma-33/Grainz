@@ -8,7 +8,7 @@ let baseURL = url['STAGING_TWO'].BaseURL;
 
 // export const loginApi = payload => {
 //   return axios.post(
-//     'https://grainzwebapid.azurewebsites.net/connect/token',
+//     'https://web-grainz-dev.azurewebsites.net/connect/token',
 //     payload,
 //     {
 //       headers: {
@@ -33,7 +33,7 @@ let baseURL = url['STAGING_TWO'].BaseURL;
 // };
 
 export const loginApi = payload => {
-  const url = 'https://grainzwebapia.azurewebsites.net/connect/token';
+  const url = 'https://web-grainz-uat.azurewebsites.net/connect/token';
   console.log('URL', url);
   return axios.post(url, payload, {
     headers: {
@@ -1604,4 +1604,26 @@ export const deleteImageApi = async (id, payload) => {
       LocationId: location,
     },
   });
+};
+
+export const updateCreditNoteApi = async (
+  orderItemId,
+  value,
+  notes,
+  payload,
+) => {
+  console.log('ID--->', orderItemId);
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.post(
+    baseURL +
+      `/SupplierCreditNoteRequest/update credit note value?OrderItemId=${orderItemId}&Value=${value}&Notes=${notes}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        LocationId: location,
+      },
+    },
+  );
 };

@@ -242,44 +242,44 @@ class AddItems extends Component {
   async componentDidMount() {
     this.getData();
 
-    this.props.navigation.addListener('focus', () => {
-      const {
-        supplierValue,
-        screen,
+    // this.props.navigation.addListener('focus', () => {
+    const {
+      supplierValue,
+      screen,
+      basketId,
+      navigateType,
+      supplierName,
+      departName,
+      departID,
+      finalData,
+      finalDataSec,
+    } = this.props.route && this.props.route.params;
+
+    console.log('screen', screen);
+    this.setState(
+      {
+        supplierId: supplierValue,
+        supplierStatus: false,
+        inventoryStatus: true,
+        screenType: screen,
         basketId,
         navigateType,
+        departmentName: departName,
         supplierName,
-        departName,
-        departID,
+        searchItemInventory: '',
+        searchItemSupplier: '',
+        listIndex: '',
+        SECTIONS: [],
+        modalData: [],
+        departmentId: departID,
         finalData,
+        mainDepartId: departID,
+        finalBasketData: [],
         finalDataSec,
-      } = this.props.route && this.props.route.params;
-
-      console.log('screen', screen);
-      this.setState(
-        {
-          supplierId: supplierValue,
-          supplierStatus: false,
-          inventoryStatus: true,
-          screenType: screen,
-          basketId,
-          navigateType,
-          departmentName: departName,
-          supplierName,
-          searchItemInventory: '',
-          searchItemSupplier: '',
-          listIndex: '',
-          SECTIONS: [],
-          modalData: [],
-          departmentId: departID,
-          finalData,
-          mainDepartId: departID,
-          finalBasketData: [],
-          finalDataSec,
-        },
-        () => this.getManualLogsData(),
-      );
-    });
+      },
+      () => this.getManualLogsData(),
+    );
+    // });
   }
 
   myProfile = () => {
@@ -774,7 +774,8 @@ class AddItems extends Component {
                   // marginBottom:
                   //   index === section.content.length - 1 ? 30 : null,
                 }}>
-                <View
+                <TouchableOpacity
+                  onPress={() => this.openModalFun(item, section, index)}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -807,8 +808,7 @@ class AddItems extends Component {
                     )}
                   </View>
                   <View style={{marginTop: 10, flex: 3}}>
-                    <TouchableOpacity
-                      onPress={() => this.openModalFun(item, section, index)}
+                    <View
                       // onPress={() =>
                       //   this.props.navigation.navigate('SelectQuantityScreen', {
                       //     finalData: item,
@@ -816,7 +816,7 @@ class AddItems extends Component {
                       // }
                       style={{}}>
                       <Text>{item.productName}</Text>
-                    </TouchableOpacity>
+                    </View>
                   </View>
                   <View
                     style={{
@@ -952,7 +952,7 @@ class AddItems extends Component {
                       <Text style={{color: 'black', fontSize: 15}}>+</Text>
                     </TouchableOpacity>
                   </View> */}
-                </View>
+                </TouchableOpacity>
                 {/* <View>
                   <Text
                     style={{
@@ -1245,10 +1245,11 @@ class AddItems extends Component {
 
   onPressInventoryFun = (item, index) => {
     const {actionOpen} = this.state;
+    console.log('actionOpen', actionOpen);
     if (actionOpen === true) {
       this.setState(
         {
-          listIndex: '',
+          listIndex: index,
           actionOpen: false,
           modalQuantity: '0',
         },
@@ -2175,7 +2176,7 @@ class AddItems extends Component {
     } = this.state;
 
     // console.log('PAGE DATA', pageData);
-    console.log('navigateType', navigateType);
+    console.log('isFreemium', isFreemium);
 
     return (
       <View style={styles.container}>
@@ -2208,7 +2209,7 @@ class AddItems extends Component {
                 justifyContent: 'center',
               }}>
               <TouchableOpacity
-                onPress={() => this.inventoryFun()}
+                // onPress={() => this.inventoryFun()}
                 style={{
                   flex: 1,
                   alignItems: 'center',
@@ -2514,7 +2515,7 @@ class AddItems extends Component {
                               <ActivityIndicator size="large" color="#5297c1" />
                             ) : (
                               <Accordion
-                                expandMultiple
+                                // expandMultiple
                                 underlayColor="#fff"
                                 sections={SECTIONS}
                                 activeSections={activeSections}
@@ -3144,158 +3145,162 @@ class AddItems extends Component {
                   flex: 1,
                   backgroundColor: '#f2efef',
                 }}>
-                <KeyboardAwareScrollView
-                  keyboardShouldPersistTaps="always"
-                  showsVerticalScrollIndicator={false}
-                  enableOnAndroid>
-                  <View style={styles.secondContainer}>
+                <View style={styles.secondContainer}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      height: hp('15%'),
+                      marginHorizontal: wp('6%'),
+                      marginTop: hp('3%'),
+                    }}>
                     <View
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        height: hp('15%'),
-                        marginHorizontal: wp('6%'),
-                        marginTop: hp('2%'),
+                        flex: 4,
                       }}>
-                      <View
-                        style={{
-                          flex: 4,
-                        }}>
-                        <Text style={styles.textStylingLogo}>
-                          {pageData.name}
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        onPress={() =>
-                          this.setState({
-                            orderingThreeModal: false,
-                            modalQuantity: '0',
-                          })
-                        }
-                        style={{
-                          backgroundColor: '#fff',
-                          borderRadius: 100,
-                          padding: 5,
-                        }}>
-                        <Image
-                          source={img.crossIcon}
-                          style={{
-                            height: 15,
-                            width: 15,
-                            resizeMode: 'contain',
-                          }}
-                        />
-                      </TouchableOpacity>
+                      <Text style={styles.textStylingLogo}>
+                        {pageData.name}
+                      </Text>
                     </View>
-                    <View>
-                      <View style={styles.insideContainer}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        this.setState({
+                          orderingThreeModal: false,
+                          modalQuantity: '0',
+                        })
+                      }
+                      style={{
+                        backgroundColor: '#fff',
+                        borderRadius: 100,
+                        padding: 5,
+                      }}>
+                      <Image
+                        source={img.crossIcon}
+                        style={{
+                          height: 15,
+                          width: 15,
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                    }}>
+                    <View style={styles.insideContainer}>
+                      {isFreemium === false ? (
                         <View>
                           <Text>{pageData.productName}</Text>
                         </View>
+                      ) : null}
 
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          flex: 0.7,
+                          marginTop: isFreemium === false ? hp('3%') : null,
+                        }}>
                         <View
                           style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
                             flex: 1,
-                            marginTop: hp('3%'),
+                            alignItems: 'center',
                           }}>
-                          <View
+                          <Text
                             style={{
-                              flex: 1,
+                              fontSize: 14,
                             }}>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                              }}>
-                              {translate('Package size')}.
-                            </Text>
-                            <Text
-                              numberOfLines={1}
-                              style={{
-                                fontSize: 13,
-                                fontWeight: 'bold',
-                                marginTop: 10,
-                              }}>
-                              {pageData.packSize} {pageData.productUnit}
-                            </Text>
-                          </View>
-
-                          <View
+                            {translate('Package size')}.
+                          </Text>
+                          <Text
+                            numberOfLines={1}
                             style={{
-                              flex: 1,
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                              marginTop: 10,
                             }}>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                              }}>
-                              {translate('Ordered Val')}.
-                            </Text>
-                            <Text
-                              numberOfLines={1}
-                              style={{
-                                fontSize: 13,
-                                fontWeight: 'bold',
-                                marginTop: 10,
-                              }}>
-                              €{' '}
-                              {(
-                                pageData.productPrice *
-                                pageData.packSize *
-                                modalQuantity
-                              ).toFixed(2)}
-                            </Text>
-                          </View>
+                            {pageData.productUnit} {pageData.packSize}
+                          </Text>
                         </View>
 
                         <View
                           style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
                             flex: 1,
-                            marginTop: hp('2%'),
+                            alignItems: 'center',
                           }}>
-                          <View
+                          <Text
                             style={{
-                              flex: 1,
+                              fontSize: 14,
                             }}>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                              }}>
-                              Price
-                            </Text>
-                            <Text
-                              style={{
-                                fontSize: 13,
-                                fontWeight: 'bold',
-                                marginTop: 10,
-                              }}>
-                              {pageData.productPrice} €/{pageData.productUnit}
-                            </Text>
-                          </View>
+                            {translate('Ordered Val')}.
+                          </Text>
+                          <Text
+                            numberOfLines={1}
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                              marginTop: 10,
+                            }}>
+                            €{' '}
+                            {(
+                              pageData.productPrice *
+                              pageData.packSize *
+                              modalQuantity
+                            ).toFixed(2)}
+                          </Text>
+                        </View>
+                      </View>
 
-                          <View
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          flex: 0.7,
+                        }}>
+                        <View
+                          style={{
+                            flex: 1,
+                            alignItems: 'center',
+                          }}>
+                          <Text
                             style={{
-                              flex: 1,
+                              fontSize: 14,
                             }}>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                              }}>
-                              {translate('Ordered Qty')}.
-                            </Text>
-                            <Text
-                              numberOfLines={1}
-                              style={{
-                                fontSize: 13,
-                                fontWeight: 'bold',
-                                marginTop: 10,
-                              }}>
-                              {pageData.volume * modalQuantity} {pageData.unit}
-                            </Text>
-                          </View>
-                          {/* <View
+                            Price
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                              marginTop: 10,
+                            }}>
+                            €/{pageData.productUnit} {pageData.productPrice}
+                          </Text>
+                        </View>
+
+                        <View
+                          style={{
+                            flex: 1,
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 14,
+                            }}>
+                            {translate('Ordered Qty')}.
+                          </Text>
+                          <Text
+                            numberOfLines={1}
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                              marginTop: 10,
+                            }}>
+                            {pageData.unit} {pageData.volume * modalQuantity}
+                          </Text>
+                        </View>
+                        {/* <View
                             style={{
                               flex: 1,
                             }}>
@@ -3330,7 +3335,7 @@ class AddItems extends Component {
                               </Text>
                             )}
                           </View> */}
-                          {/* <View
+                        {/* <View
                             style={{
                               flex: 1,
                               alignItems: 'center',
@@ -3347,70 +3352,71 @@ class AddItems extends Component {
                                 marginTop: 10,
                               }}></Text>
                           </View> */}
-                        </View>
+                      </View>
 
-                        <View
+                      <View
+                        style={{
+                          flex: 0.7,
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                        }}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            this.editModalQuantityFun('minus', '1')
+                          }
                           style={{
-                            flex: 1,
+                            width: wp('20%'),
+                            height: hp('8%'),
                             alignItems: 'center',
-                            flexDirection: 'row',
                             justifyContent: 'center',
-                            marginTop: hp('3%'),
                           }}>
-                          <TouchableOpacity
-                            onPress={() =>
-                              this.editModalQuantityFun('minus', '1')
-                            }
+                          <Text
                             style={{
-                              width: wp('20%'),
-                              height: hp('5%'),
-                              alignItems: 'center',
-                              justifyContent: 'center',
+                              fontSize: 29,
+                              fontWeight: 'bold',
+                              color: '#5197C1',
                             }}>
-                            <Text
-                              style={{
-                                fontSize: 29,
-                                fontWeight: 'bold',
-                                color: '#5197C1',
-                              }}>
-                              -
-                            </Text>
-                          </TouchableOpacity>
+                            -
+                          </Text>
+                        </TouchableOpacity>
 
-                          <TextInput
-                            value={String(modalQuantity)}
-                            keyboardType="numeric"
+                        <TextInput
+                          value={String(modalQuantity)}
+                          keyboardType="numeric"
+                          style={{
+                            borderRadius: 6,
+                            padding: 18,
+                            width: wp('50%'),
+                            backgroundColor: '#fff',
+                          }}
+                          onChangeText={value =>
+                            this.editModalQuantityFun('input', value)
+                          }
+                        />
+                        <TouchableOpacity
+                          onPress={() => this.editModalQuantityFun('add', '1')}
+                          style={{
+                            width: wp('20%'),
+                            height: hp('8%'),
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                          <Text
                             style={{
-                              borderRadius: 6,
-                              padding: 10,
-                              width: wp('50%'),
-                              backgroundColor: '#fff',
-                            }}
-                            onChangeText={value =>
-                              this.editModalQuantityFun('input', value)
-                            }
-                          />
-                          <TouchableOpacity
-                            onPress={() =>
-                              this.editModalQuantityFun('add', '1')
-                            }
-                            style={{
-                              width: wp('20%'),
-                              height: hp('5%'),
-                              alignItems: 'center',
-                              justifyContent: 'center',
+                              color: '#5197C1',
+                              fontSize: 20,
+                              fontWeight: 'bold',
                             }}>
-                            <Text
-                              style={{
-                                color: '#5197C1',
-                                fontSize: 20,
-                                fontWeight: 'bold',
-                              }}>
-                              +
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
+                            +
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
 
+                      <View
+                        style={{
+                          flex: 2,
+                        }}>
                         <TouchableOpacity
                           onPress={() => this.confirmQuantityFun()}
                           style={styles.signInStyling}>
@@ -3432,7 +3438,7 @@ class AddItems extends Component {
                       </View>
                     </View>
                   </View>
-                </KeyboardAwareScrollView>
+                </View>
               </View>
             </View>
           </Modal>
@@ -3767,7 +3773,7 @@ class AddItems extends Component {
           style={{
             position: 'absolute',
             right: 20,
-            top: hp('75%'),
+            top: hp('80%'),
             backgroundColor: '#5297c1',
             padding: 15,
             borderRadius: 5,

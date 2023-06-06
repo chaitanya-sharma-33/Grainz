@@ -119,16 +119,17 @@ export class RequestCreditNote extends Component {
     viewCreditNoteApi(id)
       .then(res => {
         const {data} = res;
+        console.log('DATA', data);
         this.setState({
           ccValue: data.ccEmail,
           toValue: data.email,
           imageData: data.image,
           modalNotes: data.message,
           requestedPriceQty: data.quantity,
-          requestedPriceValue: data.price,
+          requestedPriceValue: parseFloat(data.requestedValue).toFixed(2),
           orderedNumberValue: modalData.quantityOrdered,
           deliveredQtyValue: modalData.quantityDelivered,
-          orderedValue: modalData.orderValueExpected,
+          orderedValue: parseFloat(modalData.orderValueExpected).toFixed(2),
           fromValue: emailDetails.subject,
         });
         console.log('Res', res);
@@ -142,7 +143,6 @@ export class RequestCreditNote extends Component {
     const location = await AsyncStorage.getItem('@location');
     const {modalData, emailDetails} =
       this.props.route && this.props.route.params;
-    console.log('modalData-->', modalData);
     this.setState(
       {
         hasCreditNoteStatus: modalData.hasCreditNote > 0 ? true : false,
@@ -153,6 +153,8 @@ export class RequestCreditNote extends Component {
   };
 
   getFinalDataFun = (modalData, emailDetails) => {
+    console.log('modalData-->', modalData);
+
     const {hasCreditNoteStatus} = this.state;
 
     if (hasCreditNoteStatus) {
@@ -161,9 +163,11 @@ export class RequestCreditNote extends Component {
       this.setState({
         orderedNumberValue: modalData.quantityOrdered,
         deliveredQtyValue: modalData.quantityDelivered,
-        orderedValue: modalData.orderValueExpected,
-        requestedPriceValue: modalData.unitPrice,
-        mainPriceValue: modalData.unitPrice,
+        orderedValue: parseFloat(modalData.orderValueExpected).toFixed(2),
+        requestedPriceValue: parseFloat(
+          modalData.unitPrice * modalData.packSize,
+        ).toFixed(2),
+        mainPriceValue: modalData.unitPrice * modalData.packSize,
         fromValue: emailDetails.subject,
         toValue: emailDetails.toRecipient,
         ccValue: emailDetails.ccRecipients,
@@ -193,7 +197,7 @@ export class RequestCreditNote extends Component {
       locationId: locationId,
       message: modalNotes,
       orderItemId: orderItemId,
-      price: requestedPriceValue,
+      requestedValue: requestedPriceValue,
       quantity: requestedPriceQty,
       supplierId: supplierId,
     };
@@ -680,7 +684,7 @@ export class RequestCreditNote extends Component {
                       Requested Price
                     </Text>
                     <TextInput
-                      placeholder=" Requested Price"
+                      placeholder="Requested Price"
                       editable={hasCreditNoteStatus ? false : true}
                       style={{
                         width: 80,

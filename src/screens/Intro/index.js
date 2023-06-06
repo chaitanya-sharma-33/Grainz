@@ -255,7 +255,7 @@ export default class App extends React.Component {
           <Text style={styles.title}>{item.title}</Text>
           <Image source={item.image} style={styles.image} />
           <Text style={styles.text}>{item.text}</Text>
-          {item.page === '1' ? (
+          {/* {item.page === '1' ? (
             <TouchableOpacity
               onPress={() => this.props.navigation.navigate('ContactUsScreen')}
               style={{
@@ -270,7 +270,7 @@ export default class App extends React.Component {
                 {translate('Contact Us')}
               </Text>
             </TouchableOpacity>
-          ) : null}
+          ) : null} */}
         </View>
       </View>
     );

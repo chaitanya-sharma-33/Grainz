@@ -135,7 +135,9 @@ class PendingOrderDelivery extends Component {
     // this.props.navigation.addListener('focus', () => {
     const {route} = this.props;
     const finalData = route.params.finalData;
+    const finalArrivedDate = route.params.finalArrivedDate;
     console.log('finalData', finalData);
+    console.log('finalArrivedDate', finalArrivedDate);
 
     this.setState({
       finalData,
@@ -147,9 +149,7 @@ class PendingOrderDelivery extends Component {
       pageChilledTemp: finalData.chilledTemp,
       pageFrozenTemp: finalData.frozenTemp,
       pageNotes: finalData.notes,
-      finalArrivedDate:
-        finalData.deliveredDate &&
-        moment(finalData.deliveredDate).format('DD/MM/YYYY'),
+      finalArrivedDate: finalArrivedDate,
       itemId: finalData.id,
     });
     this.getProfileDataFun();

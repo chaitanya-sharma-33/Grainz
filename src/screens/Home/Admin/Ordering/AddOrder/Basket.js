@@ -1719,7 +1719,7 @@ class Basket extends Component {
                         borderColor: 'grey',
                         borderRadius: 6,
                       }}>
-                      <View
+                      {/* <View
                         style={{
                           position: 'absolute',
                           flexDirection: 'row',
@@ -1772,7 +1772,7 @@ class Basket extends Component {
                             }
                           />
                         </View>
-                      </View>
+                      </View> */}
                       <View
                         style={{
                           flexDirection: 'row',
@@ -1877,8 +1877,8 @@ class Basket extends Component {
                               )
                             }
                             style={{
-                              width: wp('10%'),
-                              height: hp('5%'),
+                              width: wp('18%'),
+                              height: hp('8%'),
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}>
@@ -1898,8 +1898,9 @@ class Basket extends Component {
                             style={{
                               borderRadius: 6,
                               padding: 10,
-                              width: wp('15%'),
+                              width: wp('20%'),
                               backgroundColor: '#fff',
+                              height: hp('5%'),
                             }}
                             onChangeText={value =>
                               this.editQuantityFun(
@@ -1922,8 +1923,8 @@ class Basket extends Component {
                               )
                             }
                             style={{
-                              width: wp('10%'),
-                              height: hp('5%'),
+                              width: wp('18%'),
+                              height: hp('8%'),
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}>
@@ -3111,7 +3112,7 @@ class Basket extends Component {
             <View
               style={{
                 width: wp('80%'),
-                height: hp('65%'),
+                height: hp('75%'),
                 alignSelf: 'center',
                 borderRadius: 6,
                 backgroundColor: '#F5F8FE',

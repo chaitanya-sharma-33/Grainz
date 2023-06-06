@@ -3182,6 +3182,7 @@ class ViewHistoryOrder extends Component {
       reviewModalStatus: false,
       cancelModalStatus: false,
       checklistModalStatus: false,
+      isFreemium: '',
       checklistNotes: '',
       choicesProp: [
         {
@@ -3199,10 +3200,12 @@ class ViewHistoryOrder extends Component {
   getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@appToken');
+      const userStatus = await AsyncStorage.getItem('@isFreemium');
       if (value !== null) {
         this.setState(
           {
             token: value,
+            isFreemium: userStatus,
           },
           () => this.getProfileData(),
         );
@@ -4051,6 +4054,7 @@ class ViewHistoryOrder extends Component {
       cancelModalStatus,
       checklistModalStatus,
       checklistNotes,
+      isFreemium,
     } = this.state;
 
     console.log('finalData', finalData);
@@ -4874,7 +4878,7 @@ class ViewHistoryOrder extends Component {
                         console.log('item', item);
                         return (
                           <View key={index}>
-                            <View
+                            {/* <View
                               style={{
                                 position: 'absolute',
                                 flexDirection: 'row',
@@ -4929,7 +4933,7 @@ class ViewHistoryOrder extends Component {
                                   }
                                 />
                               </View>
-                            </View>
+                            </View> */}
                             <View
                               style={{
                                 marginTop: hp('2%'),
@@ -5007,13 +5011,73 @@ class ViewHistoryOrder extends Component {
                                   padding: 10,
                                   backgroundColor: '#fff',
                                 }}>
+                                {isFreemium === 'false' ? (
+                                  <View
+                                    style={{
+                                      flex: 1,
+                                    }}>
+                                    <Text style={{}}>
+                                      {item.inventoryMapping &&
+                                        item.inventoryMapping.productName}
+                                    </Text>
+                                  </View>
+                                ) : null}
+                              </View>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  flexDirection: 'row',
+                                  padding: 10,
+                                  backgroundColor: '#fff',
+                                }}>
                                 <View
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{}}>
+                                  <Text style={{fontSize: 10}}>Order Val.</Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {/* {item.value.toFixed(2)} */}
+                                    {item.orderValue.toFixed(2)} €
+                                  </Text>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    Delivered No.
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {item.displayQuantity.split('=')[0]}
+                                  </Text>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    {translate('Price')}
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
                                     {item.inventoryMapping &&
-                                      item.inventoryMapping.productName}
+                                      item.inventoryMapping.productPrice}{' '}
+                                    Є/
+                                    {item.inventoryMapping.productUnit}
                                   </Text>
                                 </View>
                               </View>
@@ -6012,14 +6076,16 @@ class ViewHistoryOrder extends Component {
                                       }}>
                                       {item.inventoryName}
                                     </Text>
-                                    <Text
-                                      style={{
-                                        fontSize: 12,
-                                        color: 'black',
-                                        marginTop: 10,
-                                      }}>
-                                      {item.productName}
-                                    </Text>
+                                    {isFreemium === 'false' ? (
+                                      <Text
+                                        style={{
+                                          fontSize: 12,
+                                          color: 'black',
+                                          marginTop: 10,
+                                        }}>
+                                        {item.productName}
+                                      </Text>
+                                    ) : null}
                                   </View>
 
                                   <View

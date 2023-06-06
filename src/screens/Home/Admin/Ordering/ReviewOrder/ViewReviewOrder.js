@@ -90,6 +90,7 @@ class ViewReviewOrder extends Component {
       showMoreStatus: false,
       listIndex: '',
       finalData: '',
+      isFreemium: '',
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -106,10 +107,12 @@ class ViewReviewOrder extends Component {
   getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@appToken');
+      const userStatus = await AsyncStorage.getItem('@isFreemium');
       if (value !== null) {
         this.setState(
           {
             token: value,
+            isFreemium: userStatus,
           },
           () => this.getProfileData(),
         );
@@ -698,6 +701,7 @@ class ViewReviewOrder extends Component {
   };
 
   showEditModal = (item, index) => {
+    console.log('ITEM', item);
     this.setState({
       modalData: item,
       modalVisibleEditElement: true,
@@ -727,6 +731,7 @@ class ViewReviewOrder extends Component {
       orderValueExpected: item.orderValueExpected,
       priceExpected: item.priceExpected,
       priceActual: item.priceActual,
+      finalUnit: item.unit,
     });
   };
 
@@ -1131,6 +1136,8 @@ class ViewReviewOrder extends Component {
       priceExpected,
       priceActual,
       orderValueExpected,
+      isFreemium,
+      finalUnit,
     } = this.state;
 
     return (
@@ -1939,7 +1946,7 @@ class ViewReviewOrder extends Component {
                         console.log('item->REVIEW-MAIN', item);
                         return (
                           <View key={index}>
-                            <View
+                            {/* <View
                               style={{
                                 position: 'absolute',
                                 flexDirection: 'row',
@@ -1994,7 +2001,7 @@ class ViewReviewOrder extends Component {
                                   }
                                 />
                               </View>
-                            </View>
+                            </View> */}
 
                             {item.isFlagged === true ? (
                               <View
@@ -2035,6 +2042,7 @@ class ViewReviewOrder extends Component {
                                   }
                                   style={{
                                     flex: 3,
+                                    padding: 10,
                                   }}>
                                   <Text
                                     style={{
@@ -2093,13 +2101,73 @@ class ViewReviewOrder extends Component {
                                   borderBottomWidth: 0.5,
                                   borderBottomColor: 'grey',
                                 }}>
+                                {isFreemium === 'false' ? (
+                                  <View
+                                    style={{
+                                      flex: 1,
+                                    }}>
+                                    <Text style={{}}>
+                                      {item.inventoryMapping &&
+                                        item.inventoryMapping.productName}
+                                    </Text>
+                                  </View>
+                                ) : null}
+                              </View>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  flexDirection: 'row',
+                                  padding: 10,
+                                  backgroundColor: '#fff',
+                                }}>
                                 <View
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{}}>
+                                  <Text style={{fontSize: 10}}>Order Val.</Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {/* {item.value.toFixed(2)} */}
+                                    {item.orderValue.toFixed(2)} €
+                                  </Text>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    Delivered No.
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {item.displayQuantity.split('=')[0]}
+                                  </Text>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    {translate('Price')}
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
                                     {item.inventoryMapping &&
-                                      item.inventoryMapping.productName}
+                                      item.inventoryMapping.productPrice}{' '}
+                                    Є/
+                                    {item.inventoryMapping.productUnit}
                                   </Text>
                                 </View>
                               </View>
@@ -2138,9 +2206,13 @@ class ViewReviewOrder extends Component {
                                     justifyContent: 'center',
                                     flexDirection: 'row',
                                     alignItems: 'center',
-                                    justifyContent: 'space-between',
                                   }}>
-                                  <Text>Checked</Text>
+                                  <Text
+                                    style={{
+                                      marginRight: 10,
+                                    }}>
+                                    Correct
+                                  </Text>
                                   <Switch
                                     thumbColor={'#fff'}
                                     trackColor={{
@@ -2985,7 +3057,7 @@ class ViewReviewOrder extends Component {
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>
-                          Mark all as Checked
+                          Mark all as Correct
                         </Text>
                       </View>
 
@@ -3678,14 +3750,16 @@ class ViewReviewOrder extends Component {
                                     }}>
                                     {item.inventoryName}
                                   </Text>
-                                  <Text
-                                    style={{
-                                      fontSize: 12,
-                                      color: 'black',
-                                      marginTop: 10,
-                                    }}>
-                                    {item.productName}
-                                  </Text>
+                                  {isFreemium === 'false' ? (
+                                    <Text
+                                      style={{
+                                        fontSize: 12,
+                                        color: 'black',
+                                        marginTop: 10,
+                                      }}>
+                                      {item.productName}
+                                    </Text>
+                                  ) : null}
                                 </View>
                                 <View
                                   style={{
@@ -3726,11 +3800,50 @@ class ViewReviewOrder extends Component {
                                   flex: 1,
                                   marginTop: hp('3%'),
                                 }}>
+                                {/* <View
+                                  style={{
+                                    flex: 1,
+                                    backgroundColor: '#fff',
+                                    padding: 8,
+                                    borderRadius: 6,
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 12,
+                                    }}>
+                                    Delivered Qty.
+                                  </Text>
+                                  <View
+                                    style={{
+                                      alignItems: 'center',
+                                      flexDirection: 'row',
+                                    }}>
+                                    <TextInput
+                                      placeholder="Delivered Qty."
+                                      value={String(item.userQuantityDelivered)}
+                                      style={{
+                                        width: 80,
+                                        marginTop: 5,
+                                        fontWeight: 'bold',
+                                      }}
+                                      onChangeText={value =>
+                                        this.editChecklistFun(
+                                          index,
+                                          'userQuantityDelivered',
+                                          value,
+                                          item,
+                                          'DeliveredQty',
+                                        )
+                                      }
+                                    />
+                                  </View>
+                                </View> */}
+
                                 <View
                                   style={{
                                     flex: 1,
                                   }}>
-                                  {/* <Text
+                                  <Text
                                     style={{
                                       fontSize: 12,
                                     }}>
@@ -3743,44 +3856,16 @@ class ViewReviewOrder extends Component {
                                       fontWeight: 'bold',
                                       marginTop: 10,
                                     }}>
-                                    {item.quantityOrdered}
-                                  </Text> */}
+                                    {item.grainzVolume * item.quantityOrdered}{' '}
+                                    {item.unit}
+                                  </Text>
                                 </View>
+
                                 <View
                                   style={{
                                     flex: 0.3,
                                   }}></View>
 
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
-                                  <Text
-                                    style={{
-                                      fontSize: 12,
-                                    }}>
-                                    {translate('Ordered Qty')}.
-                                  </Text>
-                                  <Text
-                                    numberOfLines={1}
-                                    style={{
-                                      fontSize: 13,
-                                      fontWeight: 'bold',
-                                      marginTop: 10,
-                                    }}>
-                                    {item.grainzVolume * item.quantityOrdered}{' '}
-                                    {item.unit}
-                                  </Text>
-                                </View>
-                              </View>
-
-                              <View
-                                style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  flex: 1,
-                                  marginTop: hp('2%'),
-                                }}>
                                 <View
                                   style={{
                                     flex: 1,
@@ -3814,6 +3899,48 @@ class ViewReviewOrder extends Component {
                                     }
                                   />
                                 </View>
+                              </View>
+
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  flex: 1,
+                                  marginTop: hp('2%'),
+                                }}>
+                                {/* <View
+                                  style={{
+                                    flex: 1,
+                                    backgroundColor: '#fff',
+                                    padding: 8,
+                                    borderRadius: 6,
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 12,
+                                    }}>
+                                    Delivered No.
+                                  </Text>
+
+                                  <TextInput
+                                    placeholder="Delivered No."
+                                    value={String(item.quantityDelivered)}
+                                    style={{
+                                      width: 80,
+                                      marginTop: 5,
+                                      fontWeight: 'bold',
+                                    }}
+                                    onChangeText={value =>
+                                      this.editChecklistFun(
+                                        index,
+                                        'quantityDelivered',
+                                        value,
+                                        item,
+                                        'DeliveredNo',
+                                      )
+                                    }
+                                  />
+                                </View> */}
 
                                 <View
                                   style={{
@@ -3823,11 +3950,10 @@ class ViewReviewOrder extends Component {
                                 <View
                                   style={{
                                     flex: 1,
-                                    backgroundColor: '#fff',
                                     padding: 8,
                                     borderRadius: 6,
                                   }}>
-                                  <Text
+                                  {/* <Text
                                     style={{
                                       fontSize: 12,
                                     }}>
@@ -3851,7 +3977,7 @@ class ViewReviewOrder extends Component {
                                         'DeliveredQty',
                                       )
                                     }
-                                  />
+                                  /> */}
                                 </View>
                               </View>
                             </View>
@@ -3968,9 +4094,9 @@ class ViewReviewOrder extends Component {
                           style={{
                             flex: 4,
                           }}>
-                          {/* <Text style={styles.textStylingLogo}>
+                          <Text style={styles.textStylingLogo}>
                             {inventoryName}
-                          </Text> */}
+                          </Text>
                         </View>
                       </View>
 
@@ -3979,16 +4105,18 @@ class ViewReviewOrder extends Component {
                           marginHorizontal: wp('3%'),
                         }}>
                         <View style={styles.insideContainer}>
-                          <View>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                                color: 'black',
-                                marginTop: 10,
-                              }}>
-                              {productName}
-                            </Text>
-                          </View>
+                          {isFreemium === 'false' ? (
+                            <View>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                  color: 'black',
+                                  marginTop: 10,
+                                }}>
+                                {productName}
+                              </Text>
+                            </View>
+                          ) : null}
 
                           <View
                             style={{
@@ -4159,27 +4287,42 @@ class ViewReviewOrder extends Component {
                                 }}>
                                 Delivered Qty.
                               </Text>
-                              <TextInput
-                                placeholder="Delivered Qty."
-                                value={
-                                  modalUserQuantityDelivered &&
-                                  String(modalUserQuantityDelivered)
-                                }
+                              <View
                                 style={{
-                                  width: 80,
-                                  marginTop: 5,
-                                  fontWeight: 'bold',
-                                }}
-                                onChangeText={value =>
-                                  this.setState({
-                                    modalUserQuantityDelivered: value,
-                                    modalQuantityDelivered:
-                                      (value /
-                                        Number(volume * modalQuantityOrdered)) *
-                                      modalQuantityOrdered,
-                                  })
-                                }
-                              />
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                }}>
+                                <TextInput
+                                  placeholder="Delivered Qty."
+                                  value={
+                                    modalUserQuantityDelivered &&
+                                    String(modalUserQuantityDelivered)
+                                  }
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  onChangeText={value =>
+                                    this.setState({
+                                      modalUserQuantityDelivered: value,
+                                      modalQuantityDelivered:
+                                        (value /
+                                          Number(
+                                            volume * modalQuantityOrdered,
+                                          )) *
+                                        modalQuantityOrdered,
+                                    })
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}>
+                                  {finalUnit}
+                                </Text>
+                              </View>
                             </View>
                           </View>
 
@@ -4246,27 +4389,42 @@ class ViewReviewOrder extends Component {
                                 }}>
                                 Invoiced Qty.
                               </Text>
-                              <TextInput
-                                placeholder="Volume"
+                              <View
                                 style={{
-                                  width: 80,
-                                  marginTop: 5,
-                                  fontWeight: 'bold',
-                                }}
-                                value={
-                                  modalUserQuantityInvoiced &&
-                                  String(modalUserQuantityInvoiced)
-                                }
-                                onChangeText={value =>
-                                  this.setState({
-                                    modalUserQuantityInvoiced: value,
-                                    modalQuantityInvoiced:
-                                      (value /
-                                        Number(volume * modalQuantityOrdered)) *
-                                      modalQuantityOrdered,
-                                  })
-                                }
-                              />
+                                  alignItems: 'center',
+                                  flexDirection: 'row',
+                                }}>
+                                <TextInput
+                                  placeholder="Volume"
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  value={
+                                    modalUserQuantityInvoiced &&
+                                    String(modalUserQuantityInvoiced)
+                                  }
+                                  onChangeText={value =>
+                                    this.setState({
+                                      modalUserQuantityInvoiced: value,
+                                      modalQuantityInvoiced:
+                                        (value /
+                                          Number(
+                                            volume * modalQuantityOrdered,
+                                          )) *
+                                        modalQuantityOrdered,
+                                    })
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}>
+                                  {finalUnit}
+                                </Text>
+                              </View>
                             </View>
                           </View>
 
@@ -4321,20 +4479,35 @@ class ViewReviewOrder extends Component {
                                 }}>
                                 Ordered Val. Actual
                               </Text>
-                              <TextInput
-                                placeholder={translate('Order Value Ex-VAT')}
+                              <View
                                 style={{
-                                  width: 80,
-                                  marginTop: 5,
-                                  fontWeight: 'bold',
-                                }}
-                                value={modalPricePaid && String(modalPricePaid)}
-                                onChangeText={value =>
-                                  this.setState({
-                                    modalPricePaid: value,
-                                  })
-                                }
-                              />
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                }}>
+                                <TextInput
+                                  placeholder={translate('Order Value Ex-VAT')}
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  value={
+                                    modalPricePaid && String(modalPricePaid)
+                                  }
+                                  onChangeText={value =>
+                                    this.setState({
+                                      modalPricePaid: value,
+                                    })
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}>
+                                  Є
+                                </Text>
+                              </View>
                             </View>
                           </View>
 

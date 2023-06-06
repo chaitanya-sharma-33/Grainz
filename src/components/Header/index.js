@@ -2,14 +2,58 @@ import React, {Component} from 'react';
 import {View, Text, Image, TouchableOpacity, Switch} from 'react-native';
 import styles from './style';
 import img from '../../constants/images';
+import {getUserLocationApi} from '../../connectivity/api';
+import url from '../../connectivity/Environment.json';
+
+let baseURL = url['STAGING_TWO'].BaseURL;
 
 class index extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      finalLocation: '',
+    };
   }
 
+  componentDidMount() {
+    this.getUserLocationFun();
+  }
+
+  getUserLocationFun = () => {
+    getUserLocationApi()
+      .then(res => {
+        console.log('res-->LOC', res);
+        let finalUsersList = res.data.map((item, index) => {
+          return {
+            label: item.name,
+            value: item.id,
+          };
+        });
+
+        let defaultUser = res.data.map((item, index) => {
+          if (item.isDefault === true) {
+            return item.name;
+          }
+        });
+        let finalData = defaultUser.filter(function (element) {
+          return element !== undefined;
+        });
+        this.setState({
+          locationArr: finalUsersList,
+          finalLocation: finalData[0],
+        });
+      })
+      .catch(err => {
+        console.warn('ERr', err);
+      });
+  };
+
   render() {
+    const {finalLocation} = this.state;
+
+    console.log('FinalLoca', finalLocation);
+    console.log('baseURL', baseURL.includes('uat'));
+
     return (
       <View style={styles.container}>
         <View
@@ -29,11 +73,47 @@ class index extends Component {
             <Image
               source={img.appLogo}
               style={{
-                height: 100,
+                height: 60,
                 width: 150,
                 resizeMode: 'contain',
               }}
             />
+
+            <View
+              style={{
+                justifyContent: 'space-around',
+                flexDirection: 'row',
+              }}>
+              {baseURL.includes('uat') ? (
+                <View
+                  style={{
+                    backgroundColor: '#428855',
+                    padding: 5,
+                    borderRadius: 10,
+                  }}>
+                  <Text
+                    style={{
+                      color: '#fff',
+                    }}>
+                    UAT
+                  </Text>
+                </View>
+              ) : baseURL.includes('dev') ? (
+                <View
+                  style={{
+                    backgroundColor: '#428855',
+                    padding: 5,
+                    borderRadius: 10,
+                  }}>
+                  <Text
+                    style={{
+                      color: '#fff',
+                    }}>
+                    DEV
+                  </Text>
+                </View>
+              ) : null}
+            </View>
           </TouchableOpacity>
           <View
             style={{
@@ -58,6 +138,20 @@ class index extends Component {
                 source={img.profilePhotoIcon}
               />
             </TouchableOpacity>
+            <View
+              style={{
+                backgroundColor: '#428855',
+                padding: 5,
+                borderRadius: 10,
+                marginTop: 12,
+              }}>
+              <Text
+                style={{
+                  color: '#fff',
+                }}>
+                {finalLocation}
+              </Text>
+            </View>
           </View>
         </View>
       </View>

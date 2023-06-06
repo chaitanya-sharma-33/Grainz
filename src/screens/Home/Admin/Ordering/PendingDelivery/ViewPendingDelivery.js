@@ -29,6 +29,8 @@ import {
   processDeliveredDateApi,
   flagApi,
   uploadImageApi,
+  viewCreditNoteApi,
+  updateCreditNoteApi,
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
@@ -77,7 +79,7 @@ class ViewPendingDelivery extends Component {
       modalQuantityInvoiced: '',
       modalUserQuantityInvoiced: '',
       modalPricePaid: '',
-      modalNotes: '',
+      modalNotes: 'Notes',
       modalData: '',
       flagStatus: false,
       initialValueAllCorrect: 'null',
@@ -104,6 +106,7 @@ class ViewPendingDelivery extends Component {
       productCode: '',
       notArrivedStatus: false,
       flagAllStatus: false,
+      isFreemium: '',
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -114,16 +117,21 @@ class ViewPendingDelivery extends Component {
           choiceText: 'N',
         },
       ],
+      creditRequested: '',
+      creditApprovedValue: '',
+      netValue: '',
     };
   }
 
   getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@appToken');
+      const userStatus = await AsyncStorage.getItem('@isFreemium');
       if (value !== null) {
         this.setState(
           {
             token: value,
+            isFreemium: userStatus,
           },
           () => this.getProfileData(),
         );
@@ -217,6 +225,23 @@ class ViewPendingDelivery extends Component {
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
+      });
+  };
+
+  getCreditNote = id => {
+    const {modalPricePaid} = this.state;
+    viewCreditNoteApi(id)
+      .then(res => {
+        const {data} = res;
+        this.setState({
+          creditRequested: data.requestedValue,
+          creditApprovedValue: data.creditValue,
+          netValue: (modalPricePaid - data.creditValue).toFixed(2),
+        });
+        console.log('DATA1212121', data);
+      })
+      .catch(err => {
+        console.warn('ERr', err.response);
       });
   };
 
@@ -721,36 +746,40 @@ class ViewPendingDelivery extends Component {
     console.log('item123123123', item);
     const {finalArrivedDate} = this.state;
     if (finalArrivedDate) {
-      this.setState({
-        modalData: item,
-        modalVisibleEditElement: true,
-        modalOrderedInventoryVolume: item.grainzVolume,
-        modalQuantityOrdered: item.quantityOrdered,
-        modalQuantityDelivered: item.quantityDelivered,
-        modalUserQuantityDelivered: item.userQuantityDelivered,
-        modalQuantityInvoiced: item.quantityInvoiced,
-        priceExpected: item.priceExpected,
-        priceActual: item.priceActual,
-        orderValueExpected: item.orderValueExpected,
-        modalUserQuantityInvoiced: item.userQuantityInvoiced,
-        modalPricePaid: item.orderValue.toFixed(2),
-        modalNotes: item.notes,
-        finalArrivalDateSpecific:
-          item.arrivedDate && moment(item.arrivedDate).format('DD/MM/YYYY'),
-        apiArrivalDateSpecific: moment.utc(item.arrivedDate).format(),
-        volume: item.inventoryMapping
-          ? item.inventoryMapping.volume
-          : item.grainzVolume,
+      this.setState(
+        {
+          modalData: item,
+          modalVisibleEditElement: true,
+          modalOrderedInventoryVolume: item.grainzVolume,
+          modalQuantityOrdered: item.quantityOrdered,
+          modalQuantityDelivered: item.quantityDelivered,
+          modalUserQuantityDelivered: item.userQuantityDelivered,
+          modalQuantityInvoiced: item.quantityInvoiced,
+          priceExpected: item.priceExpected,
+          priceActual: item.priceActual,
+          orderValueExpected: item.orderValueExpected,
+          modalUserQuantityInvoiced: item.userQuantityInvoiced,
+          modalPricePaid: item.orderValue.toFixed(2),
+          modalNotes: item.notes ? item.notes : 'Notes',
+          finalArrivalDateSpecific:
+            item.arrivedDate && moment(item.arrivedDate).format('DD/MM/YYYY'),
+          apiArrivalDateSpecific: moment.utc(item.arrivedDate).format(),
+          volume: item.inventoryMapping
+            ? item.inventoryMapping.volume
+            : item.grainzVolume,
 
-        packSize: item.inventoryMapping
-          ? item.inventoryMapping.packSize
-          : item.packSize,
-        unitPrizeModal: item.unitPrice,
-        inventoryName: item.inventoryName,
-        productName: item.productName,
-        productCode: item.productCode,
-        flagStatus: item.isFlagged,
-      });
+          packSize: item.inventoryMapping
+            ? item.inventoryMapping.packSize
+            : item.packSize,
+          unitPrizeModal: item.unitPrice,
+          inventoryName: item.inventoryName,
+          productName: item.productName,
+          productCode: item.productCode,
+          flagStatus: item.isFlagged,
+          finalUnit: item.unit,
+        },
+        () => this.getCreditNote(item.id),
+      );
     } else {
       alert('Please select arrival date first.');
     }
@@ -775,6 +804,31 @@ class ViewPendingDelivery extends Component {
     );
   };
 
+  updateCreditNoteFun = () => {
+    const {modalNotes, modalData, creditApprovedValue} = this.state;
+    let payload = {};
+    console.log('creditApprovedValue', creditApprovedValue);
+    console.log('modalNotes', modalNotes);
+    console.log('modalData', modalData.id);
+
+    updateCreditNoteApi(modalData.id, creditApprovedValue, modalNotes, payload)
+      .then(res => {
+        console.log('res--> UPDATE CREDIT', res);
+        // this.setState({
+        //   loaderCompStatus: false,
+        //   modalVisibleEditElement: false,
+        // });
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+  };
+
   saveFunInventoryItemSec = () => {
     this.setState(
       {
@@ -783,6 +837,7 @@ class ViewPendingDelivery extends Component {
       () =>
         setTimeout(() => {
           this.saveFunInventoryItemThird();
+          this.updateCreditNoteFun();
         }, 300),
     );
   };
@@ -1211,11 +1266,18 @@ class ViewPendingDelivery extends Component {
   };
 
   deliveryChecklistFun = () => {
-    const {finalArrivedDate} = this.state;
+    const {finalArrivedDate, pageOrderItems} = this.state;
+
+    const sortedList = pageOrderItems.sort((a, b) =>
+      a.productName.localeCompare(b.productName),
+    );
+
+    console.log('sortedList', sortedList);
 
     if (finalArrivedDate) {
       this.setState({
         checklistModalStatus: true,
+        pageOrderItems: sortedList,
       });
     } else {
       alert('Please enter arrived date first.');
@@ -1326,6 +1388,29 @@ class ViewPendingDelivery extends Component {
     );
   };
 
+  changeCreditRequestedFun = value => {
+    const {modalPricePaid} = this.state;
+
+    const finalPrice = parseFloat(modalPricePaid) - parseFloat(value);
+
+    this.setState({
+      creditApprovedValue: value,
+      netValue: finalPrice.toFixed(2),
+    });
+  };
+
+  checkListDetailsFun = (item, index) => {
+    this.setState(
+      {
+        checklistModalStatus: false,
+      },
+      () =>
+        setTimeout(() => {
+          this.showEditModal(item, index);
+        }, 400),
+    );
+  };
+
   render() {
     const {
       chooseImageModalStatus,
@@ -1390,8 +1475,15 @@ class ViewPendingDelivery extends Component {
       orderValueExpected,
       imageShow,
       flagAllStatus,
+      creditRequested,
+      creditApprovedValue,
+      netValue,
+      isFreemium,
+      finalUnit,
     } = this.state;
+    console.log('creditRequested--->', creditRequested);
     console.log('pageOrderItems--->', pageOrderItems);
+
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
 
     return (
@@ -1493,7 +1585,7 @@ class ViewPendingDelivery extends Component {
                         onPress={() =>
                           this.props.navigation.navigate(
                             'PendingOrderDeliveryScreen',
-                            {finalData: finalData},
+                            {finalData: finalData, finalArrivedDate},
                           )
                         }
                         style={{
@@ -2235,7 +2327,7 @@ class ViewPendingDelivery extends Component {
                         console.log('item->MAIN PAGE', item);
                         return (
                           <View key={index}>
-                            <View
+                            {/* <View
                               style={{
                                 position: 'absolute',
                                 flexDirection: 'row',
@@ -2290,7 +2382,7 @@ class ViewPendingDelivery extends Component {
                                   }
                                 />
                               </View>
-                            </View>
+                            </View> */}
                             {item.isFlagged === true ? (
                               <View
                                 style={{
@@ -2332,6 +2424,7 @@ class ViewPendingDelivery extends Component {
                                   }
                                   style={{
                                     flex: 3,
+                                    padding: 10,
                                   }}>
                                   <Text
                                     style={{
@@ -2390,15 +2483,17 @@ class ViewPendingDelivery extends Component {
                                   padding: 10,
                                   backgroundColor: '#fff',
                                 }}>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
-                                  <Text style={{}}>
-                                    {item.inventoryMapping &&
-                                      item.inventoryMapping.productName}
-                                  </Text>
-                                </View>
+                                {isFreemium === 'false' ? (
+                                  <View
+                                    style={{
+                                      flex: 1,
+                                    }}>
+                                    <Text style={{}}>
+                                      {item.inventoryMapping &&
+                                        item.inventoryMapping.productName}
+                                    </Text>
+                                  </View>
+                                ) : null}
                               </View>
                               <View
                                 style={{
@@ -2407,6 +2502,37 @@ class ViewPendingDelivery extends Component {
                                   padding: 10,
                                   backgroundColor: '#fff',
                                 }}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>Order Val.</Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {/* {item.value.toFixed(2)} */}
+                                    {item.orderValue.toFixed(2)} €
+                                  </Text>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    Delivered No.
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {item.displayQuantity.split('=')[0]}
+                                  </Text>
+                                </View>
                                 <View
                                   style={{
                                     flex: 1,
@@ -2424,39 +2550,6 @@ class ViewPendingDelivery extends Component {
                                       item.inventoryMapping.productPrice}{' '}
                                     Є/
                                     {item.inventoryMapping.productUnit}
-                                  </Text>
-                                </View>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
-                                  <Text style={{fontSize: 10}}>
-                                    {translate('Ordered Val')}.
-                                  </Text>
-                                  <Text
-                                    style={{
-                                      marginTop: 10,
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {/* {item.value.toFixed(2)} */}
-                                    {item.orderValue.toFixed(2)} €
-                                  </Text>
-                                </View>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
-                                  <Text style={{fontSize: 10}}>
-                                    {translate('Ordered Qty')}.
-                                  </Text>
-                                  <Text
-                                    style={{
-                                      marginTop: 10,
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {item.displayQuantity}
                                   </Text>
                                 </View>
                               </View>
@@ -2495,9 +2588,13 @@ class ViewPendingDelivery extends Component {
                                     justifyContent: 'center',
                                     flexDirection: 'row',
                                     alignItems: 'center',
-                                    justifyContent: 'space-between',
                                   }}>
-                                  <Text>Checked</Text>
+                                  <Text
+                                    style={{
+                                      marginRight: 10,
+                                    }}>
+                                    Checked
+                                  </Text>
                                   <Switch
                                     thumbColor={'#fff'}
                                     trackColor={{
@@ -3826,6 +3923,7 @@ class ViewPendingDelivery extends Component {
                         </View>
                       </TouchableOpacity>
                       {pageOrderItems.map((item, index) => {
+                        console.log('ITEMMMMMMMMMM', item);
                         return (
                           <View
                             style={{
@@ -3846,22 +3944,29 @@ class ViewPendingDelivery extends Component {
                                   style={{
                                     flex: 4,
                                   }}>
-                                  <Text
-                                    style={{
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                      color: 'black',
-                                    }}>
-                                    {item.inventoryName}
-                                  </Text>
-                                  <Text
-                                    style={{
-                                      fontSize: 12,
-                                      color: 'black',
-                                      marginTop: 10,
-                                    }}>
-                                    {item.productName}
-                                  </Text>
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      this.checkListDetailsFun(item, index)
+                                    }>
+                                    <Text
+                                      style={{
+                                        fontSize: 15,
+                                        fontWeight: 'bold',
+                                        color: 'black',
+                                      }}>
+                                      {item.inventoryName}
+                                    </Text>
+                                  </TouchableOpacity>
+                                  {isFreemium === false ? (
+                                    <Text
+                                      style={{
+                                        fontSize: 15,
+                                        color: 'black',
+                                        marginTop: 10,
+                                      }}>
+                                      {item.productName}
+                                    </Text>
+                                  ) : null}
                                 </View>
                                 <View
                                   style={{
@@ -3882,8 +3987,8 @@ class ViewPendingDelivery extends Component {
                                     <Image
                                       source={img.flagIcon}
                                       style={{
-                                        width: 25,
-                                        height: 25,
+                                        width: 30,
+                                        height: 30,
                                         resizeMode: 'contain',
                                         tintColor:
                                           item.isFlagged === false
@@ -3902,30 +4007,38 @@ class ViewPendingDelivery extends Component {
                                   flex: 1,
                                   marginTop: hp('3%'),
                                 }}>
-                                <View
+                                {/* <View
                                   style={{
                                     flex: 1,
+                                    backgroundColor: '#fff',
+                                    padding: 8,
+                                    borderRadius: 6,
                                   }}>
-                                  {/* <Text
+                                  <Text
                                     style={{
                                       fontSize: 12,
                                     }}>
-                                    Ordered No.
+                                    Delivered Qty.
                                   </Text>
-                                  <Text
-                                    numberOfLines={1}
+                                  <TextInput
+                                    placeholder="Delivered Qty."
+                                    value={String(item.userQuantityDelivered)}
                                     style={{
-                                      fontSize: 13,
+                                      width: 80,
+                                      marginTop: 5,
                                       fontWeight: 'bold',
-                                      marginTop: 10,
-                                    }}>
-                                    {item.quantityOrdered}
-                                  </Text> */}
-                                </View>
-                                <View
-                                  style={{
-                                    flex: 0.3,
-                                  }}></View>
+                                    }}
+                                    onChangeText={value =>
+                                      this.editChecklistFun(
+                                        index,
+                                        'userQuantityDelivered',
+                                        value,
+                                        item,
+                                        'DeliveredQty',
+                                      )
+                                    }
+                                  />
+                                </View> */}
 
                                 <View
                                   style={{
@@ -3933,20 +4046,56 @@ class ViewPendingDelivery extends Component {
                                   }}>
                                   <Text
                                     style={{
-                                      fontSize: 12,
+                                      fontSize: 15,
                                     }}>
-                                    {translate('Ordered Qty')}.
+                                    Ordered No.
                                   </Text>
                                   <Text
                                     numberOfLines={1}
                                     style={{
-                                      fontSize: 13,
+                                      fontSize: 16,
                                       fontWeight: 'bold',
                                       marginTop: 10,
                                     }}>
-                                    {item.grainzVolume * item.quantityOrdered}{' '}
-                                    {item.unit}
+                                    {item.quantityOrdered} {item.unit}
                                   </Text>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 0.3,
+                                  }}></View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    backgroundColor: '#fff',
+                                    padding: 8,
+                                    borderRadius: 6,
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 15,
+                                    }}>
+                                    Delivered No.
+                                  </Text>
+
+                                  <TextInput
+                                    placeholder="Delivered No."
+                                    value={String(item.quantityDelivered)}
+                                    style={{
+                                      width: 80,
+                                      marginTop: 5,
+                                      fontWeight: 'bold',
+                                    }}
+                                    onChangeText={value =>
+                                      this.editChecklistFun(
+                                        index,
+                                        'quantityDelivered',
+                                        value,
+                                        item,
+                                        'DeliveredNo',
+                                      )
+                                    }
+                                  />
                                 </View>
                               </View>
 
@@ -3957,7 +4106,7 @@ class ViewPendingDelivery extends Component {
                                   flex: 1,
                                   marginTop: hp('2%'),
                                 }}>
-                                <View
+                                {/* <View
                                   style={{
                                     flex: 1,
                                     backgroundColor: '#fff',
@@ -3989,7 +4138,7 @@ class ViewPendingDelivery extends Component {
                                       )
                                     }
                                   />
-                                </View>
+                                </View> */}
 
                                 <View
                                   style={{
@@ -3999,11 +4148,10 @@ class ViewPendingDelivery extends Component {
                                 <View
                                   style={{
                                     flex: 1,
-                                    backgroundColor: '#fff',
                                     padding: 8,
                                     borderRadius: 6,
                                   }}>
-                                  <Text
+                                  {/* <Text
                                     style={{
                                       fontSize: 12,
                                     }}>
@@ -4027,7 +4175,7 @@ class ViewPendingDelivery extends Component {
                                         'DeliveredQty',
                                       )
                                     }
-                                  />
+                                  /> */}
                                 </View>
                               </View>
                             </View>
@@ -4242,16 +4390,18 @@ class ViewPendingDelivery extends Component {
                           marginHorizontal: wp('3%'),
                         }}>
                         <View style={styles.insideContainer}>
-                          <View>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                                color: 'black',
-                                marginTop: 10,
-                              }}>
-                              {productName}
-                            </Text>
-                          </View>
+                          {isFreemium === 'false' ? (
+                            <View>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                  color: 'black',
+                                  marginTop: 10,
+                                }}>
+                                {productName}
+                              </Text>
+                            </View>
+                          ) : null}
 
                           <View
                             style={{
@@ -4422,27 +4572,42 @@ class ViewPendingDelivery extends Component {
                                 }}>
                                 Delivered Qty.
                               </Text>
-                              <TextInput
-                                placeholder="Delivered Qty."
-                                value={
-                                  modalUserQuantityDelivered &&
-                                  String(modalUserQuantityDelivered)
-                                }
+                              <View
                                 style={{
-                                  width: 80,
-                                  marginTop: 5,
-                                  fontWeight: 'bold',
-                                }}
-                                onChangeText={value =>
-                                  this.setState({
-                                    modalUserQuantityDelivered: value,
-                                    modalQuantityDelivered:
-                                      (value /
-                                        Number(volume * modalQuantityOrdered)) *
-                                      modalQuantityOrdered,
-                                  })
-                                }
-                              />
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                }}>
+                                <TextInput
+                                  placeholder="Delivered Qty."
+                                  value={
+                                    modalUserQuantityDelivered &&
+                                    String(modalUserQuantityDelivered)
+                                  }
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  onChangeText={value =>
+                                    this.setState({
+                                      modalUserQuantityDelivered: value,
+                                      modalQuantityDelivered:
+                                        (value /
+                                          Number(
+                                            volume * modalQuantityOrdered,
+                                          )) *
+                                        modalQuantityOrdered,
+                                    })
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}>
+                                  {finalUnit}
+                                </Text>
+                              </View>
                             </View>
                           </View>
 
@@ -4509,27 +4674,42 @@ class ViewPendingDelivery extends Component {
                                 }}>
                                 Invoiced Qty.
                               </Text>
-                              <TextInput
-                                placeholder="Volume"
+                              <View
                                 style={{
-                                  width: 80,
-                                  marginTop: 5,
-                                  fontWeight: 'bold',
-                                }}
-                                value={
-                                  modalUserQuantityInvoiced &&
-                                  String(modalUserQuantityInvoiced)
-                                }
-                                onChangeText={value =>
-                                  this.setState({
-                                    modalUserQuantityInvoiced: value,
-                                    modalQuantityInvoiced:
-                                      (value /
-                                        Number(volume * modalQuantityOrdered)) *
-                                      modalQuantityOrdered,
-                                  })
-                                }
-                              />
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                }}>
+                                <TextInput
+                                  placeholder="Volume"
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  value={
+                                    modalUserQuantityInvoiced &&
+                                    String(modalUserQuantityInvoiced)
+                                  }
+                                  onChangeText={value =>
+                                    this.setState({
+                                      modalUserQuantityInvoiced: value,
+                                      modalQuantityInvoiced:
+                                        (value /
+                                          Number(
+                                            volume * modalQuantityOrdered,
+                                          )) *
+                                        modalQuantityOrdered,
+                                    })
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}>
+                                  {finalUnit}
+                                </Text>
+                              </View>
                             </View>
                           </View>
 
@@ -4584,23 +4764,35 @@ class ViewPendingDelivery extends Component {
                                 }}>
                                 Ordered Val. Actual
                               </Text>
-                              <TextInput
-                                placeholder={translate('Order Value Ex-VAT')}
+                              <View
                                 style={{
-                                  width: 80,
-                                  marginTop: 5,
-                                  fontWeight: 'bold',
-                                }}
-                                value={
-                                  modalPricePaid &&
-                                  String(modalPricePaid) + ' € '
-                                }
-                                onChangeText={value =>
-                                  this.setState({
-                                    modalPricePaid: value,
-                                  })
-                                }
-                              />
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                }}>
+                                <TextInput
+                                  placeholder={translate('Order Value Ex-VAT')}
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  value={
+                                    modalPricePaid && String(modalPricePaid)
+                                  }
+                                  onChangeText={value =>
+                                    this.setState({
+                                      modalPricePaid: value,
+                                    })
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    fontWeight: 'bold',
+                                    marginTop: 5,
+                                  }}>
+                                  €
+                                </Text>
+                              </View>
                             </View>
                           </View>
 
@@ -4660,6 +4852,159 @@ class ViewPendingDelivery extends Component {
                                 }}
                                 value={priceActual && String(priceActual)}
                                 editable={false}
+                              />
+                            </View>
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('2%'),
+                            }}>
+                            <View
+                              style={{
+                                flex: 1,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Credit Requested
+                              </Text>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                }}>
+                                <TextInput
+                                  placeholder="Credit Requested"
+                                  keyboardType="numeric"
+                                  style={{
+                                    width: 80,
+                                    fontWeight: 'bold',
+                                    marginTop: 5,
+                                  }}
+                                  value={String(creditRequested)}
+                                  editable={false}
+                                />
+                                <Text
+                                  style={{
+                                    fontWeight: 'bold',
+                                    marginTop: 5,
+                                  }}>
+                                  €
+                                </Text>
+                              </View>
+                            </View>
+
+                            <View
+                              style={{
+                                flex: 0.3,
+                              }}></View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#fff',
+                                padding: 5,
+                                borderRadius: 6,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Credit Approved Value
+                              </Text>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                }}>
+                                <TextInput
+                                  placeholder="Credit Approved Value"
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  value={String(creditApprovedValue)}
+                                  onChangeText={value =>
+                                    this.changeCreditRequestedFun(value)
+                                  }
+                                />
+                                <Text
+                                  style={{
+                                    fontWeight: 'bold',
+                                    marginTop: 5,
+                                  }}>
+                                  €
+                                </Text>
+                              </View>
+                            </View>
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              flex: 1,
+                              marginTop: hp('2%'),
+                              borderBottomWidth: 0.5,
+                              borderBottomColor: 'grey',
+                              paddingBottom: 15,
+                            }}>
+                            <View
+                              style={{
+                                flex: 1,
+                                padding: 5,
+                              }}>
+                              {/* <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Price Expected
+                              </Text>
+                              <TextInput
+                                placeholder="Price Expected"
+                                style={{
+                                  width: 80,
+                                  fontWeight: 'bold',
+                                  marginTop: 5,
+                                }}
+                                value={priceExpected && String(priceExpected)}
+                                editable={false}
+                              /> */}
+                            </View>
+
+                            <View
+                              style={{
+                                flex: 0.3,
+                              }}></View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                                // backgroundColor: '#fff',
+                                // padding: 5,
+                                // borderRadius: 6,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Net Value
+                              </Text>
+                              <TextInput
+                                placeholder="Net Value"
+                                editable={false}
+                                style={{
+                                  width: 80,
+                                  marginTop: 5,
+                                  fontWeight: 'bold',
+                                }}
+                                value={netValue && String(netValue) + ' Є '}
                               />
                             </View>
                           </View>

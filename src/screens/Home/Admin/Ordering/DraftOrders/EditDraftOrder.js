@@ -1882,7 +1882,7 @@ class EditDraftOrder extends Component {
                         borderRadius: 6,
                         borderColor: 'grey',
                       }}>
-                      <View
+                      {/* <View
                         style={{
                           position: 'absolute',
                           flexDirection: 'row',
@@ -1935,7 +1935,7 @@ class EditDraftOrder extends Component {
                             }
                           />
                         </View>
-                      </View>
+                      </View> */}
                       <View
                         style={{
                           flexDirection: 'row',
@@ -2039,8 +2039,8 @@ class EditDraftOrder extends Component {
                               )
                             }
                             style={{
-                              width: wp('10%'),
-                              height: hp('5%'),
+                              width: wp('18%'),
+                              height: hp('8%'),
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}>
@@ -2056,7 +2056,7 @@ class EditDraftOrder extends Component {
 
                           <View
                             style={{
-                              width: wp('15%'),
+                              width: wp('20%'),
                               backgroundColor: '#fff',
                               alignItems: 'center',
                             }}>
@@ -2066,8 +2066,9 @@ class EditDraftOrder extends Component {
                               style={{
                                 borderRadius: 6,
                                 padding: 10,
-                                width: wp('8%'),
+                                width: wp('20%'),
                                 color: 'black',
+                                height: hp('5%'),
                               }}
                               onChangeText={value =>
                                 this.editQuantityFun(
@@ -2091,8 +2092,8 @@ class EditDraftOrder extends Component {
                               )
                             }
                             style={{
-                              width: wp('10%'),
-                              height: hp('5%'),
+                              width: wp('18%'),
+                              height: hp('8%'),
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}>
