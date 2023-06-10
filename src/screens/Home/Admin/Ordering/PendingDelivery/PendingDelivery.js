@@ -1072,6 +1072,7 @@ class PendingDelivery extends Component {
                     <View>
                       {deliveryPendingData && deliveryPendingData.length > 0
                         ? deliveryPendingData.map((item, index) => {
+                            console.log('item', item);
                             return (
                               <View
                                 style={{

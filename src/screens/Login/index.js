@@ -47,23 +47,27 @@ class index extends Component {
   }
 
   async componentDidMount() {
-    // const rememberMe = await AsyncStorage.getItem('RememberMe');
-    // const rememberEmail = await AsyncStorage.getItem('email');
-    // const rememberPass = await AsyncStorage.getItem('password');
+    const rememberMe = await AsyncStorage.getItem('RememberMe');
+    const rememberEmail = await AsyncStorage.getItem('email');
+    const rememberPass = await AsyncStorage.getItem('password');
 
-    // if (rememberMe != null && rememberMe != undefined && rememberMe == 'true') {
-    //   this.setState({
-    //     switchValueRemember: rememberMe,
-    //     email: rememberEmail,
-    //     password: rememberPass,
-    //   });
-    // } else {
-    //   this.setState({
-    //     switchValueRemember: false,
-    //     email: '',
-    //     password: '',
-    //   });
-    // }
+    console.log('rememberMe', rememberMe);
+    console.log('rememberEmail', rememberEmail);
+    console.log('rememberPass', rememberPass);
+
+    if (rememberMe != null && rememberMe != undefined && rememberMe == 'true') {
+      this.setState({
+        switchValueRemember: rememberMe,
+        email: rememberEmail,
+        password: rememberPass,
+      });
+    } else {
+      this.setState({
+        switchValueRemember: false,
+        email: '',
+        password: '',
+      });
+    }
     setI18nConfig();
 
     const lang = await AsyncStorage.getItem('Language');
@@ -132,18 +136,19 @@ class index extends Component {
         grant_type: 'password',
       };
 
-      // if (switchValueRemember === true) {
-      //   await AsyncStorage.setItem('RememberMe', 'true');
-      //   await AsyncStorage.setItem('email', email);
-      //   await AsyncStorage.setItem('password', password);
-      // } else {
-      //   this.setState(
-      //     {
-      //       switchValueRemember: false,
-      //     },
-      //     await AsyncStorage.setItem('RememberMe', 'false'),
-      //   );
-      // }
+      if (switchValueRemember === true) {
+        console.log('switchValueRemember', switchValueRemember);
+        await AsyncStorage.setItem('RememberMe', 'true');
+        await AsyncStorage.setItem('email', email);
+        await AsyncStorage.setItem('password', password);
+      } else {
+        this.setState(
+          {
+            switchValueRemember: false,
+          },
+          await AsyncStorage.setItem('RememberMe', 'false'),
+        );
+      }
 
       console.log('payload', payload);
 
@@ -193,9 +198,9 @@ class index extends Component {
     );
   };
 
-  rememberMeFun = value => {
+  rememberMeFun = () => {
     this.setState({
-      switchValueRemember: value,
+      switchValueRemember: !this.state.switchValueRemember,
     });
   };
 
@@ -241,7 +246,7 @@ class index extends Component {
       forgetPassModal,
       resetEmail,
     } = this.state;
-    // console.log('switchValueRemember', switchValueRemember);
+    console.log('switchValueRemember', switchValueRemember);
     return (
       <View style={styles.container}>
         <KeyboardAwareScrollView
@@ -386,11 +391,14 @@ class index extends Component {
                   />
                   <Text style={styles.langStyling}>Français</Text>
                 </View> */}
-                <View style={{flexDirection: 'row', marginTop: 15}}>
+                <TouchableOpacity
+                  style={{flexDirection: 'row', marginTop: 15}}
+                  onPress={() => this.rememberMeFun()}>
                   <View>
                     <CheckBox
                       value={switchValueRemember}
-                      onValueChange={value => this.rememberMeFun(value)}
+                      disabled={true}
+                      // onValueChange={value => this.rememberMeFun(value)}
                       style={{
                         height: 18,
                         width: 18,
@@ -423,7 +431,7 @@ class index extends Component {
                     }}>
                     {translate('Remember me')}
                   </Text>
-                </View>
+                </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => this.signInFun()}
                   style={styles.signInStyling}>

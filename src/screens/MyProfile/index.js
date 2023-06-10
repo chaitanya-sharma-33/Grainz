@@ -479,7 +479,7 @@ class index extends Component {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     flex: 3,
-                    height: hp('6%'),
+                    height: hp('5%'),
                     alignSelf: 'center',
                   }}>
                   <View
@@ -504,6 +504,7 @@ class index extends Component {
                           width: '100%',
                           alignSelf: 'center',
                           fontWeight: 'bold',
+                          paddingVertical: 10,
                         },
                         inputAndroid: {
                           fontSize: 14,
@@ -520,17 +521,21 @@ class index extends Component {
                       items={locationArr}
                       value={finalLocation}
                       useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
-                  <View style={{marginRight: wp('5%')}}>
-                    <Image
-                      source={img.arrowDownIcon}
-                      resizeMode="contain"
-                      style={{
-                        height: 16,
-                        width: 16,
-                        resizeMode: 'contain',
-                        marginTop: Platform.OS === 'ios' ? 13 : 13,
+                      Icon={() => {
+                        return (
+                          <View style={{marginRight: wp('5%')}}>
+                            <Image
+                              source={img.arrowDownIcon}
+                              resizeMode="contain"
+                              style={{
+                                height: 16,
+                                width: 16,
+                                resizeMode: 'contain',
+                                position: 'absolute',
+                              }}
+                            />
+                          </View>
+                        );
                       }}
                     />
                   </View>
@@ -582,6 +587,7 @@ class index extends Component {
                           width: '100%',
                           alignSelf: 'center',
                           fontWeight: 'bold',
+                          paddingVertical: 10,
                         },
                         inputAndroid: {
                           fontSize: 14,
@@ -598,17 +604,21 @@ class index extends Component {
                       items={languageArr}
                       value={finalLang}
                       useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
-                  <View style={{marginRight: wp('5%')}}>
-                    <Image
-                      source={img.arrowDownIcon}
-                      resizeMode="contain"
-                      style={{
-                        height: 16,
-                        width: 16,
-                        resizeMode: 'contain',
-                        marginTop: Platform.OS === 'ios' ? 13 : 13,
+                      Icon={() => {
+                        return (
+                          <View style={{marginRight: wp('5%')}}>
+                            <Image
+                              source={img.arrowDownIcon}
+                              resizeMode="contain"
+                              style={{
+                                height: 16,
+                                width: 16,
+                                resizeMode: 'contain',
+                                position: 'absolute',
+                              }}
+                            />
+                          </View>
+                        );
                       }}
                     />
                   </View>

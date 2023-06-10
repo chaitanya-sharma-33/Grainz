@@ -22,7 +22,7 @@ class index extends Component {
   getUserLocationFun = () => {
     getUserLocationApi()
       .then(res => {
-        console.log('res-->LOC', res);
+        // console.log('res-->LOC', res);
         let finalUsersList = res.data.map((item, index) => {
           return {
             label: item.name,
@@ -51,8 +51,8 @@ class index extends Component {
   render() {
     const {finalLocation} = this.state;
 
-    console.log('FinalLoca', finalLocation);
-    console.log('baseURL', baseURL.includes('uat'));
+    // console.log('FinalLoca', finalLocation);
+    // console.log('baseURL', baseURL.includes('uat'));
 
     return (
       <View style={styles.container}>

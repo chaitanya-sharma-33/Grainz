@@ -193,7 +193,10 @@ class ViewPendingDelivery extends Component {
     getOrderByIdApi(productId)
       .then(res => {
         const {data} = res;
-        console.log('data----->', data);
+        const sortedList = data.orderItems.sort((a, b) =>
+          a.productName.localeCompare(b.inventoryName),
+        );
+        // console.log('data----->', data);
         this.setState(
           {
             pageData: data,
@@ -205,7 +208,7 @@ class ViewPendingDelivery extends Component {
             pageFrozenTemp: data.frozenTemp,
             pageNotes: data.notes,
             apiDeliveryDate: data.deliveryDate,
-            pageOrderItems: data.orderItems,
+            pageOrderItems: sortedList,
             apiArrivalDate: data.deliveredDate,
             emailDetails: data.emailDetails,
             finalArrivedDate:
@@ -238,7 +241,7 @@ class ViewPendingDelivery extends Component {
           creditApprovedValue: data.creditValue,
           netValue: (modalPricePaid - data.creditValue).toFixed(2),
         });
-        console.log('DATA1212121', data);
+        // console.log('DATA1212121', data);
       })
       .catch(err => {
         console.warn('ERr', err.response);
@@ -294,7 +297,7 @@ class ViewPendingDelivery extends Component {
         return item.isFlagged === false;
       });
 
-      console.log('finalStatus-->FLAG', finalStatus);
+      // console.log('finalStatus-->FLAG', finalStatus);
       this.setState({
         isCheckedEditableStatus: finalStatus,
         loaderCompStatus: false,
@@ -306,7 +309,7 @@ class ViewPendingDelivery extends Component {
         return item.isCorrect === false;
       });
 
-      console.log('finalStatus--> SWITCH', finalStatus);
+      // console.log('finalStatus--> SWITCH', finalStatus);
       this.setState({
         isCheckedEditableStatus: finalStatus,
         loaderCompStatus: false,
@@ -362,11 +365,11 @@ class ViewPendingDelivery extends Component {
       isChecked: false,
     };
 
-    console.log('PAYLOAD----->PROCESS ORDER', payload);
+    // console.log('PAYLOAD----->PROCESS ORDER', payload);
 
     processPendingOrderApi(payload)
       .then(res => {
-        console.log('RES-PROCESS ORDER', res);
+        // console.log('RES-PROCESS ORDER', res);
         this.setState(
           {
             loaderCompStatus: false,
@@ -574,7 +577,7 @@ class ViewPendingDelivery extends Component {
       userQuantityInvoiced: item.userQuantityInvoiced,
     };
 
-    console.log('payload', payload);
+    // console.log('payload', payload);
     if (item.arrivedDate) {
       processPendingOrderItemApi(payload)
         .then(res => {
@@ -743,7 +746,7 @@ class ViewPendingDelivery extends Component {
   };
 
   showEditModal = (item, index) => {
-    console.log('item123123123', item);
+    // console.log('item123123123', item);
     const {finalArrivedDate} = this.state;
     if (finalArrivedDate) {
       this.setState(
@@ -807,13 +810,13 @@ class ViewPendingDelivery extends Component {
   updateCreditNoteFun = () => {
     const {modalNotes, modalData, creditApprovedValue} = this.state;
     let payload = {};
-    console.log('creditApprovedValue', creditApprovedValue);
-    console.log('modalNotes', modalNotes);
-    console.log('modalData', modalData.id);
+    // console.log('creditApprovedValue', creditApprovedValue);
+    // console.log('modalNotes', modalNotes);
+    // console.log('modalData', modalData.id);
 
     updateCreditNoteApi(modalData.id, creditApprovedValue, modalNotes, payload)
       .then(res => {
-        console.log('res--> UPDATE CREDIT', res);
+        // console.log('res--> UPDATE CREDIT', res);
         // this.setState({
         //   loaderCompStatus: false,
         //   modalVisibleEditElement: false,
@@ -874,7 +877,7 @@ class ViewPendingDelivery extends Component {
       userQuantityDelivered: Number(modalUserQuantityDelivered),
       userQuantityInvoiced: Number(modalUserQuantityInvoiced),
     };
-    console.log('payload', payload);
+    // console.log('payload', payload);
     processPendingOrderItemApi(payload)
       .then(res => {
         this.setState(
@@ -940,7 +943,7 @@ class ViewPendingDelivery extends Component {
             includeBase64: true,
             cropping: true,
           }).then(image => {
-            console.log('image-FINAL', image);
+            // console.log('image-FINAL', image);
 
             const finalImageData = {
               action: 'New',
@@ -952,7 +955,7 @@ class ViewPendingDelivery extends Component {
               type: 'png',
             };
 
-            console.log('image-finalImageData', finalImageData);
+            // console.log('image-finalImageData', finalImageData);
 
             // const finalImageData = image.map((item, index) => {
             //   console.log('itemImage', item);
@@ -1127,7 +1130,7 @@ class ViewPendingDelivery extends Component {
       pageData.deliveryDate,
     )
       .then(res => {
-        console.log('res-ARIIVED-DATE', res);
+        // console.log('res-ARIIVED-DATE', res);
         this.setState(
           {
             loaderCompStatus: false,
@@ -1151,7 +1154,7 @@ class ViewPendingDelivery extends Component {
 
     flagApi(payload, item.id, flagStatus)
       .then(res => {
-        console.log('res-FLAGGG', res);
+        // console.log('res-FLAGGG', res);
         this.setState(
           {
             loaderCompStatus: false,
@@ -1171,7 +1174,7 @@ class ViewPendingDelivery extends Component {
 
   flagFunction = () => {
     const {flagStatus} = this.state;
-    console.log('fla', flagStatus);
+    // console.log('fla', flagStatus);
     this.setState(
       {
         flagStatus: !flagStatus,
@@ -1185,7 +1188,7 @@ class ViewPendingDelivery extends Component {
     let payload = {};
     flagApi(payload, modalData.id, flagStatus)
       .then(res => {
-        console.log('res-FLAGGG', res);
+        // console.log('res-FLAGGG', res);
         this.setState(
           {
             loaderCompStatus: false,
@@ -1206,7 +1209,7 @@ class ViewPendingDelivery extends Component {
   editChecklistFun = (index, type, value, data, valueType) => {
     const {pageOrderItems} = this.state;
 
-    console.log('data', data);
+    // console.log('data', data);
 
     const finalValue = value;
     const volume = data.inventoryMapping && data.inventoryMapping.volume;
@@ -1216,7 +1219,7 @@ class ViewPendingDelivery extends Component {
     const finalValueThird =
       (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered;
 
-    console.log('finalValue', finalValue);
+    // console.log('finalValue', finalValue);
 
     if (valueType === 'DeliveredNo') {
       let newArr = pageOrderItems.map((item, i) =>
@@ -1266,13 +1269,14 @@ class ViewPendingDelivery extends Component {
   };
 
   deliveryChecklistFun = () => {
+    // console.log('SORTED');
     const {finalArrivedDate, pageOrderItems} = this.state;
 
     const sortedList = pageOrderItems.sort((a, b) =>
       a.productName.localeCompare(b.productName),
     );
 
-    console.log('sortedList', sortedList);
+    // console.log('sortedList', sortedList);
 
     if (finalArrivedDate) {
       this.setState({
@@ -1313,7 +1317,7 @@ class ViewPendingDelivery extends Component {
   editStatusFlagFun = value => {
     const {pageOrderItems, flagAllStatus} = this.state;
 
-    console.log('flagAllStatus', flagAllStatus);
+    // console.log('flagAllStatus', flagAllStatus);
 
     const index = 0;
 
@@ -1353,7 +1357,7 @@ class ViewPendingDelivery extends Component {
     };
     uploadImageApi(payload)
       .then(res => {
-        console.log('RES-PROCESS ORDER', res);
+        // console.log('RES-PROCESS ORDER', res);
         this.setState(
           {
             loaderCompStatus: false,
@@ -1481,7 +1485,7 @@ class ViewPendingDelivery extends Component {
       isFreemium,
       finalUnit,
     } = this.state;
-    console.log('creditRequested--->', creditRequested);
+    // console.log('creditRequested--->', creditRequested);
     console.log('pageOrderItems--->', pageOrderItems);
 
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
@@ -3923,7 +3927,7 @@ class ViewPendingDelivery extends Component {
                         </View>
                       </TouchableOpacity>
                       {pageOrderItems.map((item, index) => {
-                        console.log('ITEMMMMMMMMMM', item);
+                        // console.log('ITEMMMMMMMMMM', item);
                         return (
                           <View
                             style={{

@@ -2633,12 +2633,12 @@ class Basket extends Component {
                           }}
                         />
                       </View>
-                      {/* <View style={{marginLeft: 10}}>
+                      <View style={{marginLeft: 10}}>
                         <Text style={styles.textStylingLogo}>
                           {lineData.inventoryMapping &&
                             lineData.inventoryMapping.inventoryName}
                         </Text>
-                      </View> */}
+                      </View>
                     </TouchableOpacity>
                     <View>
                       <View style={styles.insideContainer}>

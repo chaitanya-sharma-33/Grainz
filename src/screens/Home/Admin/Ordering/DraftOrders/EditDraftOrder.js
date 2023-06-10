@@ -2927,10 +2927,10 @@ class EditDraftOrder extends Component {
                         />
                       </View>
                       <View style={{marginLeft: 10}}>
-                        {/* <Text style={styles.textStylingLogo}>
+                        <Text style={styles.textStylingLogo}>
                           {lineData.inventoryMapping &&
                             lineData.inventoryMapping.inventoryName}
-                        </Text> */}
+                        </Text>
                       </View>
                     </TouchableOpacity>
                     <View>

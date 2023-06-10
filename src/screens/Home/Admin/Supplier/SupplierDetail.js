@@ -24,6 +24,7 @@ import {translate, setI18nConfig} from '../../../../utils/translations';
 import styles from './style';
 import RNPickerSelect from 'react-native-picker-select';
 import SurePopUp from '../../../../components/SurePopUp';
+import call from 'react-native-phone-call';
 
 class SupplierDetail extends Component {
   constructor(props) {
@@ -109,6 +110,18 @@ class SupplierDetail extends Component {
         }),
       2000,
     );
+  };
+
+  callSupplierFun = () => {
+    const {supplierData} = this.state;
+    console.log('supplierData', supplierData);
+    const args = {
+      number: supplierData.telephone, // String value with the number to call
+      prompt: false, // Optional boolean property. Determines if the user should be prompted prior to the call
+      skipCanOpen: true, // Skip the canOpenURL check
+    };
+
+    call(args).catch(console.error);
   };
 
   render() {
@@ -226,7 +239,8 @@ class SupplierDetail extends Component {
                   }}
                   editable={false}
                 />
-                <View
+                <TouchableOpacity
+                  onPress={() => this.callSupplierFun()}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -240,7 +254,18 @@ class SupplierDetail extends Component {
                       tintColor: '#5197C1',
                     }}
                   />
-                  <TextInput
+                  <Text
+                    style={{
+                      paddingVertical: 10,
+                      fontWeight: 'bold',
+                      color: 'black',
+                      marginLeft: 10,
+                      color: '#5197C1',
+                      textDecorationLine: 'underline',
+                    }}>
+                    {supplierData.telephone}
+                  </Text>
+                  {/* <TextInput
                     value={supplierData.telephone}
                     placeholder={translate('Last name')}
                     style={{
@@ -252,9 +277,9 @@ class SupplierDetail extends Component {
                       textDecorationLine: 'underline',
                     }}
                     editable={false}
-                  />
-                </View>
-                <View
+                  /> */}
+                </TouchableOpacity>
+                {/* <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -280,7 +305,7 @@ class SupplierDetail extends Component {
                     }}
                     editable={false}
                   />
-                </View>
+                </View> */}
               </View>
 
               <View
