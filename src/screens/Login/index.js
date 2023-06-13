@@ -47,26 +47,32 @@ class index extends Component {
   }
 
   async componentDidMount() {
-    const rememberMe = await AsyncStorage.getItem('RememberMe');
-    const rememberEmail = await AsyncStorage.getItem('email');
-    const rememberPass = await AsyncStorage.getItem('password');
+    const rememberMe = await AsyncStorage.getItem('@rememberMe');
+    const rememberEmail = await AsyncStorage.getItem('@email');
+    const rememberPass = await AsyncStorage.getItem('@password');
 
-    console.log('rememberMe', rememberMe);
-    console.log('rememberEmail', rememberEmail);
-    console.log('rememberPass', rememberPass);
+    console.log('rememberMe-2', rememberMe);
+    console.log('rememberEmail-3', rememberEmail);
+    console.log('rememberPass-4', rememberPass);
 
     if (rememberMe != null && rememberMe != undefined && rememberMe == 'true') {
+      console.log('FIRST-5');
       this.setState({
         switchValueRemember: rememberMe,
         email: rememberEmail,
         password: rememberPass,
       });
     } else {
-      this.setState({
-        switchValueRemember: false,
-        email: '',
-        password: '',
-      });
+      console.log('SEC-6');
+
+      this.setState(
+        {
+          switchValueRemember: false,
+          email: '',
+          password: '',
+        },
+        () => this.removeStorageFun(),
+      );
     }
     setI18nConfig();
 
@@ -91,6 +97,12 @@ class index extends Component {
       setI18nConfig();
     }
   }
+
+  removeStorageFun = async () => {
+    await AsyncStorage.removeItem('@rememberMe');
+    await AsyncStorage.removeItem('@email');
+    await AsyncStorage.removeItem('@password');
+  };
 
   verification = () => {
     let emailError = '';
@@ -138,15 +150,15 @@ class index extends Component {
 
       if (switchValueRemember === true) {
         console.log('switchValueRemember', switchValueRemember);
-        await AsyncStorage.setItem('RememberMe', 'true');
-        await AsyncStorage.setItem('email', email);
-        await AsyncStorage.setItem('password', password);
+        await AsyncStorage.setItem('@rememberMe', 'true');
+        await AsyncStorage.setItem('@email', email);
+        await AsyncStorage.setItem('@password', password);
       } else {
         this.setState(
           {
             switchValueRemember: false,
           },
-          await AsyncStorage.setItem('RememberMe', 'false'),
+          await AsyncStorage.setItem('@rememberMe', 'false'),
         );
       }
 
@@ -246,7 +258,7 @@ class index extends Component {
       forgetPassModal,
       resetEmail,
     } = this.state;
-    console.log('switchValueRemember', switchValueRemember);
+    console.log('switchValueRemember-1', switchValueRemember);
     return (
       <View style={styles.container}>
         <KeyboardAwareScrollView

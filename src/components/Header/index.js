@@ -4,6 +4,7 @@ import styles from './style';
 import img from '../../constants/images';
 import {getUserLocationApi} from '../../connectivity/api';
 import url from '../../connectivity/Environment.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let baseURL = url['STAGING_TWO'].BaseURL;
 
@@ -15,14 +16,22 @@ class index extends Component {
     };
   }
 
-  componentDidMount() {
-    this.getUserLocationFun();
+  async componentDidMount() {
+    const location = await AsyncStorage.getItem('@locationName');
+    if (location) {
+      this.setState({
+        finalLocation: location,
+      });
+      console.log('LOCATION', location);
+    } else {
+      this.getUserLocationFun();
+    }
   }
 
   getUserLocationFun = () => {
     getUserLocationApi()
       .then(res => {
-        // console.log('res-->LOC', res);
+        console.log('res-->LOC', res);
         let finalUsersList = res.data.map((item, index) => {
           return {
             label: item.name,
@@ -149,7 +158,9 @@ class index extends Component {
                 style={{
                   color: '#fff',
                 }}>
-                {finalLocation}
+                {this.props.finalLocation
+                  ? this.props.finalLocation
+                  : finalLocation}
               </Text>
             </View>
           </View>

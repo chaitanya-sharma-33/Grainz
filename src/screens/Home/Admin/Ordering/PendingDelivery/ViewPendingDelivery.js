@@ -107,6 +107,7 @@ class ViewPendingDelivery extends Component {
       notArrivedStatus: false,
       flagAllStatus: false,
       isFreemium: '',
+      deliveryChecklistStatus: false,
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -365,7 +366,7 @@ class ViewPendingDelivery extends Component {
       isChecked: false,
     };
 
-    // console.log('PAYLOAD----->PROCESS ORDER', payload);
+    console.log('PAYLOAD----->PROCESS ORDER', payload);
 
     processPendingOrderApi(payload)
       .then(res => {
@@ -1282,6 +1283,7 @@ class ViewPendingDelivery extends Component {
       this.setState({
         checklistModalStatus: true,
         pageOrderItems: sortedList,
+        deliveryChecklistStatus: true
       });
     } else {
       alert('Please enter arrived date first.');
@@ -1415,6 +1417,24 @@ class ViewPendingDelivery extends Component {
     );
   };
 
+  arrivedDateUpdateFun = () => {
+    Alert.alert(`Grainz`, 'Cancel date or select date', [
+      {
+        text: 'Cancel',
+        onPress: () =>
+          this.setState({
+            finalArrivedDate: '',
+            finalArrivalDateSpecific: '',
+            apiArrivalDate: '',
+          }),
+      },
+      {
+        text: 'Select Date',
+        onPress: () => this.showDatePickerFunArrived(),
+      },
+    ]);
+  };
+
   render() {
     const {
       chooseImageModalStatus,
@@ -1538,7 +1558,7 @@ class ViewPendingDelivery extends Component {
                         borderTopLeftRadius: 6,
                       }}>
                       <TouchableOpacity
-                        onPress={() => this.showDatePickerFunArrived()}>
+                        onPress={() => this.arrivedDateUpdateFun()}>
                         <View style={{}}>
                           <Text
                             style={{
@@ -1589,7 +1609,11 @@ class ViewPendingDelivery extends Component {
                         onPress={() =>
                           this.props.navigation.navigate(
                             'PendingOrderDeliveryScreen',
-                            {finalData: finalData, finalArrivedDate},
+                            {
+                              finalData: finalData,
+                              finalArrivedDate,
+                              pageOrderItems,
+                            },
                           )
                         }
                         style={{
@@ -2439,6 +2463,27 @@ class ViewPendingDelivery extends Component {
                                       item.inventoryMapping.inventoryName}
                                   </Text>
                                 </TouchableOpacity>
+
+                                {item.hasCreditNote > 0 ? (
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      this.showEditModal(item, index)
+                                    }
+                                    style={{
+                                      flex: 1,
+                                      alignItems: 'center',
+                                    }}>
+                                    <Image
+                                      source={img.envolopeIcon}
+                                      style={{
+                                        width: 18,
+                                        height: 18,
+                                        resizeMode: 'contain',
+                                        tintColor: 'black',
+                                      }}
+                                    />
+                                  </TouchableOpacity>
+                                ) : null}
 
                                 {item.notes ? (
                                   <TouchableOpacity
@@ -4144,10 +4189,39 @@ class ViewPendingDelivery extends Component {
                                   />
                                 </View> */}
 
-                                <View
+                                {/* <View
                                   style={{
                                     flex: 0.3,
-                                  }}></View>
+                                  }}></View> */}
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <Text
+                                    style={{
+                                      marginRight: 10,
+                                    }}>
+                                    Checked
+                                  </Text>
+                                  <Switch
+                                    thumbColor={'#fff'}
+                                    trackColor={{
+                                      false: 'grey',
+                                      true: '#5197C1',
+                                    }}
+                                    ios_backgroundColor="white"
+                                    onValueChange={value =>
+                                      this.checkSingleItemFun(
+                                        item,
+                                        value,
+                                        index,
+                                      )
+                                    }
+                                    value={item.isCorrect}
+                                  />
+                                </View>
 
                                 <View
                                   style={{
@@ -4188,6 +4262,100 @@ class ViewPendingDelivery extends Component {
                       })}
                     </View>
                   </KeyboardAwareScrollView>
+                  <View>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        marginTop: hp('2%'),
+                        alignItems: 'center',
+                        marginTop: '5%',
+                        marginBottom: '5%',
+                      }}>
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          width: wp('90%'),
+                        }}>
+                        <View>
+                          <Text
+                            style={{
+                              color: 'black',
+                              fontSize: 15,
+                              fontWeight: 'bold',
+                            }}>
+                            Check all
+                          </Text>
+                        </View>
+
+                        <View>
+                          <Switch
+                            thumbColor={'#fff'}
+                            trackColor={{
+                              false: 'grey',
+                              true: '#5197C1',
+                            }}
+                            ios_backgroundColor="white"
+                            onValueChange={value => this.checkAllItemFun(value)}
+                            value={switchValueAll}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          width: wp('90%'),
+                        }}>
+                        <View
+                          style={{
+                            flex: 1,
+                          }}>
+                          <Text
+                            style={{
+                              color: 'black',
+                              fontSize: 15,
+                              fontWeight: 'bold',
+                            }}>
+                            Flag all
+                          </Text>
+                        </View>
+
+                        <TouchableOpacity
+                          onPress={() => this.flagFunctionChecklistAll()}
+                          style={{
+                            flex: 1,
+                            alignItems: 'flex-end',
+                          }}>
+                          <Image
+                            source={img.flagIcon}
+                            style={{
+                              width: 25,
+                              height: 25,
+                              resizeMode: 'contain',
+                              tintColor:
+                                flagAllStatus === false ? 'grey' : null,
+                              marginRight: 20,
+                            }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+
                   <TouchableOpacity
                     onPress={() => this.processOrderFun()}
                     style={{

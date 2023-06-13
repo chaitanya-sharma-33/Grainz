@@ -35,6 +35,7 @@ class index extends Component {
       loader: false,
       locationArr: [],
       finalLocation: '',
+      finalLocationName: '',
     };
   }
 
@@ -177,10 +178,14 @@ class index extends Component {
   };
 
   componentDidMount() {
-    // this.props.navigation.addListener('focus', () => {
-    this.getData();
     this.getUserLocationFun();
-    // });
+    this.props.navigation.addListener('focus', async () => {
+      const location = await AsyncStorage.getItem('@locationName');
+      this.getData();
+      this.setState({
+        finalLocationName: location,
+      });
+    });
     this.setLanguage();
   }
 
@@ -270,13 +275,14 @@ class index extends Component {
   };
 
   render() {
-    const {buttons, loader} = this.state;
+    const {buttons, loader, finalLocationName} = this.state;
 
     return (
       <View style={styles.container}>
         <Header
           logoutFun={this.myProfile}
           logoFun={() => this.props.navigation.navigate('HomeScreen')}
+          finalLocation={finalLocationName}
         />
         {loader ? (
           <ActivityIndicator size="large" color="grey" />

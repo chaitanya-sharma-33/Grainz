@@ -69,7 +69,7 @@ class index extends Component {
   getProfileData = () => {
     getMyProfileApi()
       .then(res => {
-        console.log('res---->USER', res);
+        // console.log('res---->USER', res);
         const {firstName, lastName, email, jobTitle, phoneNumber} = res.data;
         this.setState({
           firstName,
@@ -95,15 +95,15 @@ class index extends Component {
 
   async componentDidMount() {
     this.getProfileData();
-    const location = await AsyncStorage.getItem('@location');
-    console.log('Location', location);
+    const location = await AsyncStorage.getItem('@locationName');
+    console.log('LocationNAME', location);
     this.getUserLocationFun();
     this.getLanguageFun();
   }
 
   getLanguageFun = async () => {
     const lan = await AsyncStorage.getItem('Language');
-    console.log('LANNNN', lan);
+    // console.log('LANNNN', lan);
 
     this.setState({
       finalLang: lan,
@@ -139,9 +139,22 @@ class index extends Component {
         let finalData = defaultUser.filter(function (element) {
           return element !== undefined;
         });
+
+        let defaultUserName = res.data.map((item, index) => {
+          if (item.isCurrent === true) {
+            return item.name;
+          }
+        });
+        let finalDataName = defaultUserName.filter(function (element) {
+          return element !== undefined;
+        });
+
+        // console.warn('finalDataName', finalDataName[0]);
+
         this.setState({
           locationArr: finalUsersList,
           finalLocation: finalData[0],
+          finalLocationName: finalDataName[0],
         });
       })
       .catch(err => {
@@ -149,11 +162,13 @@ class index extends Component {
       });
   };
 
-  setCurrentLocFun = id => {
-    setCurrentLocation(id)
+  setCurrentLocFun = () => {
+    const {finalLocation} = this.state;
+    console.log('finllocation', finalLocation);
+    setCurrentLocation(finalLocation)
       .then(res => {
         this.storeLocationFun(res);
-        console.log('res-SETLOC', res);
+        // console.log('res-SETLOC', res);
       })
       .catch(err => {
         console.warn('ERr', err);
@@ -161,16 +176,19 @@ class index extends Component {
   };
 
   storeLocationFun = async res => {
-    const {finalLocation} = this.state;
-    console.log('res-STORE', finalLocation);
+    const {finalLocation, finalLocationName} = this.state;
+    // console.log('res-STORE', finalLocation);
     await AsyncStorage.setItem('@location', finalLocation);
+    await AsyncStorage.setItem('@locationName', finalLocationName);
     const finalData = (res.data && res.data.isFreemium).toString();
-    console.log('final', finalData);
+    console.log('final', finalLocationName);
     await AsyncStorage.setItem('@isFreemium', finalData);
   };
 
   removeToken = async () => {
     await AsyncStorage.removeItem('@appToken');
+    await AsyncStorage.removeItem('@locationName');
+
     this.props.UserTokenAction(null);
   };
 
@@ -178,17 +196,16 @@ class index extends Component {
     this.props.navigation.navigate('MyProfile');
   };
 
-  setLocationFun = value => {
+  setLocationFun = (value, index) => {
+    console.log('index', index);
+    const finalIndex = index - 1;
+    console.log('finalIndex', finalIndex);
+    const {locationArr} = this.state;
     if (value) {
-      this.setState(
-        {
-          finalLocation: value,
-        },
-        () =>
-          setTimeout(() => {
-            this.setCurrentLocFun(value);
-          }, 300),
-      );
+      this.setState({
+        finalLocation: value,
+        finalLocationName: locationArr[finalIndex].label,
+      });
     }
   };
 
@@ -228,6 +245,7 @@ class index extends Component {
   };
 
   updateUserFun = () => {
+    this.setCurrentLocFun();
     this.setState(
       {
         pageLoader: true,
@@ -281,18 +299,19 @@ class index extends Component {
       loader,
       languageArr,
       finalLang,
-
+      finalLocationName,
       pickerModalStatus,
     } = this.state;
 
     console.log('locationArr', locationArr);
-    console.log('finalLocation', finalLocation);
+    console.log('finalLocationName', finalLocationName);
 
     return (
       <View style={styles.container}>
         <Header
           logoutFun={this.myProfile}
           logoFun={() => this.props.navigation.navigate('HomeScreen')}
+          finalLocation={finalLocationName}
         />
 
         <ScrollView
@@ -494,8 +513,8 @@ class index extends Component {
                         value: null,
                         color: 'black',
                       }}
-                      onValueChange={value => {
-                        this.setLocationFun(value);
+                      onValueChange={(value, index) => {
+                        this.setLocationFun(value, index);
                       }}
                       style={{
                         inputIOS: {

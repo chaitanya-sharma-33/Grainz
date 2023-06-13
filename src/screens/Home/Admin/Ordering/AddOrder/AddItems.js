@@ -242,44 +242,44 @@ class AddItems extends Component {
   async componentDidMount() {
     this.getData();
 
-    // this.props.navigation.addListener('focus', () => {
-    const {
-      supplierValue,
-      screen,
-      basketId,
-      navigateType,
-      supplierName,
-      departName,
-      departID,
-      finalData,
-      finalDataSec,
-    } = this.props.route && this.props.route.params;
-
-    console.log('screen', screen);
-    this.setState(
-      {
-        supplierId: supplierValue,
-        supplierStatus: false,
-        inventoryStatus: true,
-        screenType: screen,
+    this.props.navigation.addListener('focus', () => {
+      const {
+        supplierValue,
+        screen,
         basketId,
         navigateType,
-        departmentName: departName,
         supplierName,
-        searchItemInventory: '',
-        searchItemSupplier: '',
-        listIndex: '',
-        SECTIONS: [],
-        modalData: [],
-        departmentId: departID,
+        departName,
+        departID,
         finalData,
-        mainDepartId: departID,
-        finalBasketData: [],
         finalDataSec,
-      },
-      () => this.getManualLogsData(),
-    );
-    // });
+      } = this.props.route && this.props.route.params;
+
+      console.log('screen', screen);
+      this.setState(
+        {
+          supplierId: supplierValue,
+          supplierStatus: false,
+          inventoryStatus: true,
+          screenType: screen,
+          basketId,
+          navigateType,
+          departmentName: departName,
+          supplierName,
+          searchItemInventory: '',
+          searchItemSupplier: '',
+          listIndex: '',
+          SECTIONS: [],
+          modalData: [],
+          departmentId: departID,
+          finalData,
+          mainDepartId: departID,
+          finalBasketData: [],
+          finalDataSec,
+        },
+        () => this.getManualLogsData(),
+      );
+    });
   }
 
   myProfile = () => {

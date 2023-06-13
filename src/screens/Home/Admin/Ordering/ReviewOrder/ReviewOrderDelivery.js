@@ -32,6 +32,7 @@ import {
   uploadImageApi,
   getImageApi,
   deleteImageApi,
+  processPendingOrderApi,
 } from '../../../../../connectivity/api';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -133,20 +134,33 @@ class ReviewOrderDelivery extends Component {
     // this.props.navigation.addListener('focus', () => {
     const {route} = this.props;
     const finalData = route.params.finalData;
+    const finalArrivedDate = route.params.finalArrivedDate;
+    const pageOrderItems = route.params.pageOrderItems;
     this.setState({
       finalData,
       finalOrderDate: moment(finalData.orderDate).format('DD/MM/YYYY'),
       productionDateOrder: moment.utc(finalData.orderDate).format(),
       finalDeliveryDate: moment(finalData.deliveryDate).format('DD/MM/YYYY'),
       productionDateDelivery: moment.utc(finalData.deliveryDate).format(),
-      pageAmbientTemp: finalData.ambientTemp,
-      pageChilledTemp: finalData.chilledTemp,
-      pageFrozenTemp: finalData.frozenTemp,
+      productionDateArrived: moment.utc(finalData.deliveredDate).format(),
+      deliveryReference: finalData.orderReference,
+      pageAmbientTemp: finalData.ambientTemp
+        ? finalData.ambientTemp.toString()
+        : '',
+      pageChilledTemp: finalData.chilledTemp
+        ? finalData.chilledTemp.toString()
+        : '',
+      pageFrozenTemp: finalData.frozenTemp
+        ? finalData.frozenTemp.toString()
+        : '',
       pageNotes: finalData.notes,
       finalArrivedDate:
         finalData.deliveredDate &&
         moment(finalData.deliveredDate).format('DD/MM/YYYY'),
       itemId: finalData.id,
+      invoiceNumber: finalData.invoiceNumber,
+      pageOrderItems,
+      placedBy: finalData.placedBy,
     });
     this.getProfileDataFun();
     this.getImageFun(finalData.id);
@@ -248,6 +262,61 @@ class ReviewOrderDelivery extends Component {
   };
 
   processOrderFun() {
+    this.processOrderFunSec();
+    this.processOrderFunThird();
+  }
+
+  processOrderFunSec = () => {
+    const {
+      finalData,
+      finalOrderDate,
+      productionDateOrder,
+      finalDeliveryDate,
+      productionDateDelivery,
+      productionDateArrived,
+      deliveryReference,
+      pageAmbientTemp,
+      pageChilledTemp,
+      pageFrozenTemp,
+      pageNotes,
+      finalArrivedDate,
+      itemId,
+      invoiceNumber,
+      pageOrderItems,
+      placedBy,
+    } = this.state;
+    let payload = {
+      ambientTemp: pageAmbientTemp,
+      chilledTemp: pageChilledTemp,
+      deliveredDate: productionDateArrived,
+      deliveryDate: productionDateDelivery,
+      deliveryNoteReference: deliveryReference,
+      frozenTemp: pageFrozenTemp,
+      id: itemId,
+      invoiceNumber: invoiceNumber,
+      notes: pageNotes,
+      orderDate: productionDateOrder,
+      orderItems: pageOrderItems,
+      orderReference: deliveryReference,
+      placedBy: placedBy,
+      isChecked: false,
+    };
+
+    console.log('PAYLOAD----->PROCESS ORDER', payload);
+
+    processPendingOrderApi(payload)
+      .then(res => {})
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
+  };
+
+  processOrderFunThird() {
     const {
       supplierName,
       supplierId,
@@ -277,7 +346,7 @@ class ReviewOrderDelivery extends Component {
           {
             loaderCompStatus: false,
           },
-          () => this.props.navigation.goBack(),
+          () => this.props.navigation.navigate('PendingDeliveryAdminScreen'),
         );
       })
       .catch(err => {
@@ -770,6 +839,38 @@ class ReviewOrderDelivery extends Component {
                 </View>
                 <View
                   style={{
+                    backgroundColor: '#F4F4F4',
+                    borderRadius: 6,
+                    padding: 12,
+                    marginBottom: hp('2%'),
+                  }}>
+                  <View style={{}}>
+                    <Text style={{}}>Delivery Note reference</Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      marginTop: 10,
+                    }}>
+                    <TextInput
+                      value={deliveryReference}
+                      editable={false}
+                      onChangeText={value =>
+                        this.setState({
+                          deliveryReference: value,
+                        })
+                      }
+                      style={{
+                        fontWeight: 'bold',
+                        color: 'black',
+                        width: '80%',
+                      }}
+                    />
+                  </View>
+                </View>
+                <View
+                  style={{
                     backgroundColor: '#fff',
                     borderRadius: 6,
                     padding: 12,
@@ -789,37 +890,6 @@ class ReviewOrderDelivery extends Component {
                       onChangeText={value =>
                         this.setState({
                           invoiceNumber: value,
-                        })
-                      }
-                      style={{
-                        fontWeight: 'bold',
-                        color: 'black',
-                        width: '80%',
-                      }}
-                    />
-                  </View>
-                </View>
-                <View
-                  style={{
-                    backgroundColor: '#fff',
-                    borderRadius: 6,
-                    padding: 12,
-                    marginBottom: hp('2%'),
-                  }}>
-                  <View style={{}}>
-                    <Text style={{}}>Delivery Note reference</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginTop: 10,
-                    }}>
-                    <TextInput
-                      value={deliveryReference}
-                      onChangeText={value =>
-                        this.setState({
-                          deliveryReference: value,
                         })
                       }
                       style={{

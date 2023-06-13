@@ -911,9 +911,38 @@ class ViewReviewOrder extends Component {
   };
 
   checkAllItemFun = value => {
-    this.setState({
-      switchValueAll: value,
-    });
+    this.setState(
+      {
+        switchValueAll: value,
+      },
+      () => this.editStatusFun(value),
+    );
+  };
+
+  editStatusFun = value => {
+    const {pageOrderItems} = this.state;
+
+    const finalValue = value;
+    const index = 0;
+
+    let newArr = pageOrderItems.map((item, i) =>
+      index === i
+        ? {
+            ...item,
+            ['isCorrect']: finalValue,
+          }
+        : {
+            ...item,
+            ['isCorrect']: finalValue,
+          },
+    );
+    this.setState(
+      {
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      },
+      () => this.processOrderFun(),
+    );
   };
 
   flagFunctionChecklist = item => {
@@ -1211,7 +1240,7 @@ class ViewReviewOrder extends Component {
                         onPress={() =>
                           this.props.navigation.navigate(
                             'ReviewOrderDeliveryScreen',
-                            {finalData: finalData},
+                            {finalData: finalData, pageOrderItems},
                           )
                         }
                         style={{
@@ -2053,6 +2082,27 @@ class ViewReviewOrder extends Component {
                                       item.inventoryMapping.inventoryName}
                                   </Text>
                                 </TouchableOpacity>
+
+                                {item.hasCreditNote > 0 ? (
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      this.showEditModal(item, index)
+                                    }
+                                    style={{
+                                      flex: 1,
+                                      alignItems: 'center',
+                                    }}>
+                                    <Image
+                                      source={img.envolopeIcon}
+                                      style={{
+                                        width: 18,
+                                        height: 18,
+                                        resizeMode: 'contain',
+                                        tintColor: 'black',
+                                      }}
+                                    />
+                                  </TouchableOpacity>
+                                ) : null}
 
                                 {item.notes ? (
                                   <TouchableOpacity
@@ -3941,11 +3991,41 @@ class ViewReviewOrder extends Component {
                                     }
                                   />
                                 </View> */}
-
+                                {/* 
                                 <View
                                   style={{
                                     flex: 0.3,
-                                  }}></View>
+                                  }}></View> */}
+
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <Text
+                                    style={{
+                                      marginRight: 10,
+                                    }}>
+                                    Correct
+                                  </Text>
+                                  <Switch
+                                    thumbColor={'#fff'}
+                                    trackColor={{
+                                      false: 'grey',
+                                      true: '#5197C1',
+                                    }}
+                                    ios_backgroundColor="white"
+                                    onValueChange={value =>
+                                      this.checkSingleItemFun(
+                                        item,
+                                        value,
+                                        index,
+                                      )
+                                    }
+                                    value={item.isCorrect}
+                                  />
+                                </View>
 
                                 <View
                                   style={{
@@ -3986,6 +4066,50 @@ class ViewReviewOrder extends Component {
                       })}
                     </View>
                   </KeyboardAwareScrollView>
+
+                  <View>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        marginTop: hp('2%'),
+                        alignItems: 'center',
+                        marginTop: '5%',
+                        marginBottom: '5%',
+                      }}>
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          width: wp('90%'),
+                        }}>
+                        <View>
+                          <Text
+                            style={{
+                              color: 'black',
+                              fontSize: 15,
+                              fontWeight: 'bold',
+                            }}>
+                            Mark all as Correct
+                          </Text>
+                        </View>
+
+                        <View>
+                          <Switch
+                            thumbColor={'#fff'}
+                            trackColor={{
+                              false: 'grey',
+                              true: '#5197C1',
+                            }}
+                            ios_backgroundColor="white"
+                            onValueChange={value => this.checkAllItemFun(value)}
+                            value={switchValueAll}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  </View>
                   <TouchableOpacity
                     onPress={() => this.processOrderFun()}
                     style={{

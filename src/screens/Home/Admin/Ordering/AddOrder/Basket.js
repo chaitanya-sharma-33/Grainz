@@ -1877,8 +1877,8 @@ class Basket extends Component {
                               )
                             }
                             style={{
-                              width: wp('18%'),
-                              height: hp('8%'),
+                              width: '30%',
+                              height: '100%',
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}>
@@ -1892,26 +1892,32 @@ class Basket extends Component {
                             </Text>
                           </TouchableOpacity>
 
-                          <TextInput
-                            value={String(item.quantity)}
-                            keyboardType="numeric"
+                          <View
                             style={{
-                              borderRadius: 6,
-                              padding: 10,
-                              width: wp('20%'),
+                              width: '50%',
                               backgroundColor: '#fff',
-                              height: hp('5%'),
-                            }}
-                            onChangeText={value =>
-                              this.editQuantityFun(
-                                index,
-                                'quantity',
-                                value,
-                                item,
-                                'input',
-                              )
-                            }
-                          />
+                            }}>
+                            <TextInput
+                              value={String(item.quantity)}
+                              keyboardType="numeric"
+                              style={{
+                                borderRadius: 6,
+                                padding: 10,
+                                width: '100%',
+                                height: '100%',
+                                color: 'black',
+                              }}
+                              onChangeText={value =>
+                                this.editQuantityFun(
+                                  index,
+                                  'quantity',
+                                  value,
+                                  item,
+                                  'input',
+                                )
+                              }
+                            />
+                          </View>
                           <TouchableOpacity
                             onPress={() =>
                               this.editQuantityFun(
@@ -1923,8 +1929,8 @@ class Basket extends Component {
                               )
                             }
                             style={{
-                              width: wp('18%'),
-                              height: hp('8%'),
+                              width: '30%',
+                              height: '100%',
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}>

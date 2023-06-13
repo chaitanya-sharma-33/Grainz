@@ -74,4 +74,5 @@ export default {
   sendIcon: require('../assests/Images/sendIcon.png'),
   inStockIcon: require('../assests/Images/inStockIcon.png'),
   outStockIcon: require('../assests/Images/outStockIcon.png'),
+  envolopeIcon: require('../assests/Images/envolopeIcon.png'),
 };

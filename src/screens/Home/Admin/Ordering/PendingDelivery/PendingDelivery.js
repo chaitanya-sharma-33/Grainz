@@ -1179,12 +1179,24 @@ class PendingDelivery extends Component {
                                     <View>
                                       {item.creditNotesCount > 0 ? (
                                         <Image
+                                          source={img.envolopeIcon}
+                                          style={{
+                                            width: 16,
+                                            height: 16,
+                                            resizeMode: 'contain',
+                                            marginLeft: 2,
+                                          }}
+                                        />
+                                      ) : null}
+                                    </View>
+                                    <View>
+                                      {item.notes ? (
+                                        <Image
                                           source={img.messageIcon}
                                           style={{
-                                            width: 15,
-                                            height: 15,
+                                            width: 16,
+                                            height: 16,
                                             resizeMode: 'contain',
-                                            tintColor: 'black',
                                             marginLeft: 2,
                                           }}
                                         />

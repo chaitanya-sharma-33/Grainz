@@ -2039,8 +2039,8 @@ class EditDraftOrder extends Component {
                               )
                             }
                             style={{
-                              width: wp('18%'),
-                              height: hp('8%'),
+                              width: '30%',
+                              height: '100%',
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}>
@@ -2056,9 +2056,8 @@ class EditDraftOrder extends Component {
 
                           <View
                             style={{
-                              width: wp('20%'),
+                              width: '50%',
                               backgroundColor: '#fff',
-                              alignItems: 'center',
                             }}>
                             <TextInput
                               value={String(item.quantity)}
@@ -2066,9 +2065,9 @@ class EditDraftOrder extends Component {
                               style={{
                                 borderRadius: 6,
                                 padding: 10,
-                                width: wp('20%'),
+                                width: '100%',
                                 color: 'black',
-                                height: hp('5%'),
+                                height: '100%',
                               }}
                               onChangeText={value =>
                                 this.editQuantityFun(
@@ -2092,10 +2091,10 @@ class EditDraftOrder extends Component {
                               )
                             }
                             style={{
-                              width: wp('18%'),
-                              height: hp('8%'),
-                              alignItems: 'center',
+                              width: '30%',
+                              height: '100%',
                               justifyContent: 'center',
+                              alignItems: 'center',
                             }}>
                             <Text
                               style={{
