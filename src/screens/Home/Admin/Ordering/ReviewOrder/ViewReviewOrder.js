@@ -206,7 +206,7 @@ class ViewReviewOrder extends Component {
   };
 
   createFinalData = () => {
-    const {pageOrderItems} = this.state;
+    const {pageOrderItems, finalStatusSwitch} = this.state;
     let finalArray = pageOrderItems.map((item, index) => {
       return {
         arrivedDate: item.arrivedDate,
@@ -228,20 +228,26 @@ class ViewReviewOrder extends Component {
     });
 
     const result = finalArray;
-    this.setState({
-      finalApiData: [...result],
-    });
+    this.setState(
+      {
+        finalApiData: [...result],
+        switchValueAll: !finalStatusSwitch,
+      },
+      () => this.isCheckedEditableStatusFun(),
+    );
   };
 
-  // isCheckedEditableStatusFun = () => {
-  //   const {pageData} = this.state;
-  //   const finalStatus = pageData.orderItems.some((item, index) => {
-  //     return item.isCorrect === null;
-  //   });
-  //   this.setState({
-  //     isCheckedEditableStatus: finalStatus,
-  //   });
-  // };
+  isCheckedEditableStatusFun = () => {
+    const {pageData} = this.state;
+    const finalStatus = pageData.orderItems.some((item, index) => {
+      return item.isCorrect === false;
+    });
+    this.setState({
+      isCheckedEditableStatus: finalStatus,
+      loaderCompStatus: false,
+      switchValueAll: !finalStatus,
+    });
+  };
 
   myProfile = () => {
     this.props.navigation.navigate('MyProfile');
@@ -436,6 +442,25 @@ class ViewReviewOrder extends Component {
   };
 
   showDatePickerArrivalDateSpecific = () => {
+    Alert.alert(`Grainz`, 'Clear date or select date', [
+      {
+        text: 'Clear',
+        onPress: () =>
+          this.setState({
+            finalArrivedDate: '',
+            finalArrivalDateSpecific: '',
+            apiArrivalDate: '',
+            apiArrivalDateSpecific: '',
+          }),
+      },
+      {
+        text: 'Select Date',
+        onPress: () => this.showDatePickerArrivalDateSpecificSec(),
+      },
+    ]);
+  };
+
+  showDatePickerArrivalDateSpecificSec = () => {
     this.setState({
       isDatePickerArrivalDateSpecific: true,
     });
@@ -2174,21 +2199,6 @@ class ViewReviewOrder extends Component {
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{fontSize: 10}}>Order Val.</Text>
-                                  <Text
-                                    style={{
-                                      marginTop: 10,
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {/* {item.value.toFixed(2)} */}
-                                    {item.orderValue.toFixed(2)} €
-                                  </Text>
-                                </View>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
                                   <Text style={{fontSize: 10}}>
                                     Delivered No.
                                   </Text>
@@ -2205,51 +2215,18 @@ class ViewReviewOrder extends Component {
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{fontSize: 10}}>
-                                    {translate('Price')}
-                                  </Text>
+                                  <Text style={{fontSize: 10}}>Order Val.</Text>
                                   <Text
                                     style={{
                                       marginTop: 10,
                                       fontSize: 14,
                                       fontWeight: 'bold',
                                     }}>
-                                    {item.inventoryMapping &&
-                                      item.inventoryMapping.productPrice}{' '}
-                                    Є/
-                                    {item.inventoryMapping.productUnit}
+                                    {/* {item.value.toFixed(2)} */}
+                                    {item.orderValue.toFixed(2)} €
                                   </Text>
                                 </View>
-                              </View>
-                              <View
-                                style={{
-                                  flex: 1,
-                                  flexDirection: 'row',
-                                  borderBottomLeftRadius: 6,
-                                  borderBottomRightRadius: 6,
-                                  padding: 10,
-                                  backgroundColor: '#fff',
-                                }}>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
-                                  <Text style={{fontSize: 10}}>
-                                    Arrived Date
-                                  </Text>
-                                  <Text
-                                    style={{
-                                      marginTop: 10,
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {item.deliveredDate
-                                      ? moment(item.deliveredDate).format(
-                                          'DD/MM/YYYY',
-                                        )
-                                      : ''}
-                                  </Text>
-                                </View>
+
                                 <View
                                   style={{
                                     flex: 1,
@@ -2280,7 +2257,58 @@ class ViewReviewOrder extends Component {
                                     value={item.isCorrect}
                                   />
                                 </View>
+
+                                {/* <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    {translate('Price')}
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {item.inventoryMapping &&
+                                      item.inventoryMapping.productPrice}{' '}
+                                    Є/
+                                    {item.inventoryMapping.productUnit}
+                                  </Text>
+                                </View> */}
                               </View>
+                              {/* <View
+                                style={{
+                                  flex: 1,
+                                  flexDirection: 'row',
+                                  borderBottomLeftRadius: 6,
+                                  borderBottomRightRadius: 6,
+                                  padding: 10,
+                                  backgroundColor: '#fff',
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    Arrived Date
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {item.deliveredDate
+                                      ? moment(item.deliveredDate).format(
+                                          'DD/MM/YYYY',
+                                        )
+                                      : ''}
+                                  </Text>
+                                </View>
+                                
+                              </View> */}
                             </View>
                             {/* <View
                               style={{
@@ -3210,9 +3238,9 @@ class ViewReviewOrder extends Component {
                           marginLeft: 10,
                           textAlign: 'center',
                         }}>
-                        {' '}
-                        Audit Complete(You can select when all items are checked
-                        correct)
+                        Audit Complete
+                        {/* (You can select when all items are checked
+                        correct) */}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -4709,13 +4737,7 @@ class ViewReviewOrder extends Component {
                               alignItems: 'center',
                               marginTop: hp('2%'),
                             }}>
-                            <View
-                              style={{
-                                borderRadius: 100,
-                                backgroundColor: isCheckedEditableStatus
-                                  ? '#D6D6D6'
-                                  : '#fff',
-                              }}>
+                            <View style={{}}>
                               <CheckBox
                                 disabled={true}
                                 value={notArrivedStatus}

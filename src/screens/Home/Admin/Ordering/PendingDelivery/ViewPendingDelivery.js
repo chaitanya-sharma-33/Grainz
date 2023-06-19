@@ -20,6 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import RNPickerSelect from 'react-native-picker-select';
 import {UserTokenAction} from '../../../../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
@@ -31,6 +32,7 @@ import {
   uploadImageApi,
   viewCreditNoteApi,
   updateCreditNoteApi,
+  getUsersApi,
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
@@ -108,6 +110,8 @@ class ViewPendingDelivery extends Component {
       flagAllStatus: false,
       isFreemium: '',
       deliveryChecklistStatus: false,
+      userName: '',
+      usersData: [],
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -142,6 +146,25 @@ class ViewPendingDelivery extends Component {
     }
   };
 
+  getUsersData = () => {
+    getUsersApi()
+      .then(res => {
+        let finalUsersList = res.data.map((item, index) => {
+          return {
+            label: item.firstName + ' ' + item.lastName,
+            value: item.id,
+          };
+        });
+        this.setState({
+          usersData: finalUsersList,
+        });
+        console.log('res-USER', res);
+      })
+      .catch(err => {
+        console.warn('ERr', err.response);
+      });
+  };
+
   getProfileData = () => {
     getMyProfileApi()
       .then(res => {
@@ -167,6 +190,8 @@ class ViewPendingDelivery extends Component {
 
   componentDidMount() {
     this.getData();
+
+    this.getUsersData();
 
     const {productId, supplierId, supplierName, basketId, listId, finalData} =
       this.props.route && this.props.route.params;
@@ -217,6 +242,7 @@ class ViewPendingDelivery extends Component {
               moment(data.deliveredDate).format('DD/MM/YYYY'),
             loaderCompStatus: false,
             totalValue: data.htva.toFixed(2),
+            userName: data.checkedBy,
           },
           () => this.createFinalData(),
         );
@@ -347,6 +373,7 @@ class ViewPendingDelivery extends Component {
       productId,
       isCheckedStatus,
       switchValueAll,
+      userName,
     } = this.state;
     let payload = {
       ambientTemp: pageAmbientTemp,
@@ -363,7 +390,8 @@ class ViewPendingDelivery extends Component {
       orderItems: finalApiData,
       orderReference: pageData.orderReference,
       placedBy: pageData.placedByNAme,
-      isChecked: false,
+      isChecked: switchValueAll,
+      checkedBy: userName,
     };
 
     console.log('PAYLOAD----->PROCESS ORDER', payload);
@@ -480,6 +508,25 @@ class ViewPendingDelivery extends Component {
   };
 
   showDatePickerArrivalDateSpecific = () => {
+    Alert.alert(`Grainz`, 'Clear date or select date', [
+      {
+        text: 'Clear',
+        onPress: () =>
+          this.setState({
+            finalArrivedDate: '',
+            finalArrivalDateSpecific: '',
+            apiArrivalDate: '',
+            apiArrivalDateSpecific: '',
+          }),
+      },
+      {
+        text: 'Select Date',
+        onPress: () => this.showDatePickerArrivalDateSpecificSec(),
+      },
+    ]);
+  };
+
+  showDatePickerArrivalDateSpecificSec = () => {
     this.setState({
       isDatePickerArrivalDateSpecific: true,
     });
@@ -824,12 +871,16 @@ class ViewPendingDelivery extends Component {
         // });
       })
       .catch(err => {
-        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-          {
-            text: 'Okay',
-            onPress: () => this.props.navigation.goBack(),
-          },
-        ]);
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-Credit',
+          [
+            {
+              text: 'Okay',
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ],
+        );
       });
   };
 
@@ -841,7 +892,9 @@ class ViewPendingDelivery extends Component {
       () =>
         setTimeout(() => {
           this.saveFunInventoryItemThird();
-          this.updateCreditNoteFun();
+          if (this.state.creditApprovedValue) {
+            this.updateCreditNoteFun();
+          }
         }, 300),
     );
   };
@@ -890,12 +943,17 @@ class ViewPendingDelivery extends Component {
         );
       })
       .catch(err => {
-        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
-          {
-            text: 'Okay',
-            onPress: () => this.props.navigation.goBack(),
-          },
-        ]);
+        console.log('err', err.response);
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-Inventory',
+          [
+            {
+              text: 'Okay',
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ],
+        );
       });
   };
 
@@ -1283,7 +1341,7 @@ class ViewPendingDelivery extends Component {
       this.setState({
         checklistModalStatus: true,
         pageOrderItems: sortedList,
-        deliveryChecklistStatus: true
+        deliveryChecklistStatus: true,
       });
     } else {
       alert('Please enter arrived date first.');
@@ -1418,9 +1476,9 @@ class ViewPendingDelivery extends Component {
   };
 
   arrivedDateUpdateFun = () => {
-    Alert.alert(`Grainz`, 'Cancel date or select date', [
+    Alert.alert(`Grainz`, 'Clear date or select date', [
       {
-        text: 'Cancel',
+        text: 'Clear',
         onPress: () =>
           this.setState({
             finalArrivedDate: '',
@@ -1433,6 +1491,12 @@ class ViewPendingDelivery extends Component {
         onPress: () => this.showDatePickerFunArrived(),
       },
     ]);
+  };
+
+  selectUserFun = value => {
+    this.setState({
+      userName: value,
+    });
   };
 
   render() {
@@ -1504,9 +1568,11 @@ class ViewPendingDelivery extends Component {
       netValue,
       isFreemium,
       finalUnit,
+      userName,
+      usersData,
     } = this.state;
     // console.log('creditRequested--->', creditRequested);
-    console.log('pageOrderItems--->', pageOrderItems);
+    console.log('pageData--->', pageData);
 
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
 
@@ -2555,21 +2621,6 @@ class ViewPendingDelivery extends Component {
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{fontSize: 10}}>Order Val.</Text>
-                                  <Text
-                                    style={{
-                                      marginTop: 10,
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {/* {item.value.toFixed(2)} */}
-                                    {item.orderValue.toFixed(2)} €
-                                  </Text>
-                                </View>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
                                   <Text style={{fontSize: 10}}>
                                     Delivered No.
                                   </Text>
@@ -2586,51 +2637,18 @@ class ViewPendingDelivery extends Component {
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{fontSize: 10}}>
-                                    {translate('Price')}
-                                  </Text>
+                                  <Text style={{fontSize: 10}}>Order Val.</Text>
                                   <Text
                                     style={{
                                       marginTop: 10,
                                       fontSize: 14,
                                       fontWeight: 'bold',
                                     }}>
-                                    {item.inventoryMapping &&
-                                      item.inventoryMapping.productPrice}{' '}
-                                    Є/
-                                    {item.inventoryMapping.productUnit}
+                                    {/* {item.value.toFixed(2)} */}
+                                    {item.orderValue.toFixed(2)} €
                                   </Text>
                                 </View>
-                              </View>
-                              <View
-                                style={{
-                                  flex: 1,
-                                  flexDirection: 'row',
-                                  borderBottomLeftRadius: 6,
-                                  borderBottomRightRadius: 6,
-                                  padding: 10,
-                                  backgroundColor: '#fff',
-                                }}>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
-                                  <Text style={{fontSize: 10}}>
-                                    Arrived Date
-                                  </Text>
-                                  <Text
-                                    style={{
-                                      marginTop: 10,
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {item.deliveredDate
-                                      ? moment(item.deliveredDate).format(
-                                          'DD/MM/YYYY',
-                                        )
-                                      : ''}
-                                  </Text>
-                                </View>
+
                                 <View
                                   style={{
                                     flex: 1,
@@ -2661,7 +2679,57 @@ class ViewPendingDelivery extends Component {
                                     value={item.isCorrect}
                                   />
                                 </View>
+                                {/*                                
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    {translate('Price')}
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {item.inventoryMapping &&
+                                      item.inventoryMapping.productPrice}{' '}
+                                    Є/
+                                    {item.inventoryMapping.productUnit}
+                                  </Text>
+                                </View> */}
                               </View>
+                              {/* <View
+                                style={{
+                                  flex: 1,
+                                  flexDirection: 'row',
+                                  borderBottomLeftRadius: 6,
+                                  borderBottomRightRadius: 6,
+                                  padding: 10,
+                                  backgroundColor: '#fff',
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
+                                  <Text style={{fontSize: 10}}>
+                                    Arrived Date
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      marginTop: 10,
+                                      fontSize: 14,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    {item.deliveredDate
+                                      ? moment(item.deliveredDate).format(
+                                          'DD/MM/YYYY',
+                                        )
+                                      : ''}
+                                  </Text>
+                                </View>
+                              </View> */}
                             </View>
 
                             {/* <View
@@ -3709,6 +3777,7 @@ class ViewPendingDelivery extends Component {
                   </TouchableOpacity>
 
                   <TouchableOpacity
+                    disabled={switchValueAll === true ? false : true}
                     onPress={() => this.processOrderFun()}
                     style={{
                       height: hp('7%'),
@@ -3971,6 +4040,73 @@ class ViewPendingDelivery extends Component {
                           </Text>
                         </View>
                       </TouchableOpacity>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          borderRadius: 100,
+                          backgroundColor: '#fff',
+                          marginHorizontal: wp('5%'),
+                          marginTop: hp('2%'),
+                        }}>
+                        <View
+                          style={{
+                            alignSelf: 'center',
+                            justifyContent: 'center',
+                            width: wp('80%'),
+                            height: hp('6%'),
+                          }}>
+                          <RNPickerSelect
+                            placeholder={{
+                              label: 'Verified By: ',
+                              value: null,
+                              color: 'black',
+                              fontWeight: 'bold',
+                            }}
+                            onValueChange={value => {
+                              this.selectUserFun(value);
+                            }}
+                            style={{
+                              inputIOS: {
+                                fontSize: 14,
+                                paddingHorizontal: '5%',
+                                color: '#161C27',
+                                width: '100%',
+                                alignSelf: 'center',
+                                paddingVertical: 15,
+                              },
+                              inputAndroid: {
+                                fontSize: 14,
+                                paddingHorizontal: '3%',
+                                color: '#161C27',
+                                width: '100%',
+                                alignSelf: 'center',
+                              },
+                              iconContainer: {
+                                top: '40%',
+                              },
+                            }}
+                            items={usersData}
+                            Icon={() => {
+                              return (
+                                <View style={{marginRight: wp('3%')}}>
+                                  <Image
+                                    source={img.arrowDownIcon}
+                                    resizeMode="contain"
+                                    style={{
+                                      height: 16,
+                                      width: 16,
+                                      resizeMode: 'contain',
+                                      position: 'absolute',
+                                    }}
+                                  />
+                                </View>
+                              );
+                            }}
+                            value={userName}
+                            useNativeAndroidPickerStyle={false}
+                          />
+                        </View>
+                      </View>
                       {pageOrderItems.map((item, index) => {
                         // console.log('ITEMMMMMMMMMM', item);
                         return (
@@ -5195,13 +5331,7 @@ class ViewPendingDelivery extends Component {
                               alignItems: 'center',
                               marginTop: hp('2%'),
                             }}>
-                            <View
-                              style={{
-                                borderRadius: 100,
-                                backgroundColor: isCheckedEditableStatus
-                                  ? '#D6D6D6'
-                                  : '#fff',
-                              }}>
+                            <View style={{}}>
                               <CheckBox
                                 disabled={true}
                                 value={notArrivedStatus}

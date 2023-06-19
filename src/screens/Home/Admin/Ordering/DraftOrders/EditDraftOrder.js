@@ -1954,7 +1954,7 @@ class EditDraftOrder extends Component {
                           style={{
                             flex: 3,
                           }}>
-                          <Text style={{fontSize: 14, fontWeight: 'bold'}}>
+                          <Text style={{fontSize: 16, fontWeight: 'bold'}}>
                             {item.inventoryMapping &&
                               item.inventoryMapping.inventoryName}
                           </Text>
@@ -2046,7 +2046,7 @@ class EditDraftOrder extends Component {
                             }}>
                             <Text
                               style={{
-                                fontSize: 29,
+                                fontSize: 30,
                                 fontWeight: 'bold',
                                 color: '#5197C1',
                               }}>
@@ -2056,7 +2056,7 @@ class EditDraftOrder extends Component {
 
                           <View
                             style={{
-                              width: '50%',
+                              width: '30%',
                               backgroundColor: '#fff',
                             }}>
                             <TextInput
@@ -2099,7 +2099,7 @@ class EditDraftOrder extends Component {
                             <Text
                               style={{
                                 color: '#5197C1',
-                                fontSize: 20,
+                                fontSize: 25,
                                 fontWeight: 'bold',
                               }}>
                               +
@@ -2124,7 +2124,6 @@ class EditDraftOrder extends Component {
                             style={{
                               marginTop: 10,
                               fontSize: 14,
-                              fontWeight: 'bold',
                             }}>
                             {item.inventoryMapping &&
                               item.inventoryMapping.productPrice}{' '}
@@ -2143,7 +2142,6 @@ class EditDraftOrder extends Component {
                             style={{
                               marginTop: 10,
                               fontSize: 14,
-                              fontWeight: 'bold',
                             }}>
                             {Number(item.value).toFixed(2)} €
                           </Text>
@@ -2159,7 +2157,6 @@ class EditDraftOrder extends Component {
                             style={{
                               marginTop: 10,
                               fontSize: 14,
-                              fontWeight: 'bold',
                             }}>
                             {item.calculatedQuantity} {item.unit}
                           </Text>

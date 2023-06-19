@@ -1617,7 +1617,7 @@ class AddItems extends Component {
         id: basketId,
       };
       console.log('UPDATEEE');
-      // console.log('Payload--> ELSE', payload);
+      console.log('Payload--> ELSE', payload);
       if (finalBasketData.length > 0 || basketId) {
         updateBasketApi(payload)
           .then(res => {
@@ -1744,6 +1744,7 @@ class AddItems extends Component {
     console.log('FINALDATA', finalData);
     console.log('finalDataSec', finalDataSec);
     console.log('basketId-->navigateToBasket', basketId);
+    console.log('close-->navigateToBasket', closeStatus);
 
     if (closeStatus) {
       this.props.navigation.navigate('BasketOrderScreen', {
@@ -1855,6 +1856,7 @@ class AddItems extends Component {
   };
 
   closeBasketFun = () => {
+    console.log('5');
     this.setState(
       {
         closeStatus: true,
@@ -1876,6 +1878,8 @@ class AddItems extends Component {
       finalDataSec,
     } = this.state;
 
+    console.log('draftStatus', draftStatus);
+
     if (draftStatus) {
       console.log('finalDataSec', finalDataSec);
       console.log('basketId->closeBasketFunSec', basketId);
@@ -1888,7 +1892,7 @@ class AddItems extends Component {
         supplierName,
         finalData,
         modalQuantity: '0',
-        finalDataSec,
+        finalDataSec: finalData ? finalData : finalDataSec,
         basketId,
       });
     } else {
@@ -1911,6 +1915,7 @@ class AddItems extends Component {
   };
 
   confirmQuantityFunSec = async () => {
+    console.log('4');
     const {
       sectionIndex,
       sectionData,
@@ -2029,12 +2034,80 @@ class AddItems extends Component {
 
     // console.log('basketArr-->', basketArr);
 
-    this.setState({
-      SECTIONS: [...LastArr],
-      finalBasketData: [...basketArr],
-      draftStatus: false,
-      modalQuantity: '0',
-    });
+    this.setState(
+      {
+        SECTIONS: [...LastArr],
+        finalBasketData: [...basketArr],
+        draftStatus: false,
+        modalQuantity: '0',
+      },
+      () => this.updateBasketFun(),
+    );
+  };
+
+  updateBasketFun = () => {
+    const {screenType} = this.state;
+    console.log('Scre', screenType);
+
+    if (screenType === 'New') {
+      console.log('NEW SFREEEN');
+      this.updateBasketFunThird();
+    } else {
+      this.updateBasketFunSec();
+    }
+  };
+
+  updateBasketFunThird = () => {
+    const {finalBasketData, supplierId, finalData} = this.state;
+
+    let payload = {
+      supplierId: supplierId,
+      shopingBasketItemList: finalBasketData,
+      customerNumber: finalData.customerNumber,
+      channel: finalData.channel,
+    };
+    console.log('Payload--> ADDITEMS', payload);
+    addBasketApi(payload)
+      .then(res => {
+        this.setState(
+          {
+            basketId: res.data && res.data.id,
+          },
+          () => this.getBasketDataFun(),
+        );
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+          },
+        ]);
+      });
+  };
+
+  updateBasketFunSec = () => {
+    const {finalBasketData, supplierId, basketId} = this.state;
+
+    let payload = {
+      supplierId: supplierId,
+      shopingBasketItemList: finalBasketData,
+      id: basketId,
+    };
+    updateBasketApi(payload)
+      .then(res => {
+        console.log('res-UPDATEBASKETFUN', res);
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: 'Okay',
+            onPress: () =>
+              this.setState({
+                basketLoader: false,
+              }),
+          },
+        ]);
+      });
   };
 
   closeFun = () => {
@@ -2177,6 +2250,7 @@ class AddItems extends Component {
 
     // console.log('PAGE DATA', pageData);
     console.log('isFreemium', isFreemium);
+    console.log('draftStatus', draftStatus);
 
     return (
       <View style={styles.container}>
@@ -3233,21 +3307,15 @@ class AddItems extends Component {
                             style={{
                               fontSize: 14,
                             }}>
-                            {translate('Ordered Val')}.
+                            Price
                           </Text>
                           <Text
-                            numberOfLines={1}
                             style={{
                               fontSize: 14,
                               fontWeight: 'bold',
                               marginTop: 10,
                             }}>
-                            €{' '}
-                            {(
-                              pageData.productPrice *
-                              pageData.packSize *
-                              modalQuantity
-                            ).toFixed(2)}
+                            €/{pageData.productUnit} {pageData.productPrice}
                           </Text>
                         </View>
                       </View>
@@ -3267,15 +3335,16 @@ class AddItems extends Component {
                             style={{
                               fontSize: 14,
                             }}>
-                            Price
+                            {translate('Ordered Qty')}.
                           </Text>
                           <Text
+                            numberOfLines={1}
                             style={{
                               fontSize: 14,
                               fontWeight: 'bold',
                               marginTop: 10,
                             }}>
-                            €/{pageData.productUnit} {pageData.productPrice}
+                            {pageData.unit} {pageData.volume * modalQuantity}
                           </Text>
                         </View>
 
@@ -3288,7 +3357,7 @@ class AddItems extends Component {
                             style={{
                               fontSize: 14,
                             }}>
-                            {translate('Ordered Qty')}.
+                            {translate('Ordered Val')}.
                           </Text>
                           <Text
                             numberOfLines={1}
@@ -3297,7 +3366,12 @@ class AddItems extends Component {
                               fontWeight: 'bold',
                               marginTop: 10,
                             }}>
-                            {pageData.unit} {pageData.volume * modalQuantity}
+                            €{' '}
+                            {(
+                              pageData.productPrice *
+                              pageData.packSize *
+                              modalQuantity
+                            ).toFixed(2)}
                           </Text>
                         </View>
                         {/* <View
@@ -3787,7 +3861,7 @@ class AddItems extends Component {
               color: '#fff',
               fontWeight: 'bold',
             }}>
-            {translate('Apply')}
+            {translate('Next')}
           </Text>
         </TouchableOpacity>
       </View>

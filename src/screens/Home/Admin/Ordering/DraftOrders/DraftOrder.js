@@ -1002,24 +1002,26 @@ class DraftOrder extends Component {
                   {translate('New Order')}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => this.addMoreFun()}
-                style={{
-                  marginTop: hp('4%'),
-                  alignSelf: 'center',
-                }}>
-                <Text
+              {draftsOrderData.length > 5 ? (
+                <TouchableOpacity
+                  onPress={() => this.addMoreFun()}
                   style={{
-                    fontSize: 14,
-                    fontFamily: 'Inter-SemiBold',
-                    color: 'black',
-                    color: '#5297c1',
-                    fontWeight: 'bold',
-                    textDecorationLine: 'underline',
+                    marginTop: hp('4%'),
+                    alignSelf: 'center',
                   }}>
-                  {translate('Load more')}
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontFamily: 'Inter-SemiBold',
+                      color: 'black',
+                      color: '#5297c1',
+                      fontWeight: 'bold',
+                      textDecorationLine: 'underline',
+                    }}>
+                    {translate('Load more')}
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
           )}
         </View>

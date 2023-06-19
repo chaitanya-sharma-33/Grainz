@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView, BackHandler} from 'react-native';
 import Navigation from './src/navigations';
 import {Provider} from 'react-redux';
 import store from './src/redux/reducers';
@@ -20,6 +20,18 @@ class App extends Component {
   async componentDidMount() {
     SplashScreen.hide();
     await this.setLanguage();
+    BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.onBackButtonPressed,
+    );
+  }
+
+  onBackButtonPressed() {
+    return true;
   }
 
   setLanguage = async () => {

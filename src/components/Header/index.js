@@ -2,11 +2,9 @@ import React, {Component} from 'react';
 import {View, Text, Image, TouchableOpacity, Switch} from 'react-native';
 import styles from './style';
 import img from '../../constants/images';
-import {getUserLocationApi} from '../../connectivity/api';
+import {getUserLocationApi, getEnvironmentApi} from '../../connectivity/api';
 import url from '../../connectivity/Environment.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-let baseURL = url['STAGING_TWO'].BaseURL;
 
 class index extends Component {
   constructor(props) {
@@ -18,6 +16,7 @@ class index extends Component {
 
   async componentDidMount() {
     const location = await AsyncStorage.getItem('@locationName');
+    this.getEnvironmentFun();
     if (location) {
       this.setState({
         finalLocation: location,
@@ -57,11 +56,23 @@ class index extends Component {
       });
   };
 
+  getEnvironmentFun = () => {
+    getEnvironmentApi()
+      .then(res => {
+        this.setState({
+          environmentName: res.data,
+        });
+        console.log('res-->ENV', res);
+      })
+      .catch(err => {
+        console.warn('ERr', err);
+      });
+  };
+
   render() {
-    const {finalLocation} = this.state;
+    const {finalLocation, environmentName} = this.state;
 
     // console.log('FinalLoca', finalLocation);
-    // console.log('baseURL', baseURL.includes('uat'));
 
     return (
       <View style={styles.container}>
@@ -93,35 +104,19 @@ class index extends Component {
                 justifyContent: 'space-around',
                 flexDirection: 'row',
               }}>
-              {baseURL.includes('uat') ? (
-                <View
+              <View
+                style={{
+                  backgroundColor: '#428855',
+                  padding: 5,
+                  borderRadius: 10,
+                }}>
+                <Text
                   style={{
-                    backgroundColor: '#428855',
-                    padding: 5,
-                    borderRadius: 10,
+                    color: '#fff',
                   }}>
-                  <Text
-                    style={{
-                      color: '#fff',
-                    }}>
-                    UAT
-                  </Text>
-                </View>
-              ) : baseURL.includes('dev') ? (
-                <View
-                  style={{
-                    backgroundColor: '#428855',
-                    padding: 5,
-                    borderRadius: 10,
-                  }}>
-                  <Text
-                    style={{
-                      color: '#fff',
-                    }}>
-                    DEV
-                  </Text>
-                </View>
-              ) : null}
+                  {environmentName}
+                </Text>
+              </View>
             </View>
           </TouchableOpacity>
           <View
