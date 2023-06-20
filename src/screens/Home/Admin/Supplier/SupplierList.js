@@ -356,6 +356,7 @@ class SupplierList extends Component {
 
   seeOrdersFun = () => {
     const {param} = this.state;
+    console.log('param', param);
     this.setState(
       {
         pickerModalStatus: false,
@@ -376,7 +377,10 @@ class SupplierList extends Component {
       searchItem,
       pickerModalStatus,
       duplicateModalStatus,
+      param,
     } = this.state;
+
+    console.log('  item: param,', param);
 
     return (
       <View style={styles.container}>
@@ -588,7 +592,7 @@ class SupplierList extends Component {
                                   justifyContent: 'center',
                                   alignItems: 'center',
                                 }}>
-                                <Image
+                                {/* <Image
                                   style={{
                                     width: 17,
                                     height: 17,
@@ -596,7 +600,7 @@ class SupplierList extends Component {
                                     tintColor: 'grey',
                                   }}
                                   source={img.threeDotsIcon}
-                                />
+                                /> */}
                               </TouchableOpacity>
                             </View>
                           </View>
@@ -709,7 +713,7 @@ class SupplierList extends Component {
                 yesStatus
               />
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 // onPress={() => this.addMoreFun()}
                 style={{
                   marginTop: hp('4%'),
@@ -726,7 +730,7 @@ class SupplierList extends Component {
                   }}>
                   {translate('Load more')}
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           )}
         </View>

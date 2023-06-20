@@ -511,6 +511,8 @@ class DraftOrder extends Component {
       pickerModalStatus,
       duplicateModalStatus,
       deleteModalStatus,
+      filterData,
+      supplierData,
     } = this.state;
 
     return (
@@ -607,6 +609,26 @@ class DraftOrder extends Component {
                   Filter
                 </Text>
               </View>
+              {filterData ? (
+                <TouchableOpacity
+                  onPress={() =>
+                    this.setState(
+                      {
+                        filterData: undefined,
+                      },
+                      () => this.getDraftOrderData(supplierData),
+                    )
+                  }>
+                  <Image
+                    style={{
+                      width: 18,
+                      height: 18,
+                      resizeMode: 'contain',
+                    }}
+                    source={img.deleteIcon}
+                  />
+                </TouchableOpacity>
+              ) : null}
             </TouchableOpacity>
           </View>
 
@@ -723,7 +745,7 @@ class DraftOrder extends Component {
                       <View
                         onPress={() => this.arrangeListFun('HTVA')}
                         style={{
-                          flex: 0.5,
+                          flex: 0.2,
                           justifyContent: 'center',
                           alignItems: 'center',
                           flexDirection: 'row',
@@ -831,7 +853,7 @@ class DraftOrder extends Component {
                               <TouchableOpacity
                                 onPress={() => this.pickerFun(item)}
                                 style={{
-                                  flex: 0.5,
+                                  flex: 0.2,
                                   justifyContent: 'center',
                                   alignItems: 'center',
                                 }}>

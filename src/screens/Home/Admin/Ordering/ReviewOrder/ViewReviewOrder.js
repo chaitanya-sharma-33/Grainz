@@ -240,7 +240,7 @@ class ViewReviewOrder extends Component {
   isCheckedEditableStatusFun = () => {
     const {pageData} = this.state;
     const finalStatus = pageData.orderItems.some((item, index) => {
-      return item.isCorrect === false;
+      return item.isCorrect === false || item.isCorrect === null;
     });
     this.setState({
       isCheckedEditableStatus: finalStatus,
@@ -1057,6 +1057,7 @@ class ViewReviewOrder extends Component {
   };
 
   processOrderFun = () => {
+    console.log('5');
     this.setState(
       {
         loaderCompStatus: true,
@@ -1080,6 +1081,7 @@ class ViewReviewOrder extends Component {
       productId,
       isCheckedStatus,
       switchValueAll,
+      isAuditStatus,
     } = this.state;
     let payload = {
       ambientTemp: pageAmbientTemp,
@@ -1090,7 +1092,7 @@ class ViewReviewOrder extends Component {
       frozenTemp: pageFrozenTemp,
       id: productId,
       invoiceNumber: pageInvoiceNumber,
-      isAuditComplete: pageData.isAuditComplete,
+      isAuditComplete: isAuditStatus,
       notes: pageNotes,
       orderDate: pageData.orderDate,
       orderItems: finalApiData,
@@ -1194,6 +1196,7 @@ class ViewReviewOrder extends Component {
       finalUnit,
     } = this.state;
 
+    console.log('pageData', pageData);
     return (
       <View style={styles.container}>
         <Header
@@ -3211,9 +3214,9 @@ class ViewReviewOrder extends Component {
                       paddingHorizontal: 20,
                     }}>
                     <TouchableOpacity
-                      // onPress={() =>
-                      //   this.setState({isAuditStatus: !isAuditStatus})
-                      // }
+                      onPress={() =>
+                        this.setState({isAuditStatus: !isAuditStatus})
+                      }
                       style={{
                         flex: 1,
                         flexDirection: 'row',
@@ -3277,7 +3280,7 @@ class ViewReviewOrder extends Component {
                 </TouchableOpacity> */}
 
                 <TouchableOpacity
-                  // onPress={() => this.updateBasketFun()}
+                  onPress={() => this.processOrderFun()}
                   style={{
                     height: hp('7%'),
                     width: wp('87%'),

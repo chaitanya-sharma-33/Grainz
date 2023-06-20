@@ -302,8 +302,10 @@ class ViewPendingDelivery extends Component {
     });
 
     const finalStatusSwitch = pageData.orderItems.some((item, index) => {
-      return item.isCorrect === false;
+      return item.isCorrect === false || item.isCorrect === null;
     });
+
+    console.log('finalStatusSwitch-->1', finalStatusSwitch);
 
     const result = finalArray;
     this.setState(
@@ -333,8 +335,10 @@ class ViewPendingDelivery extends Component {
     } else {
       const {pageData} = this.state;
       const finalStatus = pageData.orderItems.some((item, index) => {
-        return item.isCorrect === false;
+        return item.isCorrect === false || item.isCorrect === null;
       });
+
+      console.log('finalStatusSwitch-->2', finalStatus);
 
       // console.log('finalStatus--> SWITCH', finalStatus);
       this.setState({
@@ -1573,6 +1577,7 @@ class ViewPendingDelivery extends Component {
     } = this.state;
     // console.log('creditRequested--->', creditRequested);
     console.log('pageData--->', pageData);
+    console.log('SWICHH--->', switchValueAll);
 
     // console.log('isCheckedEditableStatus', isCheckedEditableStatus);
 
@@ -5164,111 +5169,114 @@ class ViewPendingDelivery extends Component {
                             </View>
                           </View>
 
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              flex: 1,
-                              marginTop: hp('2%'),
-                            }}>
+                          {modalData.hasCreditNote > 0 ? (
                             <View
                               style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
                                 flex: 1,
+                                marginTop: hp('2%'),
                               }}>
-                              <Text
-                                style={{
-                                  fontSize: 12,
-                                }}>
-                                Credit Requested
-                              </Text>
                               <View
                                 style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
+                                  flex: 1,
                                 }}>
-                                <TextInput
-                                  placeholder="Credit Requested"
-                                  keyboardType="numeric"
-                                  style={{
-                                    width: 80,
-                                    fontWeight: 'bold',
-                                    marginTop: 5,
-                                  }}
-                                  value={String(creditRequested)}
-                                  editable={false}
-                                />
                                 <Text
                                   style={{
-                                    fontWeight: 'bold',
-                                    marginTop: 5,
+                                    fontSize: 12,
                                   }}>
-                                  €
+                                  Credit Requested
                                 </Text>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <TextInput
+                                    placeholder="Credit Requested"
+                                    keyboardType="numeric"
+                                    style={{
+                                      width: 80,
+                                      fontWeight: 'bold',
+                                      marginTop: 5,
+                                    }}
+                                    value={String(creditRequested)}
+                                    editable={false}
+                                  />
+                                  <Text
+                                    style={{
+                                      fontWeight: 'bold',
+                                      marginTop: 5,
+                                    }}>
+                                    €
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
 
-                            <View
-                              style={{
-                                flex: 0.3,
-                              }}></View>
-
-                            <View
-                              style={{
-                                flex: 1,
-                                backgroundColor: '#fff',
-                                padding: 5,
-                                borderRadius: 6,
-                              }}>
-                              <Text
-                                style={{
-                                  fontSize: 12,
-                                }}>
-                                Credit Approved Value
-                              </Text>
                               <View
                                 style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
+                                  flex: 0.3,
+                                }}></View>
+
+                              <View
+                                style={{
+                                  flex: 1,
+                                  backgroundColor: '#fff',
+                                  padding: 5,
+                                  borderRadius: 6,
                                 }}>
-                                <TextInput
-                                  placeholder="Credit Approved Value"
-                                  style={{
-                                    width: 80,
-                                    marginTop: 5,
-                                    fontWeight: 'bold',
-                                  }}
-                                  value={String(creditApprovedValue)}
-                                  onChangeText={value =>
-                                    this.changeCreditRequestedFun(value)
-                                  }
-                                />
                                 <Text
                                   style={{
-                                    fontWeight: 'bold',
-                                    marginTop: 5,
+                                    fontSize: 12,
                                   }}>
-                                  €
+                                  Credit Approved Value
                                 </Text>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <TextInput
+                                    placeholder="Credit Approved Value"
+                                    style={{
+                                      width: 80,
+                                      marginTop: 5,
+                                      fontWeight: 'bold',
+                                    }}
+                                    value={String(creditApprovedValue)}
+                                    onChangeText={value =>
+                                      this.changeCreditRequestedFun(value)
+                                    }
+                                  />
+                                  <Text
+                                    style={{
+                                      fontWeight: 'bold',
+                                      marginTop: 5,
+                                    }}>
+                                    €
+                                  </Text>
+                                </View>
                               </View>
                             </View>
-                          </View>
+                          ) : null}
 
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              flex: 1,
-                              marginTop: hp('2%'),
-                              borderBottomWidth: 0.5,
-                              borderBottomColor: 'grey',
-                              paddingBottom: 15,
-                            }}>
+                          {modalData.hasCreditNote > 0 ? (
                             <View
                               style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
                                 flex: 1,
-                                padding: 5,
+                                marginTop: hp('2%'),
+                                borderBottomWidth: 0.5,
+                                borderBottomColor: 'grey',
+                                paddingBottom: 15,
                               }}>
-                              {/* <Text
+                              <View
+                                style={{
+                                  flex: 1,
+                                  padding: 5,
+                                }}>
+                                {/* <Text
                                 style={{
                                   fontSize: 12,
                                 }}>
@@ -5284,38 +5292,39 @@ class ViewPendingDelivery extends Component {
                                 value={priceExpected && String(priceExpected)}
                                 editable={false}
                               /> */}
-                            </View>
+                              </View>
 
-                            <View
-                              style={{
-                                flex: 0.3,
-                              }}></View>
-
-                            <View
-                              style={{
-                                flex: 1,
-                                // backgroundColor: '#fff',
-                                // padding: 5,
-                                // borderRadius: 6,
-                              }}>
-                              <Text
+                              <View
                                 style={{
-                                  fontSize: 12,
+                                  flex: 0.3,
+                                }}></View>
+
+                              <View
+                                style={{
+                                  flex: 1,
+                                  // backgroundColor: '#fff',
+                                  // padding: 5,
+                                  // borderRadius: 6,
                                 }}>
-                                Net Value
-                              </Text>
-                              <TextInput
-                                placeholder="Net Value"
-                                editable={false}
-                                style={{
-                                  width: 80,
-                                  marginTop: 5,
-                                  fontWeight: 'bold',
-                                }}
-                                value={netValue && String(netValue) + ' Є '}
-                              />
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                  }}>
+                                  Net Value
+                                </Text>
+                                <TextInput
+                                  placeholder="Net Value"
+                                  editable={false}
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  value={netValue && String(netValue) + ' Є '}
+                                />
+                              </View>
                             </View>
-                          </View>
+                          ) : null}
 
                           <TouchableOpacity
                             onPress={() =>

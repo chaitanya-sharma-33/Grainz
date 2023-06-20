@@ -1244,13 +1244,13 @@ class AddItems extends Component {
   };
 
   onPressInventoryFun = (item, index) => {
-    const {actionOpen} = this.state;
-    console.log('actionOpen', actionOpen);
-    if (actionOpen === true) {
+    const {actionOpen, listIndex} = this.state;
+    console.log('actionOpen====>', actionOpen);
+    if (actionOpen === false || listIndex !== index) {
       this.setState(
         {
           listIndex: index,
-          actionOpen: false,
+          actionOpen: true,
           modalQuantity: '0',
         },
         () => this.navigateSubFun(item),
@@ -1258,8 +1258,8 @@ class AddItems extends Component {
     } else {
       this.setState(
         {
-          listIndex: index,
-          actionOpen: true,
+          listIndex: '',
+          actionOpen: false,
           modalQuantity: '0',
         },
         () => this.navigateSubFun(item),
@@ -2249,7 +2249,7 @@ class AddItems extends Component {
     } = this.state;
 
     // console.log('PAGE DATA', pageData);
-    console.log('isFreemium', isFreemium);
+    console.log('actionOpen', actionOpen);
     console.log('draftStatus', draftStatus);
 
     return (

@@ -1053,7 +1053,7 @@ class PendingDelivery extends Component {
                       </TouchableOpacity>
                       <View
                         style={{
-                          flex: 0.5,
+                          flex: 0.2,
                           justifyContent: 'center',
                           alignItems: 'center',
                           flexDirection: 'row',
@@ -1184,7 +1184,7 @@ class PendingDelivery extends Component {
                                             width: 16,
                                             height: 16,
                                             resizeMode: 'contain',
-                                            marginLeft: 2,
+                                            marginLeft: 5,
                                           }}
                                         />
                                       ) : null}
@@ -1226,7 +1226,7 @@ class PendingDelivery extends Component {
                                 <TouchableOpacity
                                   onPress={() => this.pickerFun(item)}
                                   style={{
-                                    flex: 0.5,
+                                    flex: 0.2,
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                   }}>

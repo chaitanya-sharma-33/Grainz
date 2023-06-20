@@ -42,6 +42,7 @@ class index extends Component {
       pageLoader: true,
       buttonsSubHeader: [],
       locationArr: [],
+      id: '',
       languageArr: [
         {
           label: 'French',
@@ -69,8 +70,9 @@ class index extends Component {
   getProfileData = () => {
     getMyProfileApi()
       .then(res => {
-        // console.log('res---->USER', res);
-        const {firstName, lastName, email, jobTitle, phoneNumber} = res.data;
+        console.log('res---->USER', res);
+        const {firstName, lastName, email, jobTitle, phoneNumber, id} =
+          res.data;
         this.setState({
           firstName,
           lastName,
@@ -78,6 +80,7 @@ class index extends Component {
           jobTitle,
           phoneNumber,
           pageLoader: false,
+          id,
           buttonsSubHeader: [
             {name: translate('ADMIN')},
             {name: translate('Setup')},
@@ -262,16 +265,19 @@ class index extends Component {
       finalLocation,
       firstName,
       lastName,
+      id,
     } = this.state;
     const payload = {
       email: email,
       firstName: firstName,
-      id: 'd8aa6950-9d4d-4ba3-9319-3a0c42c8c7d3',
+      id: id,
       jobTitle: jobTitle,
       language: finalLang,
       lastName: lastName,
       phoneNumber: phoneNumber,
     };
+
+    console.log('payload-->', payload);
 
     updateUserApi(payload)
       .then(res => {
@@ -281,6 +287,7 @@ class index extends Component {
         console.log('Res', res);
       })
       .catch(err => {
+        console.log('err', err.response);
         console.warn('ERr', err);
       });
   };
@@ -321,20 +328,20 @@ class index extends Component {
             <ActivityIndicator color="#5297c1" size="large" />
           ) : (
             <View>
-              <View style={styles.subContainer}>
+              <TouchableOpacity
+                style={styles.subContainer}
+                onPress={() => this.props.navigation.goBack()}>
                 <View style={styles.firstContainer}>
-                  <TouchableOpacity
-                    onPress={() => this.props.navigation.goBack()}
-                    style={styles.goBackContainer}>
+                  <View style={styles.goBackContainer}>
                     <Image source={img.backIcon} style={styles.tileImageBack} />
-                  </TouchableOpacity>
+                  </View>
                   <View style={styles.flex}>
                     <Text style={styles.adminTextStyle}>
                       {translate('Profile')}
                     </Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
 
               <View
                 style={{

@@ -602,7 +602,7 @@ class ReviewOrderDelivery extends Component {
                       }}>
                       {finalData.orderReference}
                     </Text>
-                    <Image
+                    {/* <Image
                       source={img.calenderIcon}
                       style={{
                         height: 20,
@@ -612,13 +612,14 @@ class ReviewOrderDelivery extends Component {
                         marginRight: 10,
                         tintColor: 'grey',
                       }}
-                    />
+                    /> */}
                   </View>
                 </View>
 
                 <View style={{}}>
                   <TouchableOpacity
-                    onPress={() => this.showDatePickerFunDelivery()}
+                    disabled={true}
+                    // onPress={() => this.showDatePickerFunDelivery()}
                     style={{
                       backgroundColor: '#fff',
                       padding: 12,

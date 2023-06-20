@@ -333,7 +333,7 @@ class SupplierDetail extends Component {
                   style={{}}
                   onPress={() =>
                     this.props.navigation.navigate('OrderingAdminScreen', {
-                      item: '',
+                      item: supplierData,
                     })
                   }>
                   <Text
@@ -342,7 +342,7 @@ class SupplierDetail extends Component {
                       textDecorationLine: 'underline',
                       color: '#5197C1',
                     }}>
-                    See orders from suppliers
+                    See orders for this supplier
                   </Text>
                 </TouchableOpacity>
               </View>
