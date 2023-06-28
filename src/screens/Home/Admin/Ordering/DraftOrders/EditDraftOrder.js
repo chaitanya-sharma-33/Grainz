@@ -35,6 +35,7 @@ import {
   lookupDepartmentsApi,
   deleteOrderApi,
   duplicateApi,
+  validateUserApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -95,6 +96,9 @@ class EditDraftOrder extends Component {
       deleteModalStatus: false,
       totalHTVA: '',
       isFreemium: '',
+      validateDateModalStatus: false,
+      validateData: '',
+      emailData: '',
     };
   }
 
@@ -135,6 +139,44 @@ class EditDraftOrder extends Component {
     } catch (e) {
       console.warn('ErrHome', e);
     }
+  };
+
+  validateDeliveryDateFun = data => {
+    const {basketId} = this.state;
+    let payload = {
+      emailDetails: {
+        ccRecipients: data.data && data.data.emailDetails.ccRecipients,
+        subject: data.data && data.data.emailDetails.subject,
+        text: data.data && data.data.emailDetails.text,
+        toRecipient: data.data && data.data.emailDetails.toRecipient,
+      },
+      shopingBasketId: basketId,
+    };
+    console.log('payload->validateUserApi', payload);
+    validateUserApi(payload)
+      .then(res => {
+        console.log('res-Validate', res);
+        if (res.data === '') {
+          this.optionFun(data, res);
+        } else {
+          this.setState({
+            validateDateModalStatus: true,
+            validateData: res,
+            emailData: data,
+          });
+        }
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-1',
+          [
+            {
+              text: 'Okay',
+            },
+          ],
+        );
+      });
   };
 
   sendFun = () => {
@@ -192,7 +234,7 @@ class EditDraftOrder extends Component {
             {
               loaderCompStatus: false,
             },
-            () => this.optionFun(res),
+            () => this.validateDeliveryDateFun(res),
           );
         })
         .catch(err => {
@@ -216,30 +258,30 @@ class EditDraftOrder extends Component {
     }
   };
 
-  optionFun = res => {
+  optionFun = (data, res) => {
     const {channel} = this.state;
     if (channel === 'Ftp') {
       this.setState(
         {
-          toRecipientValue: res.data && res.data.emailDetails.toRecipient,
-          ccRecipientValue: res.data && res.data.emailDetails.ccRecipients,
-          mailTitleValue: res.data && res.data.emailDetails.subject,
-          mailMessageValue: res.data && res.data.emailDetails.text,
+          toRecipientValue: data.data && data.data.emailDetails.toRecipient,
+          ccRecipientValue: data.data && data.data.emailDetails.ccRecipients,
+          mailTitleValue: data.data && data.data.emailDetails.subject,
+          mailMessageValue: data.data && data.data.emailDetails.text,
         },
         () => this.sendMailFun(),
       );
     } else {
-      this.openMailModal(res);
+      this.openMailModal(data);
     }
   };
 
-  openMailModal = res => {
+  openMailModal = data => {
     this.setState({
       mailModalVisible: true,
-      toRecipientValue: res.data && res.data.emailDetails.toRecipient,
-      ccRecipientValue: res.data && res.data.emailDetails.ccRecipients,
-      mailTitleValue: res.data && res.data.emailDetails.subject,
-      mailMessageValue: res.data && res.data.emailDetails.text,
+      toRecipientValue: data.data && data.data.emailDetails.toRecipient,
+      ccRecipientValue: data.data && data.data.emailDetails.ccRecipients,
+      mailTitleValue: data.data && data.data.emailDetails.subject,
+      mailMessageValue: data.data && data.data.emailDetails.text,
     });
   };
 
@@ -1192,10 +1234,13 @@ class EditDraftOrder extends Component {
       deleteModalStatus,
       totalHTVA,
       isFreemium,
+      validateDateModalStatus,
+      validateData,
+      emailData,
     } = this.state;
 
     console.log('finalData', finalData);
-    console.log('finalApidata', finalApiData);
+    console.log('validateData', validateData);
 
     return (
       <View style={styles.container}>
@@ -1372,7 +1417,7 @@ class EditDraftOrder extends Component {
                   mode={'date'}
                   onConfirm={this.handleConfirmDeliveryDate}
                   onCancel={this.hideDatePickerDeliveryDate}
-                  minimumDate={finalOrderMinDate}
+                  // minimumDate={finalOrderMinDate}
                 />
               </View>
 
@@ -2068,6 +2113,7 @@ class EditDraftOrder extends Component {
                                 width: '100%',
                                 color: 'black',
                                 height: '100%',
+                                textAlign: 'center',
                               }}
                               onChangeText={value =>
                                 this.editQuantityFun(
@@ -3394,6 +3440,133 @@ class EditDraftOrder extends Component {
               </ScrollView>
             </View>
           </Modal>
+
+          <Modal isVisible={validateDateModalStatus} backdropOpacity={0.35}>
+            <View
+              style={{
+                width: wp('80%'),
+                height: hp('50%'),
+                backgroundColor: '#fff',
+                alignSelf: 'center',
+                borderRadius: 6,
+              }}>
+              <ScrollView>
+                <View style={{padding: hp('3%')}}>
+                  <View style={{}}>
+                    <View style={{}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: 'bold',
+                        }}>
+                        {validateData && validateData.data.propertyName}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                      }}>
+                      {validateData && validateData.data.message}
+                    </Text>
+                  </View>
+                  <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        fontWeight: 'bold',
+                      }}>
+                      Available Dates:
+                    </Text>
+                  </View>
+                  {validateData && validateData.data.parameters !== null ? (
+                    <View style={{marginTop: hp('2%')}}>
+                      {validateData &&
+                        validateData.data.parameters.map((item, index) => {
+                          return (
+                            <Text
+                              style={{
+                                fontSize: 15,
+                                color: 'black',
+                                marginTop: 10,
+                              }}>
+                              {item}
+                            </Text>
+                          );
+                        })}
+                    </View>
+                  ) : null}
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        validateDateModalStatus: false,
+                      })
+                    }
+                    style={{
+                      width: wp('70%'),
+                      height: hp('5%'),
+                      backgroundColor: '#5297c1',
+                      borderRadius: 6,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('3%'),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {validateData && validateData.data.severity < 3
+                        ? 'No'
+                        : 'Ok'}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {validateData && validateData.data.severity < 3 ? (
+                    <TouchableOpacity
+                      onPress={() =>
+                        this.setState(
+                          {
+                            validateDateModalStatus: false,
+                          },
+                          () =>
+                            setTimeout(() => {
+                              this.optionFun(emailData);
+                            }, 300),
+                        )
+                      }
+                      style={{
+                        width: wp('90%'),
+                        height: hp('5%'),
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 10,
+                        marginBottom: 5,
+                        alignSelf: 'center',
+                        marginTop: hp('1%'),
+                      }}>
+                      <Text
+                        style={{
+                          color: '#5297c1',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                        }}>
+                        Yes
+                      </Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              </ScrollView>
+            </View>
+          </Modal>
+
           {/* <Modal isVisible={actionModalStatus} backdropOpacity={0.35}>
             <View
               style={{

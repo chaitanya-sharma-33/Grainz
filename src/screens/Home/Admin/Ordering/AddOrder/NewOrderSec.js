@@ -482,6 +482,7 @@ class NewOrderSec extends Component {
                       backgroundColor: '#fff',
                       borderRadius: 6,
                       padding: 12,
+                      marginTop: 10,
                     }}>
                     <View style={{}}>
                       <Text style={{}}>Customer Number</Text>

@@ -586,7 +586,7 @@ class SupplierList extends Component {
                                 </View>
                               </TouchableOpacity>
                               <TouchableOpacity
-                                onPress={() => this.pickerFun(item)}
+                                // onPress={() => this.pickerFun(item)}
                                 style={{
                                   flex: 0.5,
                                   justifyContent: 'center',

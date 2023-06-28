@@ -1906,6 +1906,7 @@ class Basket extends Component {
                                 width: '100%',
                                 height: '100%',
                                 color: 'black',
+                                textAlign: 'center',
                               }}
                               onChangeText={value =>
                                 this.editQuantityFun(

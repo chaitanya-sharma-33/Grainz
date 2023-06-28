@@ -46,7 +46,7 @@ class index extends Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount = async () => {
     const rememberMe = await AsyncStorage.getItem('@rememberMe');
     const rememberEmail = await AsyncStorage.getItem('@email');
     const rememberPass = await AsyncStorage.getItem('@password');
@@ -54,27 +54,6 @@ class index extends Component {
     console.log('rememberMe-2', rememberMe);
     console.log('rememberEmail-3', rememberEmail);
     console.log('rememberPass-4', rememberPass);
-
-    if (rememberMe != null && rememberMe != undefined && rememberMe == 'true') {
-      console.log('FIRST-5');
-      this.setState({
-        switchValueRemember: rememberMe,
-        email: rememberEmail,
-        password: rememberPass,
-      });
-    } else {
-      console.log('SEC-6');
-
-      this.setState(
-        {
-          switchValueRemember: false,
-          email: '',
-          password: '',
-        },
-        () => this.removeStorageFun(),
-      );
-    }
-    setI18nConfig();
 
     const lang = await AsyncStorage.getItem('Language');
     if (lang !== null && lang !== undefined) {
@@ -96,9 +75,32 @@ class index extends Component {
       this.setState({switchValue: false, loader: false});
       setI18nConfig();
     }
-  }
+
+    if (rememberMe != null && rememberMe != undefined) {
+      if (rememberMe === 'true' || rememberMe === true) {
+        console.log('IF');
+        this.setState({
+          switchValueRemember: true,
+          email: rememberEmail,
+          password: rememberPass,
+        });
+      }
+    } else {
+      console.log('ELSE');
+
+      this.setState(
+        {
+          switchValueRemember: false,
+          email: '',
+          password: '',
+        },
+        () => this.removeStorageFun(),
+      );
+    }
+  };
 
   removeStorageFun = async () => {
+    console.log('remove');
     await AsyncStorage.removeItem('@rememberMe');
     await AsyncStorage.removeItem('@email');
     await AsyncStorage.removeItem('@password');
@@ -148,12 +150,14 @@ class index extends Component {
         grant_type: 'password',
       };
 
-      if (switchValueRemember === true) {
+      if (switchValueRemember === true || switchValueRemember === 'true') {
         console.log('switchValueRemember', switchValueRemember);
         await AsyncStorage.setItem('@rememberMe', 'true');
         await AsyncStorage.setItem('@email', email);
         await AsyncStorage.setItem('@password', password);
       } else {
+        console.log('ELSE-->', switchValueRemember);
+
         this.setState(
           {
             switchValueRemember: false,

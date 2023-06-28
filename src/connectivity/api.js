@@ -1556,6 +1556,17 @@ export const updateUserApi = async payload => {
   });
 };
 
+export const validateUserApi = async payload => {
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.post(baseURL + `/Order/validate delivery date`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      LocationId: location,
+    },
+  });
+};
+
 export const flagApi = async (payload, id, status) => {
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');

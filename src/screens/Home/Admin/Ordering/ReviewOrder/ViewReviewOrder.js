@@ -444,6 +444,10 @@ class ViewReviewOrder extends Component {
   showDatePickerArrivalDateSpecific = () => {
     Alert.alert(`Grainz`, 'Clear date or select date', [
       {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
         text: 'Clear',
         onPress: () =>
           this.setState({
@@ -1105,10 +1109,13 @@ class ViewReviewOrder extends Component {
 
     processPendingOrderApi(payload)
       .then(res => {
-        this.setState({
-          loaderCompStatus: false,
-          checklistModalStatus: false,
-        });
+        this.setState(
+          {
+            loaderCompStatus: false,
+            checklistModalStatus: false,
+          },
+          () => this.navigateBackFun(),
+        );
       })
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
@@ -1118,6 +1125,13 @@ class ViewReviewOrder extends Component {
           },
         ]);
       });
+  };
+
+  navigateBackFun = () => {
+    const {switchValueAll, isAuditStatus} = this.state;
+    if (switchValueAll && isAuditStatus) {
+      this.props.navigation.goBack();
+    }
   };
 
   requestCredtiNoteFun = () => {
@@ -1197,6 +1211,8 @@ class ViewReviewOrder extends Component {
     } = this.state;
 
     console.log('pageData', pageData);
+    console.log('switchValueAll-->', switchValueAll);
+
     return (
       <View style={styles.container}>
         <Header
@@ -3214,6 +3230,7 @@ class ViewReviewOrder extends Component {
                       paddingHorizontal: 20,
                     }}>
                     <TouchableOpacity
+                      disabled={switchValueAll ? false : true}
                       onPress={() =>
                         this.setState({isAuditStatus: !isAuditStatus})
                       }
@@ -4261,7 +4278,10 @@ class ViewReviewOrder extends Component {
                         }}>
                         <View style={styles.insideContainer}>
                           {isFreemium === 'false' ? (
-                            <View>
+                            <View
+                              style={{
+                                padding: 8,
+                              }}>
                               <Text
                                 style={{
                                   fontSize: 12,
@@ -4286,6 +4306,7 @@ class ViewReviewOrder extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -4311,6 +4332,7 @@ class ViewReviewOrder extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -4340,6 +4362,7 @@ class ViewReviewOrder extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -4365,6 +4388,7 @@ class ViewReviewOrder extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -4679,6 +4703,7 @@ class ViewReviewOrder extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -4706,6 +4731,7 @@ class ViewReviewOrder extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{

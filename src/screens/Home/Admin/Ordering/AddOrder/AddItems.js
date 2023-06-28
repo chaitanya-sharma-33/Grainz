@@ -115,6 +115,7 @@ class AddItems extends Component {
       expandAllStatus: false,
       navigateType: '',
       isFreemium: '',
+      loadingImageIcon: true,
     };
   }
 
@@ -1417,7 +1418,7 @@ class AddItems extends Component {
       () =>
         getInsideInventoryNewApi(catId, supplierId, finalBasketId)
           .then(res => {
-            // console.log('res', res);
+            console.log('res---->1223', res);
             const finalArr = res.data;
             finalArr.forEach(function (item) {
               item.isSelected = item.quantityProduct ? true : false;
@@ -1672,7 +1673,7 @@ class AddItems extends Component {
     const {basketId} = this.state;
     getBasketApi(basketId)
       .then(res => {
-        // console.log('res', res);
+        console.log('res---------->', res);
         this.setState(
           {
             modalData: res.data && res.data.shopingBasketItemList,
@@ -1696,6 +1697,7 @@ class AddItems extends Component {
 
   createApiData = () => {
     const {modalData, finalData} = this.state;
+
     const finalArr = [];
     modalData.map(item => {
       finalArr.push({
@@ -1906,12 +1908,18 @@ class AddItems extends Component {
   };
 
   confirmQuantityFun = () => {
-    this.setState(
-      {
-        orderingThreeModal: false,
-      },
-      () => this.confirmQuantityFunSec(),
-    );
+    const {modalQuantity} = this.state;
+    console.log('modalQuantity', modalQuantity);
+    if (modalQuantity === '0' || modalQuantity === 0) {
+      this.closeFun();
+    } else {
+      this.setState(
+        {
+          orderingThreeModal: false,
+        },
+        () => this.confirmQuantityFunSec(),
+      );
+    }
   };
 
   confirmQuantityFunSec = async () => {
@@ -2113,6 +2121,7 @@ class AddItems extends Component {
   closeFun = () => {
     this.setState({
       orderingThreeModal: false,
+      modalQuantity: '0',
     });
   };
 
@@ -2198,6 +2207,12 @@ class AddItems extends Component {
     // }
   };
 
+  _onLoadEnd = () => {
+    this.setState({
+      loadingImageIcon: false,
+    });
+  };
+
   render() {
     const {
       recipeLoader,
@@ -2246,6 +2261,7 @@ class AddItems extends Component {
       expandAllStatus,
       navigateType,
       isFreemium,
+      loadingImageIcon,
     } = this.state;
 
     // console.log('PAGE DATA', pageData);
@@ -3237,12 +3253,13 @@ class AddItems extends Component {
                       </Text>
                     </View>
                     <TouchableOpacity
-                      onPress={() =>
-                        this.setState({
-                          orderingThreeModal: false,
-                          modalQuantity: '0',
-                        })
-                      }
+                      // onPress={() =>
+                      //   this.setState({
+                      //     orderingThreeModal: false,
+                      //     modalQuantity: '0',
+                      //   })
+                      // }
+                      onPress={() => this.confirmQuantityFun()}
                       style={{
                         backgroundColor: '#fff',
                         borderRadius: 100,
@@ -3461,8 +3478,9 @@ class AddItems extends Component {
                           style={{
                             borderRadius: 6,
                             padding: 18,
-                            width: wp('50%'),
+                            width: wp('30%'),
                             backgroundColor: '#fff',
+                            textAlign: 'center',
                           }}
                           onChangeText={value =>
                             this.editModalQuantityFun('input', value)
@@ -3491,7 +3509,33 @@ class AddItems extends Component {
                         style={{
                           flex: 2,
                         }}>
-                        <TouchableOpacity
+                        {pageData.imageUrl ? (
+                          <View
+                            style={{marginTop: 15, marginHorizontal: wp('6%')}}>
+                            <Image
+                              onLoadEnd={() => this._onLoadEnd()}
+                              style={{
+                                width: wp('80%'),
+                                height: 120,
+                                resizeMode: 'cover',
+                              }}
+                              source={{uri: pageData.imageUrl}}
+                            />
+                            <ActivityIndicator
+                              style={{
+                                position: 'absolute',
+                                left: 0,
+                                right: 0,
+                                top: 0,
+                                bottom: 0,
+                              }}
+                              size="large"
+                              color="blue"
+                              animating={loadingImageIcon}
+                            />
+                          </View>
+                        ) : null}
+                        {/* <TouchableOpacity
                           onPress={() => this.confirmQuantityFun()}
                           style={styles.signInStyling}>
                           <Text style={styles.signInStylingText}>
@@ -3508,7 +3552,7 @@ class AddItems extends Component {
                           <Text style={{color: '#5297C1', fontWeight: 'bold'}}>
                             {translate('Close')}
                           </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                       </View>
                     </View>
                   </View>
@@ -3584,6 +3628,7 @@ class AddItems extends Component {
                             <View>
                               {modalData && modalData.length > 0
                                 ? modalData.map((item, index) => {
+                                    console.log('ITEM', item);
                                     return (
                                       <View key={index}>
                                         {item.isMapped ? (

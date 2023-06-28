@@ -721,7 +721,8 @@ class PendingOrderDelivery extends Component {
 
                 <View style={{}}>
                   <TouchableOpacity
-                    onPress={() => this.showDatePickerFunOrder()}
+                    disabled={true}
+                    // onPress={() => this.showDatePickerFunOrder()}
                     style={{
                       backgroundColor: '#fff',
                       padding: 12,

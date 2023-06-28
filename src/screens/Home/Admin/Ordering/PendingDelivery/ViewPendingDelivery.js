@@ -514,6 +514,10 @@ class ViewPendingDelivery extends Component {
   showDatePickerArrivalDateSpecific = () => {
     Alert.alert(`Grainz`, 'Clear date or select date', [
       {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
         text: 'Clear',
         onPress: () =>
           this.setState({
@@ -1482,6 +1486,10 @@ class ViewPendingDelivery extends Component {
   arrivedDateUpdateFun = () => {
     Alert.alert(`Grainz`, 'Clear date or select date', [
       {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
         text: 'Clear',
         onPress: () =>
           this.setState({
@@ -1609,12 +1617,12 @@ class ViewPendingDelivery extends Component {
           <View style={{flex: 1}}>
             <ScrollView style={{}} showsVerticalScrollIndicator={false}>
               <View style={{marginHorizontal: wp('5%')}}>
-                <TouchableOpacity
-                  onPress={() =>
-                    this.setState({
-                      showMoreStatus: !showMoreStatus,
-                    })
-                  }
+                <View
+                  // onPress={() =>
+                  //   this.setState({
+                  //     showMoreStatus: !showMoreStatus,
+                  //   })
+                  // }
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -1628,14 +1636,13 @@ class ViewPendingDelivery extends Component {
                         padding: 15,
                         borderTopLeftRadius: 6,
                       }}>
-                      <TouchableOpacity
-                        onPress={() => this.arrivedDateUpdateFun()}>
+                      <View>
                         <View style={{}}>
                           <Text
                             style={{
                               fontSize: 11,
                             }}>
-                            Arrived Date
+                            {translate('Delivery date')}
                           </Text>
                         </View>
                         <View
@@ -1646,11 +1653,9 @@ class ViewPendingDelivery extends Component {
                             alignItems: 'center',
                           }}>
                           <TextInput
-                            placeholder="DD/MM/YY"
-                            placeholderTextColor={
-                              finalArrivedDate ? 'black' : 'red'
-                            }
-                            value={finalArrivedDate}
+                            value={moment(finalData.deliveryDate).format(
+                              'DD/MM/YYYY',
+                            )}
                             editable={false}
                             style={{
                               fontWeight: 'bold',
@@ -1668,7 +1673,7 @@ class ViewPendingDelivery extends Component {
                             }}
                           />
                         </View>
-                      </TouchableOpacity>
+                      </View>
                       <DateTimePickerModal
                         isVisible={isDatePickerVisibleArrived}
                         mode={'date'}
@@ -1702,7 +1707,8 @@ class ViewPendingDelivery extends Component {
                   </View>
 
                   <View style={{flex: 1}}>
-                    <View
+                    <TouchableOpacity
+                      onPress={() => this.arrivedDateUpdateFun()}
                       style={{
                         backgroundColor: '#fff',
                         padding: 15,
@@ -1717,7 +1723,7 @@ class ViewPendingDelivery extends Component {
                           style={{
                             fontSize: 11,
                           }}>
-                          {translate('Delivery date')}
+                          Arrived Date
                         </Text>
                       </View>
 
@@ -1728,9 +1734,11 @@ class ViewPendingDelivery extends Component {
                           marginTop: 10,
                         }}>
                         <TextInput
-                          value={moment(finalData.deliveryDate).format(
-                            'DD/MM/YYYY',
-                          )}
+                          value={finalArrivedDate}
+                          placeholder="DD/MM/YY"
+                          placeholderTextColor={
+                            finalArrivedDate ? 'black' : 'red'
+                          }
                           editable={false}
                           style={{
                             fontSize: 14,
@@ -1739,8 +1747,7 @@ class ViewPendingDelivery extends Component {
                           }}
                         />
                       </View>
-                      <TouchableOpacity
-                        onPress={() => this.props.navigation.goBack()}
+                      <View
                         style={{
                           marginTop: 15,
                         }}>
@@ -1750,10 +1757,10 @@ class ViewPendingDelivery extends Component {
                             color: '#66A4C8',
                             paddingVertical: 3,
                           }}></Text>
-                      </TouchableOpacity>
-                    </View>
+                      </View>
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
+                </View>
 
                 <TouchableOpacity
                   onPress={() => this.deliveryChecklistFun()}
@@ -4704,7 +4711,10 @@ class ViewPendingDelivery extends Component {
                         }}>
                         <View style={styles.insideContainer}>
                           {isFreemium === 'false' ? (
-                            <View>
+                            <View
+                              style={{
+                                padding: 8,
+                              }}>
                               <Text
                                 style={{
                                   fontSize: 12,
@@ -4729,6 +4739,7 @@ class ViewPendingDelivery extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -4754,6 +4765,7 @@ class ViewPendingDelivery extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -4783,6 +4795,7 @@ class ViewPendingDelivery extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -4808,6 +4821,7 @@ class ViewPendingDelivery extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -5122,6 +5136,7 @@ class ViewPendingDelivery extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -5149,6 +5164,7 @@ class ViewPendingDelivery extends Component {
                             <View
                               style={{
                                 flex: 1,
+                                padding: 8,
                               }}>
                               <Text
                                 style={{
@@ -5180,6 +5196,7 @@ class ViewPendingDelivery extends Component {
                               <View
                                 style={{
                                   flex: 1,
+                                  padding: 8,
                                 }}>
                                 <Text
                                   style={{
@@ -5222,7 +5239,7 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   flex: 1,
                                   backgroundColor: '#fff',
-                                  padding: 5,
+                                  padding: 8,
                                   borderRadius: 6,
                                 }}>
                                 <Text
@@ -5302,6 +5319,7 @@ class ViewPendingDelivery extends Component {
                               <View
                                 style={{
                                   flex: 1,
+                                  padding: 8,
                                   // backgroundColor: '#fff',
                                   // padding: 5,
                                   // borderRadius: 6,
