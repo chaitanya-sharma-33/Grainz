@@ -37,6 +37,7 @@ import {
   viewHTMLApi,
   updateDraftOrderNewApi,
   lookupDepartmentsApi,
+  validateUserApi,
 } from '../../../../../connectivity/api';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from 'react-native-modal';
@@ -102,6 +103,9 @@ class Basket extends Component {
       lineData: '',
       itemNotes: '',
       isFreemium: '',
+      validateDateModalStatus: false,
+      validateData: '',
+      emailData: '',
     };
   }
 
@@ -162,35 +166,35 @@ class Basket extends Component {
     this.getData();
     this.getUsersListData();
 
-    this.props.navigation.addListener('focus', () => {
-      const {
-        finalData,
+    // this.props.navigation.addListener('focus', () => {
+    const {
+      finalData,
+      supplierId,
+      itemType,
+      productId,
+      supplierName,
+      finalDataSec,
+      basketId,
+    } = this.props.route && this.props.route.params;
+
+    this.setState(
+      {
         supplierId,
         itemType,
+        basketId,
+        modalLoader: true,
+        finalOrderDate: moment(new Date()).format('DD-MM-YY'),
+        finalOrderMinDate: new Date(),
+        apiOrderDate: new Date().toISOString(),
         productId,
         supplierName,
         finalDataSec,
-        basketId,
-      } = this.props.route && this.props.route.params;
-
-      this.setState(
-        {
-          supplierId,
-          itemType,
-          basketId,
-          modalLoader: true,
-          finalOrderDate: moment(new Date()).format('DD-MM-YY'),
-          finalOrderMinDate: new Date(),
-          apiOrderDate: new Date().toISOString(),
-          productId,
-          supplierName,
-          finalDataSec,
-          supplierValue: supplierId,
-          finalData,
-        },
-        () => this.getBasketDataFun(),
-      );
-    });
+        supplierValue: supplierId,
+        finalData,
+      },
+      () => this.getBasketDataFun(),
+    );
+    // });
   }
 
   getBasketDataFun = () => {
@@ -256,6 +260,7 @@ class Basket extends Component {
       supplierId: finalDataSec.supplierId,
       apiDeliveryDate: finalDataSec.productionDateDelivery,
       apiOrderDate: finalDataSec.productionDateOrder,
+      finalDeliveryDate: finalDataSec.finalDeliveryDate,
     });
   };
 
@@ -338,17 +343,11 @@ class Basket extends Component {
     const finalQuantityInput = volume * value;
 
     const finalValueMinus =
-      data.inventoryMapping.productPrice *
-      data.inventoryMapping.packSize *
-      valueMinus;
+      data.inventoryMapping.price * data.inventoryMapping.packSize * valueMinus;
     const finalValueAdd =
-      data.inventoryMapping.productPrice *
-      data.inventoryMapping.packSize *
-      valueAdd;
+      data.inventoryMapping.price * data.inventoryMapping.packSize * valueAdd;
     const finalValueInput =
-      data.inventoryMapping.productPrice *
-      data.inventoryMapping.packSize *
-      value;
+      data.inventoryMapping.price * data.inventoryMapping.packSize * value;
 
     if (valueType === 'minus') {
       let newArr = modalData.map((item, i) =>
@@ -470,15 +469,21 @@ class Basket extends Component {
         .then(res => {
           this.setState(
             {
-              mailModalVisible: finalDataSec.channel === 'Ftp' ? false : true,
               loaderCompStatus: false,
-              toRecipientValue: res.data && res.data.emailDetails.toRecipient,
-              ccRecipientValue: res.data && res.data.emailDetails.ccRecipients,
-              mailTitleValue: res.data && res.data.emailDetails.subject,
-              mailMessageValue: res.data && res.data.emailDetails.text,
             },
-            () => this.sendOrderCheckFun(),
+            () => this.validateDeliveryDateFun(res),
           );
+          // this.setState(
+          //   {
+          //     mailModalVisible: finalDataSec.channel === 'Ftp' ? false : true,
+          //     loaderCompStatus: false,
+          //     toRecipientValue: res.data && res.data.emailDetails.toRecipient,
+          //     ccRecipientValue: res.data && res.data.emailDetails.ccRecipients,
+          //     mailTitleValue: res.data && res.data.emailDetails.subject,
+          //     mailMessageValue: res.data && res.data.emailDetails.text,
+          //   },
+          //   () => this.sendOrderCheckFun(),
+          // );
         })
         .catch(err => {
           Alert.alert(
@@ -500,6 +505,71 @@ class Basket extends Component {
         },
       ]);
     }
+  };
+
+  validateDeliveryDateFun = data => {
+    const {basketId} = this.state;
+    let payload = {
+      emailDetails: {
+        ccRecipients: data.data && data.data.emailDetails.ccRecipients,
+        subject: data.data && data.data.emailDetails.subject,
+        text: data.data && data.data.emailDetails.text,
+        toRecipient: data.data && data.data.emailDetails.toRecipient,
+      },
+      shopingBasketId: basketId,
+    };
+    console.log('payload->validateUserApi', payload);
+    validateUserApi(payload)
+      .then(res => {
+        console.log('res-Validate', res);
+        if (res.data === '') {
+          this.optionFun(data, res);
+        } else {
+          this.setState({
+            validateDateModalStatus: true,
+            validateData: res,
+            emailData: data,
+          });
+        }
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-1',
+          [
+            {
+              text: 'Okay',
+            },
+          ],
+        );
+      });
+  };
+
+  optionFun = (data, res) => {
+    const {channel} = this.state;
+    if (channel === 'Ftp') {
+      this.setState(
+        {
+          toRecipientValue: data.data && data.data.emailDetails.toRecipient,
+          ccRecipientValue: data.data && data.data.emailDetails.ccRecipients,
+          mailTitleValue: data.data && data.data.emailDetails.subject,
+          mailMessageValue: data.data && data.data.emailDetails.text,
+        },
+        () => this.sendMailFun(),
+      );
+    } else {
+      this.openMailModal(data);
+    }
+  };
+
+  openMailModal = data => {
+    this.setState({
+      mailModalVisible: true,
+      toRecipientValue: data.data && data.data.emailDetails.toRecipient,
+      ccRecipientValue: data.data && data.data.emailDetails.ccRecipients,
+      mailTitleValue: data.data && data.data.emailDetails.subject,
+      mailMessageValue: data.data && data.data.emailDetails.text,
+    });
   };
 
   sendOrderCheckFun = () => {
@@ -842,17 +912,25 @@ class Basket extends Component {
   handleConfirmDeliveryDate = date => {
     const {finalOrderDate} = this.state;
     const finalDeliveryDate = moment(date).format('DD-MM-YY');
-    if (finalDeliveryDate < finalOrderDate) {
-      alert('Delivery date cannot be less than or equal to order date');
-    } else {
-      let newdate = moment(date).format('DD-MM-YY');
-      let apiDeliveryDate = date.toISOString();
-      this.setState({
-        finalDeliveryDate: newdate,
-        apiDeliveryDate,
-      });
-      this.hideDatePickerDeliveryDate();
-    }
+
+    let newdate = moment(date).format('MM/DD/YYYY');
+    let apiDeliveryDate = date.toISOString();
+    this.setState({
+      finalDeliveryDate: newdate,
+      apiDeliveryDate,
+    });
+    this.hideDatePickerDeliveryDate();
+    // if (finalDeliveryDate < finalOrderDate) {
+    //   alert('Delivery date cannot be less than or equal to order date');
+    // } else {
+    //   let newdate = moment(date).format('DD-MM-YY');
+    //   let apiDeliveryDate = date.toISOString();
+    //   this.setState({
+    //     finalDeliveryDate: newdate,
+    //     apiDeliveryDate,
+    //   });
+    //   this.hideDatePickerDeliveryDate();
+    // }
   };
 
   hideDatePickerDeliveryDate = () => {
@@ -941,15 +1019,9 @@ class Basket extends Component {
   };
 
   closeMailModal = () => {
-    this.setState(
-      {
-        mailModalVisible: false,
-      },
-      () =>
-        this.props.navigation.navigate('OrderingAdminScreen', {
-          item: '',
-        }),
-    );
+    this.setState({
+      mailModalVisible: false,
+    });
   };
 
   downLoadPdf = data => {
@@ -1228,6 +1300,9 @@ class Basket extends Component {
       lineData,
       itemNotes,
       isFreemium,
+      validateDateModalStatus,
+      emailData,
+      validateData,
     } = this.state;
 
     console.log('finalDataSec', finalDataSec);
@@ -1264,7 +1339,7 @@ class Basket extends Component {
           </View>
 
           <View style={{marginHorizontal: wp('3%')}}>
-            <TouchableOpacity
+            <View
               onPress={() =>
                 this.setState({
                   showMoreStatus: !showMoreStatus,
@@ -1308,14 +1383,17 @@ class Basket extends Component {
                   </View>
                 </View>
               </View>
-              <View style={{flex: 1}}>
-                <View
-                  style={{
-                    backgroundColor: '#fff',
-                    padding: 15,
-                    borderTopLeftRadius: 6,
-                    borderBottomLeftRadius: 6,
-                  }}>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  backgroundColor: '#fff',
+                  padding: 15,
+                  borderTopRightRadius: 6,
+                }}>
+                <TouchableOpacity
+                  onPress={() => this.showDatePickerDeliveryDate()}
+                  style={{flex: 2}}>
                   <View
                     style={{
                       flexDirection: 'row',
@@ -1327,19 +1405,6 @@ class Basket extends Component {
                       }}>
                       {translate('Delivery date')}
                     </Text>
-                    <Image
-                      source={
-                        showMoreStatus === false
-                          ? img.arrowDownIcon
-                          : img.upArrowIcon
-                      }
-                      style={{
-                        width: 15,
-                        height: 15,
-                        resizeMode: 'contain',
-                        marginRight: 10,
-                      }}
-                    />
                   </View>
                   <View
                     style={{
@@ -1348,7 +1413,7 @@ class Basket extends Component {
                       marginTop: 10,
                     }}>
                     <TextInput
-                      value={finalDataSec.finalDeliveryDate}
+                      value={finalDeliveryDate}
                       editable={false}
                       style={{
                         fontSize: 14,
@@ -1357,9 +1422,39 @@ class Basket extends Component {
                       }}
                     />
                   </View>
-                </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    this.setState({
+                      showMoreStatus: !showMoreStatus,
+                    })
+                  }
+                  style={{
+                    flex: 0.5,
+                  }}>
+                  <Image
+                    source={
+                      showMoreStatus === false
+                        ? img.arrowDownIcon
+                        : img.upArrowIcon
+                    }
+                    style={{
+                      width: 15,
+                      height: 15,
+                      resizeMode: 'contain',
+                      marginRight: 10,
+                    }}
+                  />
+                </TouchableOpacity>
+                <DateTimePickerModal
+                  isVisible={isDatePickerVisibleDeliveryDate}
+                  mode={'date'}
+                  onConfirm={this.handleConfirmDeliveryDate}
+                  onCancel={this.hideDatePickerDeliveryDate}
+                  // minimumDate={finalOrderMinDate}
+                />
               </View>
-            </TouchableOpacity>
+            </View>
             {showMoreStatus ? (
               <View
                 style={{
@@ -1397,15 +1492,23 @@ class Basket extends Component {
                     </View>
                   </View>
                 </View>
-                <View style={{flex: 1}}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    backgroundColor: '#fff',
+                    padding: 15,
+                    borderBottomRightRadius: 6,
+                  }}>
                   <View
                     style={{
-                      backgroundColor: '#fff',
-                      padding: 15,
-                      borderTopLeftRadius: 6,
-                      borderBottomLeftRadius: 6,
+                      flex: 2,
                     }}>
-                    <View style={{}}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
                       <Text
                         style={{
                           fontSize: 11,
@@ -1413,7 +1516,12 @@ class Basket extends Component {
                         {translate('Order date')}
                       </Text>
                     </View>
-                    <View style={{marginTop: 10}}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 10,
+                      }}>
                       <TextInput
                         value={finalDataSec.finalOrderDate}
                         editable={false}
@@ -1967,7 +2075,7 @@ class Basket extends Component {
                               fontWeight: 'bold',
                             }}>
                             {item.inventoryMapping &&
-                              item.inventoryMapping.productPrice}{' '}
+                              item.inventoryMapping.price}{' '}
                             Є/
                             {item.inventoryMapping.productUnit}
                           </Text>
@@ -2801,7 +2909,7 @@ class Basket extends Component {
                                 marginTop: 10,
                               }}>
                               {lineData.inventoryMapping &&
-                                lineData.inventoryMapping.productPrice}{' '}
+                                lineData.inventoryMapping.price}{' '}
                               €/
                               {lineData.inventoryMapping &&
                                 lineData.inventoryMapping.productUnit}
@@ -3285,7 +3393,7 @@ class Basket extends Component {
                         </TouchableOpacity>
                       )}
                       <TouchableOpacity
-                        onPress={() => this.closeMailModal()}
+                        // onPress={() => this.closeMailModal()}
                         style={{
                           width: wp('68%'),
                           height: hp('7%'),
@@ -3393,6 +3501,132 @@ class Basket extends Component {
                   </Text>
                 </View>
               </TouchableOpacity>
+            </View>
+          </Modal>
+
+          <Modal isVisible={validateDateModalStatus} backdropOpacity={0.35}>
+            <View
+              style={{
+                width: wp('80%'),
+                height: hp('50%'),
+                backgroundColor: '#fff',
+                alignSelf: 'center',
+                borderRadius: 6,
+              }}>
+              <ScrollView>
+                <View style={{padding: hp('3%')}}>
+                  <View style={{}}>
+                    <View style={{}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: 'bold',
+                        }}>
+                        {validateData && validateData.data.header1}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                      }}>
+                      {validateData && validateData.data.message}
+                    </Text>
+                  </View>
+                  <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        fontWeight: 'bold',
+                      }}>
+                      {validateData && validateData.data.header2}
+                    </Text>
+                  </View>
+                  {validateData && validateData.data.parameters !== null ? (
+                    <View style={{marginTop: hp('2%')}}>
+                      {validateData &&
+                        validateData.data.parameters.map((item, index) => {
+                          return (
+                            <Text
+                              style={{
+                                fontSize: 15,
+                                color: 'black',
+                                marginTop: 10,
+                              }}>
+                              {item}
+                            </Text>
+                          );
+                        })}
+                    </View>
+                  ) : null}
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        validateDateModalStatus: false,
+                      })
+                    }
+                    style={{
+                      width: wp('70%'),
+                      height: hp('5%'),
+                      backgroundColor: '#5297c1',
+                      borderRadius: 6,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('3%'),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {validateData && validateData.data.severity < 3
+                        ? 'No'
+                        : 'Ok'}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {validateData && validateData.data.severity < 3 ? (
+                    <TouchableOpacity
+                      onPress={() =>
+                        this.setState(
+                          {
+                            validateDateModalStatus: false,
+                          },
+                          () =>
+                            setTimeout(() => {
+                              this.optionFun(emailData);
+                            }, 300),
+                        )
+                      }
+                      style={{
+                        width: wp('90%'),
+                        height: hp('5%'),
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 10,
+                        marginBottom: 5,
+                        alignSelf: 'center',
+                        marginTop: hp('1%'),
+                      }}>
+                      <Text
+                        style={{
+                          color: '#5297c1',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                        }}>
+                        Yes
+                      </Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              </ScrollView>
             </View>
           </Modal>
         </ScrollView>

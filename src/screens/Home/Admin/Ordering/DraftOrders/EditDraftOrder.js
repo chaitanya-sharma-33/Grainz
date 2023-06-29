@@ -827,17 +827,11 @@ class EditDraftOrder extends Component {
     const finalQuantityInput = volume * value;
 
     const finalValueMinus =
-      data.inventoryMapping.productPrice *
-      data.inventoryMapping.packSize *
-      valueMinus;
+      data.inventoryMapping.price * data.inventoryMapping.packSize * valueMinus;
     const finalValueAdd =
-      data.inventoryMapping.productPrice *
-      data.inventoryMapping.packSize *
-      valueAdd;
+      data.inventoryMapping.price * data.inventoryMapping.packSize * valueAdd;
     const finalValueInput =
-      data.inventoryMapping.productPrice *
-      data.inventoryMapping.packSize *
-      value;
+      data.inventoryMapping.price * data.inventoryMapping.packSize * value;
 
     console.log('inven-->', inventoryData);
 
@@ -2172,7 +2166,7 @@ class EditDraftOrder extends Component {
                               fontSize: 14,
                             }}>
                             {item.inventoryMapping &&
-                              item.inventoryMapping.productPrice}{' '}
+                              item.inventoryMapping.price}{' '}
                             Є/
                             {item.inventoryMapping.productUnit}
                           </Text>
@@ -3129,7 +3123,7 @@ class EditDraftOrder extends Component {
                                 marginTop: 10,
                               }}>
                               {lineData.inventoryMapping &&
-                                lineData.inventoryMapping.productPrice}{' '}
+                                lineData.inventoryMapping.price}{' '}
                               €/
                               {lineData.inventoryMapping &&
                                 lineData.inventoryMapping.productUnit}
@@ -3459,7 +3453,7 @@ class EditDraftOrder extends Component {
                           fontSize: 16,
                           fontWeight: 'bold',
                         }}>
-                        {validateData && validateData.data.propertyName}
+                        {validateData && validateData.data.header1}
                       </Text>
                     </View>
                   </View>
@@ -3479,7 +3473,7 @@ class EditDraftOrder extends Component {
                         color: 'black',
                         fontWeight: 'bold',
                       }}>
-                      Available Dates:
+                      {validateData && validateData.data.header2}
                     </Text>
                   </View>
                   {validateData && validateData.data.parameters !== null ? (

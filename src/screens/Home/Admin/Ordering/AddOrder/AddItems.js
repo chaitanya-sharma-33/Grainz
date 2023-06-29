@@ -116,6 +116,7 @@ class AddItems extends Component {
       navigateType: '',
       isFreemium: '',
       loadingImageIcon: true,
+      closeButtonLoader: false,
     };
   }
 
@@ -518,7 +519,7 @@ class AddItems extends Component {
           id: item.orderItemId ? item.orderItemId : null,
           inventoryId: item.id,
           inventoryProductMappingId: item.inventoryProductMappingId,
-          unitPrice: item.productPrice,
+          unitPrice: item.price,
           quantity: Number(item.quantityProduct),
           action:
             screenType === 'New'
@@ -526,9 +527,7 @@ class AddItems extends Component {
               : screenType === 'Update' && item.orderItemId !== null
               ? 'Update'
               : 'New',
-          value: Number(
-            item.quantityProduct * item.productPrice * item.packSize,
-          ),
+          value: Number(item.quantityProduct * item.price * item.packSize),
           headerIndex: headerIndex,
         });
       });
@@ -685,7 +684,7 @@ class AddItems extends Component {
           id: item.orderItemId ? item.orderItemId : null,
           inventoryId: item.id,
           inventoryProductMappingId: item.inventoryProductMappingId,
-          unitPrice: item.productPrice,
+          unitPrice: item.price,
           quantity: Number(item.quantityProduct),
           action:
             screenType === 'New'
@@ -693,9 +692,7 @@ class AddItems extends Component {
               : screenType === 'Update' && item.orderItemId !== null
               ? 'Update'
               : 'New',
-          value: Number(
-            item.quantityProduct * item.productPrice * item.packSize,
-          ),
+          value: Number(item.quantityProduct * item.price * item.packSize),
           headerIndex: headerIndex,
         });
       });
@@ -1064,7 +1061,7 @@ class AddItems extends Component {
   };
 
   openModalFun = (item, section, index) => {
-    const priceFinal = item.productPrice * item.packSize;
+    const priceFinal = item.price * item.packSize;
     const finalDiscountVal = priceFinal * (item.discount / 100);
 
     const finalPriceCal = priceFinal - finalDiscountVal;
@@ -1073,7 +1070,7 @@ class AddItems extends Component {
     this.setState({
       orderingThreeModal: true,
       priceFinal: finalPrice,
-      priceFinalBackup: item.productPrice * item.packSize,
+      priceFinalBackup: item.price * item.packSize,
       userDefinedQuantity: item.userDefinedQuantity,
       pageData: item,
       userDefinedUnit: item.userDefinedUnit,
@@ -1722,12 +1719,18 @@ class AddItems extends Component {
 
   navigateToEditDraft = res => {
     const {basketId, productId, supplierName} = this.state;
-    this.props.navigation.navigate('EditDraftOrderScreen');
+    this.setState(
+      {
+        closeButtonLoader: false,
+      },
+      () => this.props.navigation.navigate('EditDraftOrderScreen'),
+    );
   };
 
   closeBasketLoader = () => {
     this.setState({
       basketLoader: false,
+      closeButtonLoader: false,
     });
   };
 
@@ -1749,17 +1752,23 @@ class AddItems extends Component {
     console.log('close-->navigateToBasket', closeStatus);
 
     if (closeStatus) {
-      this.props.navigation.navigate('BasketOrderScreen', {
-        finalData: finalData ? finalData : '',
-        supplierId,
-        itemType: 'Inventory',
-        productId,
-        supplierName,
-        finalDataSec: finalData ? finalData : finalDataSec,
-        departmentName,
-        mainDepartId,
-        basketId,
-      });
+      this.setState(
+        {
+          closeButtonLoader: false,
+        },
+        () =>
+          this.props.navigation.navigate('BasketOrderScreen', {
+            finalData: finalData ? finalData : '',
+            supplierId,
+            itemType: 'Inventory',
+            productId,
+            supplierName,
+            finalDataSec: finalData ? finalData : finalDataSec,
+            departmentName,
+            mainDepartId,
+            basketId,
+          }),
+      );
     }
   };
 
@@ -1784,7 +1793,7 @@ class AddItems extends Component {
       finalData: finalData.channel,
     };
 
-    // console.log('Payload', payload);
+    console.log('Payload--> ADD DRAFT', payload);
     addDraftApi(payload)
       .then(res => {
         this.setState(
@@ -1863,6 +1872,7 @@ class AddItems extends Component {
       {
         closeStatus: true,
         actionOpen: false,
+        closeButtonLoader: true,
       },
       () => this.closeBasketFunSec(),
     );
@@ -1886,19 +1896,26 @@ class AddItems extends Component {
       console.log('finalDataSec', finalDataSec);
       console.log('basketId->closeBasketFunSec', basketId);
 
-      this.props.navigation.navigate('BasketOrderScreen', {
-        finalData: finalData ? finalData : '',
-        supplierId,
-        itemType: 'Inventory',
-        productId,
-        supplierName,
-        finalData,
-        modalQuantity: '0',
-        finalDataSec: finalData ? finalData : finalDataSec,
-        basketId,
-      });
+      this.setState(
+        {
+          closeButtonLoader: false,
+        },
+        () =>
+          this.props.navigation.navigate('BasketOrderScreen', {
+            finalData: finalData ? finalData : '',
+            supplierId,
+            itemType: 'Inventory',
+            productId,
+            supplierName,
+            finalData,
+            modalQuantity: '0',
+            finalDataSec: finalData ? finalData : finalDataSec,
+            basketId,
+          }),
+      );
     } else {
       console.log('SAVEEEEE');
+
       this.saveChangesFun();
     }
   };
@@ -2027,7 +2044,7 @@ class AddItems extends Component {
         id: item.orderItemId ? item.orderItemId : null,
         inventoryId: item.id,
         inventoryProductMappingId: item.inventoryProductMappingId,
-        unitPrice: item.productPrice,
+        unitPrice: item.price,
         quantity: Number(item.quantityProduct),
         action:
           screenType === 'New'
@@ -2035,7 +2052,7 @@ class AddItems extends Component {
             : screenType === 'Update' && item.orderItemId !== null
             ? 'Update'
             : 'New',
-        value: Number(item.quantityProduct * item.productPrice * item.packSize),
+        value: Number(item.quantityProduct * item.price * item.packSize),
         headerIndex: headerIndex,
       });
     });
@@ -2184,17 +2201,23 @@ class AddItems extends Component {
       if (screenType === 'New') {
         this.props.navigation.goBack();
       } else {
-        this.props.navigation.navigate('BasketOrderScreen', {
-          finalData: finalData ? finalData : '',
-          supplierId,
-          itemType: 'Inventory',
-          productId,
-          supplierName,
-          finalData,
-          modalQuantity: '0',
-          finalDataSec,
-          basketId,
-        });
+        this.setState(
+          {
+            closeButtonLoader: false,
+          },
+          () =>
+            this.props.navigation.navigate('BasketOrderScreen', {
+              finalData: finalData ? finalData : '',
+              supplierId,
+              itemType: 'Inventory',
+              productId,
+              supplierName,
+              finalData,
+              modalQuantity: '0',
+              finalDataSec,
+              basketId,
+            }),
+        );
       }
     }
 
@@ -2262,6 +2285,7 @@ class AddItems extends Component {
       navigateType,
       isFreemium,
       loadingImageIcon,
+      closeButtonLoader,
     } = this.state;
 
     // console.log('PAGE DATA', pageData);
@@ -3332,7 +3356,7 @@ class AddItems extends Component {
                               fontWeight: 'bold',
                               marginTop: 10,
                             }}>
-                            €/{pageData.productUnit} {pageData.productPrice}
+                            €/{pageData.productUnit} {pageData.price}
                           </Text>
                         </View>
                       </View>
@@ -3385,7 +3409,7 @@ class AddItems extends Component {
                             }}>
                             €{' '}
                             {(
-                              pageData.productPrice *
+                              pageData.price *
                               pageData.packSize *
                               modalQuantity
                             ).toFixed(2)}
@@ -3511,13 +3535,17 @@ class AddItems extends Component {
                         }}>
                         {pageData.imageUrl ? (
                           <View
-                            style={{marginTop: 15, marginHorizontal: wp('6%')}}>
+                            style={{
+                              marginTop: 15,
+                              marginHorizontal: wp('2%'),
+                              alignItems: 'center',
+                            }}>
                             <Image
                               onLoadEnd={() => this._onLoadEnd()}
                               style={{
-                                width: wp('80%'),
-                                height: 120,
-                                resizeMode: 'cover',
+                                width: wp('100%'),
+                                height: 180,
+                                resizeMode: 'contain',
                               }}
                               source={{uri: pageData.imageUrl}}
                             />
@@ -3530,7 +3558,7 @@ class AddItems extends Component {
                                 bottom: 0,
                               }}
                               size="large"
-                              color="blue"
+                              color="#5297c1"
                               animating={loadingImageIcon}
                             />
                           </View>
@@ -3887,28 +3915,42 @@ class AddItems extends Component {
             </View>
           ) : null} */}
         </ScrollView>
-        <TouchableOpacity
-          onPress={() => this.closeBasketFun()}
-          style={{
-            position: 'absolute',
-            right: 20,
-            top: hp('80%'),
-            backgroundColor: '#5297c1',
-            padding: 15,
-            borderRadius: 5,
-          }}>
-          <Text
+        {closeButtonLoader ? (
+          <View
             style={{
-              fontSize: 12,
-              fontFamily: 'Inter-SemiBold',
-              color: 'black',
-              marginLeft: 5,
-              color: '#fff',
-              fontWeight: 'bold',
+              position: 'absolute',
+              right: 20,
+              top: hp('80%'),
+              backgroundColor: '#5297c1',
+              padding: 10,
+              borderRadius: 5,
             }}>
-            {translate('Next')}
-          </Text>
-        </TouchableOpacity>
+            <ActivityIndicator size="small" color="#fff" />
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={() => this.closeBasketFun()}
+            style={{
+              position: 'absolute',
+              right: 20,
+              top: hp('80%'),
+              backgroundColor: '#5297c1',
+              padding: 15,
+              borderRadius: 5,
+            }}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontFamily: 'Inter-SemiBold',
+                color: 'black',
+                marginLeft: 5,
+                color: '#fff',
+                fontWeight: 'bold',
+              }}>
+              {translate('Next')}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }

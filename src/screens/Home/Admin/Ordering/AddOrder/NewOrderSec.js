@@ -44,10 +44,10 @@ import RNPickerSelect from 'react-native-picker-select';
 import ModalPicker from '../../../../../components/ModalPicker';
 import TreeSelect from 'react-native-tree-select';
 
-var minTime = new Date();
-minTime.setHours(0);
-minTime.setMinutes(0);
-minTime.setMilliseconds(0);
+// var minTime = new Date();
+// minTime.setHours(0);
+// minTime.setMinutes(0);
+// minTime.setMilliseconds(0);
 
 let todayDate = moment(new Date()).format('DD/MM/YYYY');
 let todayDateProd = moment.utc(new Date()).format();
@@ -74,6 +74,7 @@ class NewOrderSec extends Component {
       placedByData: '',
       customerNumber: '',
       channel: '',
+      minTime: new Date(),
     };
   }
 
@@ -150,10 +151,12 @@ class NewOrderSec extends Component {
   };
 
   handleConfirmOrder = date => {
+    console.log('DATE-->', date);
     let newdate = moment(date).format('DD/MM/YYYY');
     this.setState({
       finalOrderDate: newdate,
       productionDateOrder: date,
+      minTime: date,
     });
 
     this.hideDatePickerOrder();
@@ -266,7 +269,12 @@ class NewOrderSec extends Component {
       placedByData,
       customerNumber,
       channel,
+      productionDateOrder,
+      minTime,
     } = this.state;
+
+    console.log('minTime', minTime);
+    console.log('productionDateOrder', productionDateOrder);
 
     return (
       <View style={styles.container}>
@@ -435,7 +443,7 @@ class NewOrderSec extends Component {
                   mode={'date'}
                   onConfirm={this.handleConfirmDelivery}
                   onCancel={this.hideDatePickerDelivery}
-                  // minimumDate={minTime}
+                  minimumDate={minTime}
                 />
                 <View
                   style={{

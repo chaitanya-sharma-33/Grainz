@@ -20,19 +20,19 @@ class App extends Component {
   async componentDidMount() {
     SplashScreen.hide();
     await this.setLanguage();
-    BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
+    // BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener(
-      'hardwareBackPress',
-      this.onBackButtonPressed,
-    );
-  }
+  // componentWillUnmount() {
+  //   BackHandler.removeEventListener(
+  //     'hardwareBackPress',
+  //     this.onBackButtonPressed,
+  //   );
+  // }
 
-  onBackButtonPressed() {
-    return true;
-  }
+  // onBackButtonPressed() {
+  //   return true;
+  // }
 
   setLanguage = async () => {
     const lang = await AsyncStorage.getItem('Language');
