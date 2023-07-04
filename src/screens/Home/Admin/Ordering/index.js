@@ -36,7 +36,7 @@ class index extends Component {
       token: '',
       buttonsSubHeader: [],
       loader: false,
-      selectedTextUser: 'All Suppliers',
+      selectedTextUser: translate('All Suppliers'),
       countData: '',
       supplierData: '',
       clearStatus: false,
@@ -289,7 +289,7 @@ class index extends Component {
                             color: '#5297c1',
                             marginTop: 10,
                           }}>
-                          Clear
+                          {translate('Clear')}
                         </Text>
                       </TouchableOpacity>
                     ) : null}

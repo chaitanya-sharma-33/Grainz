@@ -181,7 +181,7 @@ class SupplierDetail extends Component {
                     style={{
                       fontSize: 12,
                     }}>
-                    Address
+                    {translate('Address')}
                   </Text>
                   <TextInput
                     value={supplierData.addresss}
@@ -205,7 +205,7 @@ class SupplierDetail extends Component {
                   style={{
                     fontSize: 12,
                   }}>
-                  Website
+                  {translate('Website')}
                 </Text>
                 <TextInput
                   value={supplierData.website}
@@ -228,7 +228,7 @@ class SupplierDetail extends Component {
                   style={{
                     fontSize: 12,
                   }}>
-                  Contact details
+                  {translate('Contact details')}
                 </Text>
                 <TextInput
                   value={supplierData.name}
@@ -318,7 +318,7 @@ class SupplierDetail extends Component {
                   style={{
                     fontSize: 12,
                   }}>
-                  Status
+                  {translate('Status')}
                 </Text>
                 <TextInput
                   value={supplierData.status}
@@ -342,7 +342,7 @@ class SupplierDetail extends Component {
                       textDecorationLine: 'underline',
                       color: '#5197C1',
                     }}>
-                    See orders for this supplier
+                    {translate('See orders for this supplier')}
                   </Text>
                 </TouchableOpacity>
               </View>

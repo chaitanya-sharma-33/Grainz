@@ -112,11 +112,11 @@ class index extends Component {
     let formIsValid = true;
 
     if (this.state.email === '') {
-      emailError = 'Email can not be empty';
+      emailError = translate('Email can not be empty');
       formIsValid = false;
     }
     if (this.state.password === '') {
-      passwordError = 'Passsword can not be empty';
+      passwordError = translate('Passsword can not be empty');
       formIsValid = false;
     }
 

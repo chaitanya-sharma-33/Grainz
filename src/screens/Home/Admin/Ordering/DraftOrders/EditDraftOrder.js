@@ -996,13 +996,13 @@ class EditDraftOrder extends Component {
   deleteOrderFun = () => {};
 
   deleteDraftFun = () => {
-    Alert.alert('Grainz!', 'Are you sure you want to delete this order?', [
+    Alert.alert('', translate('Are you sure you want to delete this order?'), [
       {
-        text: 'No',
+        text: translate('No'),
         style: 'cancel',
       },
       {
-        text: 'Yes',
+        text: translate('Yes'),
         onPress: () => this.deleteFun(),
       },
     ]);
@@ -2709,7 +2709,7 @@ class EditDraftOrder extends Component {
                     marginLeft: 10,
                     fontFamily: 'Inter-SemiBold',
                   }}>
-                  Preview
+                  {translate('Preview')}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -2902,7 +2902,9 @@ class EditDraftOrder extends Component {
             pickerModalStatus={duplicateModalStatus}
             headingText={translate('Duplicate')}
             crossFun={() => this.closeModalFun()}
-            bodyText="Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?"
+            bodyText={translate(
+              'Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?',
+            )}
             cancelFun={() => this.closeModalFun()}
             saveFun={() => this.duplicateModalFunSec()}
             yesStatus
@@ -2911,7 +2913,9 @@ class EditDraftOrder extends Component {
             pickerModalStatus={deleteModalStatus}
             headingText={translate('Delete')}
             crossFun={() => this.closeModalFun()}
-            bodyText="Are you sure you want to delete this item from the list?"
+            bodyText={translate(
+              'Are you sure you want to delete this item from the list?',
+            )}
             cancelFun={() => this.closeModalFun()}
             saveFun={() => this.deleteFun()}
             yesStatus
@@ -3304,7 +3308,7 @@ class EditDraftOrder extends Component {
                       <Text style={{fontSize: 11, marginBottom: 10}}>From</Text>
                       <TextInput
                         value={mailTitleValue}
-                        placeholder="From"
+                        placeholder={translate('From')}
                         style={{
                           width: '100%',
                         }}
@@ -3325,7 +3329,7 @@ class EditDraftOrder extends Component {
                       <Text style={{fontSize: 11, marginBottom: 10}}> To </Text>
                       <TextInput
                         value={toRecipientValue}
-                        placeholder="To"
+                        placeholder={translate('To')}
                         style={{
                           width: '100%',
                           fontWeight: 'bold',

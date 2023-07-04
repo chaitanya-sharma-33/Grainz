@@ -414,7 +414,7 @@ class ViewPendingDelivery extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -423,11 +423,11 @@ class ViewPendingDelivery extends Component {
 
   deleteFun = item => {
     Alert.alert(
-      `Grainz`,
-      'Are you sure you want to delete this order line item?',
+      ``,
+      translate('Are you sure you want to delete this order line item?'),
       [
         {
-          text: 'Yes',
+          text: translate('Yes'),
           onPress: () =>
             this.setState(
               {
@@ -438,7 +438,7 @@ class ViewPendingDelivery extends Component {
             ),
         },
         {
-          text: 'No',
+          text: translate('No'),
         },
       ],
     );
@@ -512,13 +512,13 @@ class ViewPendingDelivery extends Component {
   };
 
   showDatePickerArrivalDateSpecific = () => {
-    Alert.alert(`Grainz`, 'Clear date or select date', [
+    Alert.alert(``, 'Clear date or select date', [
       {
-        text: 'Cancel',
+        text: translate('Cancel'),
         style: 'cancel',
       },
       {
-        text: 'Clear',
+        text: translate('Clear'),
         onPress: () =>
           this.setState({
             finalArrivedDate: '',
@@ -528,7 +528,7 @@ class ViewPendingDelivery extends Component {
           }),
       },
       {
-        text: 'Select Date',
+        text: translate('Select'),
         onPress: () => this.showDatePickerArrivalDateSpecificSec(),
       },
     ]);
@@ -657,7 +657,7 @@ class ViewPendingDelivery extends Component {
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Kildly fill arrived date first', [
+      Alert.alert(``, 'Kildly fill arrived date first', [
         {
           text: 'Okay',
           onPress: () => this.closeLoader(),
@@ -1352,7 +1352,7 @@ class ViewPendingDelivery extends Component {
         deliveryChecklistStatus: true,
       });
     } else {
-      alert('Please enter arrived date first.');
+      alert(translate('Please enter arrived date first.'));
     }
   };
 
@@ -1700,7 +1700,7 @@ class ViewPendingDelivery extends Component {
                             fontWeight: 'bold',
                             color: '#66A4C8',
                           }}>
-                          See details
+                          {translate('See details')}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -2634,7 +2634,7 @@ class ViewPendingDelivery extends Component {
                                     flex: 1,
                                   }}>
                                   <Text style={{fontSize: 10}}>
-                                    Delivered No.
+                                    {translate('Delivered No.')}
                                   </Text>
                                   <Text
                                     style={{
@@ -2672,7 +2672,7 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       marginRight: 10,
                                     }}>
-                                    Checked
+                                    {translate('Checked')}
                                   </Text>
                                   <Switch
                                     thumbColor={'#fff'}
@@ -3593,7 +3593,7 @@ class ViewPendingDelivery extends Component {
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>
-                          Check all
+                          {translate('Check all')}
                         </Text>
                       </View>
 
@@ -3639,7 +3639,7 @@ class ViewPendingDelivery extends Component {
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>
-                          Flag all
+                          {translate('Flag all')}
                         </Text>
                       </View>
 
@@ -3811,7 +3811,7 @@ class ViewPendingDelivery extends Component {
                           marginLeft: 10,
                           fontFamily: 'Inter-SemiBold',
                         }}>
-                        Move to review
+                        {translate('Move to review')}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -4069,7 +4069,7 @@ class ViewPendingDelivery extends Component {
                           }}>
                           <RNPickerSelect
                             placeholder={{
-                              label: 'Verified By: ',
+                              label: translate('Verified By:'),
                               value: null,
                               color: 'black',
                               fontWeight: 'bold',
@@ -4245,7 +4245,7 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       fontSize: 15,
                                     }}>
-                                    Ordered No.
+                                    {translate('Ordered No.')}
                                   </Text>
                                   <Text
                                     numberOfLines={1}
@@ -4272,11 +4272,11 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       fontSize: 15,
                                     }}>
-                                    Delivered No.
+                                    {translate('Delivered No.')}
                                   </Text>
 
                                   <TextInput
-                                    placeholder="Delivered No."
+                                    placeholder={translate('Delivered No.')}
                                     value={String(item.quantityDelivered)}
                                     style={{
                                       width: 80,
@@ -4351,7 +4351,7 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       marginRight: 10,
                                     }}>
-                                    Checked
+                                    {translate('Checked')}
                                   </Text>
                                   <Switch
                                     thumbColor={'#fff'}
@@ -4434,7 +4434,7 @@ class ViewPendingDelivery extends Component {
                               fontSize: 15,
                               fontWeight: 'bold',
                             }}>
-                            Check all
+                            {translate('Check all')}
                           </Text>
                         </View>
 
@@ -4478,7 +4478,7 @@ class ViewPendingDelivery extends Component {
                               fontSize: 15,
                               fontWeight: 'bold',
                             }}>
-                            Flag all
+                            {translate('Flag all')}
                           </Text>
                         </View>
 
@@ -4526,7 +4526,7 @@ class ViewPendingDelivery extends Component {
                           marginLeft: 10,
                           fontFamily: 'Inter-SemiBold',
                         }}>
-                        Save
+                        {translate('Save')}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -5399,10 +5399,10 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Arrived Date
+                                {translate('Arrived Date')}
                               </Text>
                               <TextInput
-                                placeholder="Arrived Date"
+                                placeholder={translate('Arrived Date')}
                                 editable={false}
                                 style={{
                                   width: 100,
@@ -5611,7 +5611,7 @@ class ViewPendingDelivery extends Component {
                               marginLeft: 10,
                               fontFamily: 'Inter-SemiBold',
                             }}>
-                            Save
+                            {translate('Save')}
                           </Text>
                         </View>
                       </TouchableOpacity>

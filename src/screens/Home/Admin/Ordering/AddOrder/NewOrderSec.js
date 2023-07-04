@@ -63,10 +63,10 @@ class NewOrderSec extends Component {
       isDatePickerVisibleDelivery: false,
       finalDeliveryDate: '',
       productionDateDelivery: '',
-      supplierName: 'Select Supplier',
+      supplierName: translate('Select Supplier'),
       supplierId: '',
       items: [],
-      selectedTextUser: 'Select Supplier',
+      selectedTextUser: translate('Select Supplier'),
       orderItemsFinal: [],
       saveLoader: false,
       saveTouchableStatus: false,
@@ -359,7 +359,7 @@ class NewOrderSec extends Component {
                       borderRadius: 6,
                     }}>
                     <View style={{}}>
-                      <Text>Order Date</Text>
+                      <Text>{translate('Order Date')}</Text>
                     </View>
                     <View
                       style={{
@@ -408,7 +408,7 @@ class NewOrderSec extends Component {
                       borderRadius: 6,
                     }}>
                     <View style={{}}>
-                      <Text>Delivery Date</Text>
+                      <Text>{translate('Delivery Date')}</Text>
                     </View>
                     <View
                       style={{
@@ -452,7 +452,7 @@ class NewOrderSec extends Component {
                     padding: 12,
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Placed By</Text>
+                    <Text style={{}}>{translate('Placed By')}</Text>
                   </View>
                   <View
                     style={{

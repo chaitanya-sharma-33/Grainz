@@ -197,7 +197,7 @@ class AddItems extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             // onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -234,7 +234,7 @@ class AddItems extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             // onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -764,7 +764,7 @@ class AddItems extends Component {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={{backgroundColor: '#fff', width: wp('87%')}}>
           {section.content.map((item, index) => {
-            console.log('item213242342342', item);
+            // console.log('item213242342342', item);
             return (
               <View
                 style={{
@@ -853,7 +853,8 @@ class AddItems extends Component {
                           marginTop: 10,
                           fontSize: 12,
                         }}>
-                        Qty: {item.quantityProduct ? item.quantityProduct : '0'}{' '}
+                        {translate('Qty:')}{' '}
+                        {item.quantityProduct ? item.quantityProduct : '0'}{' '}
                         {item.unit}
                       </Text>
                     </View>
@@ -990,7 +991,7 @@ class AddItems extends Component {
       .then(res => {
         Alert.alert('Grainz', 'Inventory updated successfully', [
           {
-            text: 'Oky',
+            text: translate('Ok'),
             onPress: () =>
               this.setState(
                 {
@@ -1297,7 +1298,7 @@ class AddItems extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
               },
             ],
           );
@@ -1335,7 +1336,7 @@ class AddItems extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
                 onPress: () =>
                   this.setState({
                     basketLoader: false,
@@ -1437,7 +1438,7 @@ class AddItems extends Component {
               'Something went wrong',
               [
                 {
-                  text: 'Okay',
+                  text: translate('Ok'),
                   // onPress: () => this.props.navigation.goBack(),
                 },
               ],
@@ -1541,7 +1542,7 @@ class AddItems extends Component {
               'Something went wrong',
               [
                 {
-                  text: 'Okay',
+                  text: translate('Ok'),
                 },
               ],
             );
@@ -1594,15 +1595,15 @@ class AddItems extends Component {
               'Something went wrong',
               [
                 {
-                  text: 'Okay',
+                  text: translate('Ok'),
                 },
               ],
             );
           });
       } else {
-        Alert.alert('Grainz', 'Please add atleast one item', [
+        Alert.alert('', translate('Please add atleast one item'), [
           {
-            text: 'okay',
+            text: translate('Ok'),
             onPress: () => this.closeBasketLoader(),
             style: 'default',
           },
@@ -1645,7 +1646,7 @@ class AddItems extends Component {
               'Something went wrong',
               [
                 {
-                  text: 'Okay',
+                  text: translate('Ok'),
                   onPress: () =>
                     this.setState({
                       basketLoader: false,
@@ -1655,9 +1656,9 @@ class AddItems extends Component {
             );
           });
       } else {
-        Alert.alert('Grainz', 'Please add atleast one item', [
+        Alert.alert('', translate('Please add atleast one item'), [
           {
-            text: 'okay',
+            text: translate('Ok'),
             onPress: () => this.closeBasketLoader(),
             style: 'default',
           },
@@ -1685,7 +1686,7 @@ class AddItems extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             // onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -1809,7 +1810,7 @@ class AddItems extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             // onPress: () => this.closeLoaderComp(),
           },
         ]);
@@ -1872,7 +1873,7 @@ class AddItems extends Component {
       {
         closeStatus: true,
         actionOpen: false,
-        closeButtonLoader: true,
+        // closeButtonLoader: true,
       },
       () => this.closeBasketFunSec(),
     );
@@ -1888,6 +1889,7 @@ class AddItems extends Component {
       finalBasketData,
       finalData,
       finalDataSec,
+      navigateType,
     } = this.state;
 
     console.log('draftStatus', draftStatus);
@@ -1914,10 +1916,42 @@ class AddItems extends Component {
           }),
       );
     } else {
-      console.log('SAVEEEEE');
+      if (finalBasketData.length > 0 || basketId) {
+        if (navigateType === 'EditDraft') {
+          console.log('EditDraft');
+          this.setState(
+            {
+              basketLoader: false,
+            },
+            () => this.navigateToEditDraft(res),
+          );
+        } else {
+          console.log('EditDraft->ELSE');
 
-      this.saveChangesFun();
+          this.setState(
+            {
+              basketLoader: false,
+              draftStatus: true,
+            },
+            () => this.navigateToBasket(),
+          );
+        }
+      } else {
+        Alert.alert('', translate('Please add atleast one item'), [
+          {
+            text: translate('Ok'),
+            onPress: () => this.closeBasketLoader(),
+            style: 'default',
+          },
+        ]);
+      }
     }
+
+    // else {
+    //   console.log('SAVEEEEE');
+
+    //   this.saveChangesFun();
+    // }
   };
 
   saveChangesFun = () => {
@@ -2104,7 +2138,7 @@ class AddItems extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
           },
         ]);
       });
@@ -2125,7 +2159,7 @@ class AddItems extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () =>
               this.setState({
                 basketLoader: false,
@@ -2291,6 +2325,8 @@ class AddItems extends Component {
     // console.log('PAGE DATA', pageData);
     console.log('actionOpen', actionOpen);
     console.log('draftStatus', draftStatus);
+    console.log('screenType', screenType);
+    console.log('basketID', basketId);
 
     return (
       <View style={styles.container}>
@@ -2466,7 +2502,7 @@ class AddItems extends Component {
                     backgroundColor: '#fff',
                   }}>
                   <TextInput
-                    placeholder="Search"
+                    placeholder={translate('Search')}
                     value={searchItemInventory}
                     style={{
                       padding: 15,
@@ -2533,7 +2569,7 @@ class AddItems extends Component {
                     backgroundColor: '#fff',
                   }}>
                   <TextInput
-                    placeholder="Search"
+                    placeholder={translate('Search')}
                     value={searchItemSupplier}
                     style={{
                       padding: 15,
@@ -3348,7 +3384,7 @@ class AddItems extends Component {
                             style={{
                               fontSize: 14,
                             }}>
-                            Price
+                            {translate('Price')}
                           </Text>
                           <Text
                             style={{

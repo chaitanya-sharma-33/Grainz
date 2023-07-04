@@ -786,7 +786,7 @@ class PendingDelivery extends Component {
                 borderRadius: 5,
               }}>
               <TextInput
-                placeholder="Search"
+                placeholder={translate('SearchDot')}
                 style={{
                   padding: 12,
                   borderRadius: 5,
@@ -844,7 +844,7 @@ class PendingDelivery extends Component {
                       padding: 12,
                       color: 'grey',
                     }}>
-                    Filter
+                    {translate('Filter')}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -1372,7 +1372,7 @@ class PendingDelivery extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            Move to Pending
+                            {translate('Move to Pending')}
                           </Text>
                         </TouchableOpacity>
                       ) : listId == 4 ? (
@@ -1393,7 +1393,7 @@ class PendingDelivery extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            Move to Review
+                            {translate('Move to Review')}
                           </Text>
                         </TouchableOpacity>
                       ) : null}
@@ -1578,7 +1578,9 @@ class PendingDelivery extends Component {
                 pickerModalStatus={duplicateModalStatus}
                 headingText={translate('Duplicate')}
                 crossFun={() => this.closeModalFun()}
-                bodyText="Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?"
+                bodyText={translate(
+                  'Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?',
+                )}
                 cancelFun={() => this.closeModalFun()}
                 saveFun={() => this.duplicateModalFunSec()}
                 yesStatus

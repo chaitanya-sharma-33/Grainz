@@ -231,7 +231,7 @@ class Basket extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -408,11 +408,11 @@ class Basket extends Component {
     if (finalDataSec.channel === 'Ftp') {
       Alert.alert(`Grainz`, 'Do yo want to send this order?', [
         {
-          text: 'Yes',
+          text: translate('Yes'),
           onPress: () => this.sendFTPFun(),
         },
         {
-          text: 'No',
+          text: translate('No'),
           // onPress: () => this.props.navigation.goBack(),
         },
       ]);
@@ -491,7 +491,7 @@ class Basket extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
                 onPress: () => this.props.navigation.goBack(),
               },
             ],
@@ -500,7 +500,7 @@ class Basket extends Component {
     } else {
       Alert.alert(`Grainz`, 'Please select all values.', [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
         },
       ]);
@@ -538,7 +538,7 @@ class Basket extends Component {
           'Something went wrong-1',
           [
             {
-              text: 'Okay',
+              text: translate('Ok'),
             },
           ],
         );
@@ -605,7 +605,7 @@ class Basket extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
                 onPress: () => this.closeLoaderComp(),
               },
             ],
@@ -629,13 +629,13 @@ class Basket extends Component {
       },
       () =>
         setTimeout(() => {
-          Alert.alert('Grainz', 'Are you sure you want to delete it?', [
+          Alert.alert('', translate('Are you sure you want to delete it?'), [
             {
-              text: 'Yes',
+              text: translate('Yes'),
               onPress: () => this.hitDeleteApiFun(),
             },
             {
-              text: 'No',
+              text: translate('No'),
               onPress: () => this.closeLoaderComp(),
             },
           ]);
@@ -676,7 +676,7 @@ class Basket extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.closeLoaderComp(),
           },
         ]);
@@ -727,7 +727,7 @@ class Basket extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
                 onPress: () => this.closeLoaderComp(),
               },
             ],
@@ -736,7 +736,7 @@ class Basket extends Component {
     } else {
       Alert.alert(`Grainz`, 'Please select all values.', [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
         },
       ]);
@@ -818,7 +818,7 @@ class Basket extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
                 onPress: () => this.closeLoaderComp(),
               },
             ],
@@ -827,7 +827,7 @@ class Basket extends Component {
     } else {
       Alert.alert(`Grainz`, 'Please select all values.', [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
         },
       ]);
@@ -852,7 +852,7 @@ class Basket extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.closeLoaderComp(),
           },
         ]);
@@ -961,7 +961,7 @@ class Basket extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.closeLoaderComp(),
           },
         ]);
@@ -1011,7 +1011,7 @@ class Basket extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.closeLoaderComp(),
           },
         ]);
@@ -3073,7 +3073,7 @@ class Basket extends Component {
                     marginLeft: 10,
                     fontFamily: 'Inter-SemiBold',
                   }}>
-                  Preview
+                  {translate('Preview')}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -3247,7 +3247,7 @@ class Basket extends Component {
                   }}>
                   <Text
                     style={{fontSize: 16, color: 'black', fontWeight: 'bold'}}>
-                    Send Order
+                    {translate('Send Order')}
                   </Text>
                 </View>
               </View>
@@ -3261,7 +3261,7 @@ class Basket extends Component {
                       <Text style={{fontSize: 11, paddingLeft: 15}}>From</Text>
                       <TextInput
                         value={mailTitleValue}
-                        placeholder="From"
+                        placeholder={translate('From')}
                         style={{
                           padding: 15,
                           width: '100%',
@@ -3284,7 +3284,7 @@ class Basket extends Component {
                       <Text style={{fontSize: 11, paddingLeft: 15}}> To </Text>
                       <TextInput
                         value={toRecipientValue}
-                        placeholder="To"
+                        placeholder={translate('To')}
                         style={{
                           padding: 15,
                           width: '100%',
@@ -3587,8 +3587,8 @@ class Basket extends Component {
                         fontWeight: 'bold',
                       }}>
                       {validateData && validateData.data.severity < 3
-                        ? 'No'
-                        : 'Ok'}
+                        ? translate('No')
+                        : translate('Ok')}
                     </Text>
                   </TouchableOpacity>
 
@@ -3621,7 +3621,7 @@ class Basket extends Component {
                           fontSize: 14,
                           fontWeight: 'bold',
                         }}>
-                        Yes
+                        {translate('Yes')}
                       </Text>
                     </TouchableOpacity>
                   ) : null}

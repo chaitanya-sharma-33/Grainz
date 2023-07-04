@@ -45,11 +45,11 @@ class index extends Component {
       id: '',
       languageArr: [
         {
-          label: 'French',
+          label: translate('French'),
           value: 'fr',
         },
         {
-          label: 'English',
+          label: translate('English'),
           value: 'en',
         },
       ],
@@ -598,7 +598,7 @@ class index extends Component {
                     }}>
                     <RNPickerSelect
                       placeholder={{
-                        label: 'Please select language*',
+                        label: translate('Please select language*'),
                         value: null,
                         color: 'black',
                       }}
@@ -710,11 +710,12 @@ class index extends Component {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() =>
-                  this.setState({
-                    pickerModalStatus: true,
-                  })
-                }
+                // onPress={() =>
+                //   this.setState({
+                //     pickerModalStatus: true,
+                //   })
+                // }
+                onPress={() => this.props.navigation.goBack()}
                 style={{
                   width: wp('90%'),
                   height: hp('7%'),

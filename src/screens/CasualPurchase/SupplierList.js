@@ -212,7 +212,7 @@ class SupplierList extends Component {
                           marginBottom: hp('3%'),
                         }}>
                         <TextInput
-                          placeholder="Search..."
+                          placeholder={translate('SearchDot')}
                           placeholderTextColor="grey"
                           value={searchItem}
                           style={{

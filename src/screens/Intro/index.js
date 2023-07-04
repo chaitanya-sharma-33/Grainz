@@ -215,7 +215,7 @@ export default class App extends React.Component {
                   color: '#1E1E1E',
                   fontWeight: 'bold',
                 }}>
-                Log In{' '}
+                {translate('Log In')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.toggleSwitch(false)}>

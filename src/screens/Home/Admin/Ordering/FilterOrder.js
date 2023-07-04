@@ -57,7 +57,7 @@ class FilterOrder extends Component {
       fromProductionDate: '',
       toProductionDate: '',
       isDatePickerVisibleToDate: false,
-      supplierName: 'All Suppliers',
+      supplierName: translate('All Suppliers'),
       supplierId: '',
       supplieReference: '',
       flagStatus: false,
@@ -370,11 +370,11 @@ class FilterOrder extends Component {
                           style={{
                             marginBottom: 10,
                           }}>
-                          From Date
+                          {translate('From Date')}
                         </Text>
                       </View>
                       <TextInput
-                        placeholder={'DD-MM-YYYY'}
+                        placeholder={translate('DD-MM-YYYY')}
                         value={fromDate}
                         editable={false}
                         style={{
@@ -412,7 +412,7 @@ class FilterOrder extends Component {
                             paddingLeft: 15,
                             marginBottom: 10,
                           }}>
-                          To Date
+                          {translate('To Date')}
                         </Text>
                       </View>
                       <View
@@ -420,7 +420,7 @@ class FilterOrder extends Component {
                           flexDirection: 'row',
                         }}>
                         <TextInput
-                          placeholder={'DD-MM-YYYY'}
+                          placeholder={translate('DD-MM-YYYY')}
                           value={toDate}
                           editable={false}
                           style={{
@@ -544,7 +544,7 @@ class FilterOrder extends Component {
                         fontSize: 14,
                         fontFamily: 'Inter-Regular',
                       }}>
-                      Orders with credit Note
+                      {translate('Orders with credit note')}
                     </Text>
                   </TouchableOpacity>
                 ) : null}

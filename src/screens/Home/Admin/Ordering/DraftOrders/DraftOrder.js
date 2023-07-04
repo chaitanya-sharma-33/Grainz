@@ -553,7 +553,7 @@ class DraftOrder extends Component {
                 borderRadius: 5,
               }}>
               <TextInput
-                placeholder="Search"
+                placeholder={translate('SearchDot')}
                 style={{
                   padding: 12,
                   borderRadius: 5,
@@ -606,7 +606,7 @@ class DraftOrder extends Component {
                     padding: 12,
                     color: 'grey',
                   }}>
-                  Filter
+                  {translate('Filter')}
                 </Text>
               </View>
               {filterData ? (
