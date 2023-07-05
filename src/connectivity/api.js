@@ -1660,3 +1660,19 @@ export const updateCreditNoteApi = async (
     },
   );
 };
+
+export const setDeliveryDateApi = async (id, date, payload) => {
+  console.log('ID--->', id);
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  return axios.post(
+    baseURL + `/Order/set delivery date?Id=${id}&DeliveryDate=${date}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        LocationId: location,
+      },
+    },
+  );
+};

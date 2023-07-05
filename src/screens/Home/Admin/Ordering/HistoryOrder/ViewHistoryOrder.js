@@ -5050,7 +5050,7 @@ class ViewHistoryOrder extends Component {
                                     flex: 1,
                                   }}>
                                   <Text style={{fontSize: 10}}>
-                                    Delivered No.
+                                    {translate('Delivered No')}
                                   </Text>
                                   <Text
                                     style={{
@@ -6124,7 +6124,7 @@ class ViewHistoryOrder extends Component {
                                         style={{
                                           fontSize: 12,
                                         }}>
-                                        {translate('Ordered Qty')}.
+                                        {translate('Ordered Qty')}
                                       </Text>
                                       <Text
                                         numberOfLines={1}
@@ -6155,7 +6155,7 @@ class ViewHistoryOrder extends Component {
                                         style={{
                                           fontSize: 12,
                                         }}>
-                                        Delivered No.
+                                        {translate('Delivered No')}
                                       </Text>
                                       <Text
                                         style={{

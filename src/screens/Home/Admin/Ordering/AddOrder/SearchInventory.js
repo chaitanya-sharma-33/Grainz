@@ -638,7 +638,7 @@ class SearchInventory extends Component {
                 marginVertical: hp('2%'),
               }}>
               <TextInput
-                placeholder="Search"
+                placeholder={translate('Search')}
                 value={searchItem}
                 style={{
                   padding: 15,

@@ -29,7 +29,7 @@ import {translate} from '../../utils/translations';
 const todayDate = new Date().toISOString();
 var tomorrow = new Date();
 tomorrow.setDate(new Date().getDate() + 1);
-// let newdate = moment(tomorrow).format('MM/DD/YYYY');
+// let newdate = moment(tomorrow).format('DD/MM/YYYY');
 const endDate = tomorrow.toISOString();
 
 class NewStock extends Component {

@@ -371,7 +371,7 @@ class NewOrderThird extends Component {
                                 fontWeight: 'bold',
                                 color: '#66A4C8',
                               }}>
-                              Edit Details
+                              {translate('Edit details')}
                             </Text>
                           </TouchableOpacity>
                         </View>
@@ -507,12 +507,12 @@ class NewOrderThird extends Component {
                                   }}
                                   numberOfLines={1}>
                                   {item.name === 'Kitchen'
-                                    ? '0 Selected'
+                                    ? `0 ${translate('Selected')}`
                                     : item.name === 'Bar'
-                                    ? '0 Selected'
+                                    ? `0 ${translate('Selected')}`
                                     : item.name === 'Retail'
-                                    ? '0 Selected'
-                                    : '0 Selected'}
+                                    ? `0 ${translate('Selected')}`
+                                    : `0 ${translate('Selected')}`}
                                 </Text>
                               </View>
                             </View>

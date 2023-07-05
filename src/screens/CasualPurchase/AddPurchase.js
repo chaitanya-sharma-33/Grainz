@@ -1545,12 +1545,12 @@ class index extends Component {
                                   }}
                                   numberOfLines={1}>
                                   {item.name === 'Kitchen'
-                                    ? '1 Selected'
+                                    ? `1 ${translate('Selected')}`
                                     : item.name === 'Bar'
-                                    ? '2 Selected'
+                                    ? `2 ${translate('Selected')}`
                                     : item.name === 'Retail'
-                                    ? '3 Selected'
-                                    : '4 Selected'}
+                                    ? `3 ${translate('Selected')}`
+                                    : `4 ${translate('Selected')}`}
                                 </Text>
                               </View>
                             </View>

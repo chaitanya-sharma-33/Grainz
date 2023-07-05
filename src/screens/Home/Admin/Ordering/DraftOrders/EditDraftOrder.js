@@ -36,6 +36,7 @@ import {
   deleteOrderApi,
   duplicateApi,
   validateUserApi,
+  setDeliveryDateApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -180,26 +181,39 @@ class EditDraftOrder extends Component {
   };
 
   sendFun = () => {
-    const {channel} = this.state;
-    if (channel === 'Ftp') {
-      Alert.alert(`Grainz`, 'Do yo want to send this order?', [
-        {
-          text: 'Yes',
-          onPress: () => this.sendFunSec(),
-        },
-        {
-          text: 'No',
-          // onPress: () => this.props.navigation.goBack(),
-        },
-      ]);
-    } else {
+    const {finalDeliveryDate} = this.state;
+
+    if (finalDeliveryDate) {
       this.setState(
         {
           loaderCompStatus: true,
         },
         () => this.sendFunSec(),
       );
+    } else {
+      alert(translate('Please select delivery date first'));
     }
+
+    // const {channel} = this.state;
+    // if (channel === 'Ftp') {
+    //   Alert.alert(`Grainz`, 'Do yo want to send this order?', [
+    //     {
+    //       text: 'Yes',
+    //       onPress: () => this.sendFunSec(),
+    //     },
+    //     {
+    //       text: 'No',
+    //       // onPress: () => this.props.navigation.goBack(),
+    //     },
+    //   ]);
+    // } else {
+    //   this.setState(
+    //     {
+    //       loaderCompStatus: true,
+    //     },
+    //     () => this.sendFunSec(),
+    //   );
+    // }
   };
   sendFunSec = () => {
     const {
@@ -260,6 +274,7 @@ class EditDraftOrder extends Component {
 
   optionFun = (data, res) => {
     const {channel} = this.state;
+    console.log('CHANNEL', channel);
     if (channel === 'Ftp') {
       this.setState(
         {
@@ -581,7 +596,7 @@ class EditDraftOrder extends Component {
   };
 
   handleConfirmOrderDate = date => {
-    let newdate = moment(date).format('MM/DD/YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     let newMinDate = date;
     let apiOrderDate = date.toISOString();
     this.setState({
@@ -605,12 +620,15 @@ class EditDraftOrder extends Component {
   };
 
   handleConfirmDeliveryDate = date => {
-    let newdate = moment(date).format('MM/DD/YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     let apiDeliveryDate = date.toISOString();
-    this.setState({
-      finalDeliveryDate: newdate,
-      apiDeliveryDate,
-    });
+    this.setState(
+      {
+        finalDeliveryDate: newdate,
+        apiDeliveryDate,
+      },
+      () => this.setDeliveryDateFun(),
+    );
     this.hideDatePickerDeliveryDate();
   };
 
@@ -664,16 +682,20 @@ class EditDraftOrder extends Component {
 
   deleteFunSec = () => {
     setTimeout(() => {
-      Alert.alert('Grainz', 'Are you sure you want to delete this inventory?', [
-        {
-          text: 'Yes',
-          onPress: () => this.hitDeleteApi(),
-        },
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-      ]);
+      Alert.alert(
+        '',
+        translate('Are you sure you want to delete this draft from the list?'),
+        [
+          {
+            text: 'Yes',
+            onPress: () => this.hitDeleteApi(),
+          },
+          {
+            text: 'No',
+            style: 'cancel',
+          },
+        ],
+      );
     }, 100);
   };
 
@@ -996,16 +1018,20 @@ class EditDraftOrder extends Component {
   deleteOrderFun = () => {};
 
   deleteDraftFun = () => {
-    Alert.alert('', translate('Are you sure you want to delete this order?'), [
-      {
-        text: translate('No'),
-        style: 'cancel',
-      },
-      {
-        text: translate('Yes'),
-        onPress: () => this.deleteFun(),
-      },
-    ]);
+    Alert.alert(
+      '',
+      translate('Are you sure you want to delete this draft from the list?'),
+      [
+        {
+          text: translate('No'),
+          style: 'cancel',
+        },
+        {
+          text: translate('Yes'),
+          onPress: () => this.deleteFun(),
+        },
+      ],
+    );
   };
 
   deleteFun = () => {
@@ -1183,6 +1209,29 @@ class EditDraftOrder extends Component {
 
   goBackFun = () => {
     this.props.navigation.navigate('DraftOrderAdminScreen');
+  };
+
+  setDeliveryDateFun = () => {
+    const {basketId, apiDeliveryDate} = this.state;
+    let payload = {};
+    console.log('apiDeliveryDate', apiDeliveryDate);
+    console.log('basketId', basketId);
+
+    setDeliveryDateApi(basketId, apiDeliveryDate, payload)
+      .then(res => {
+        console.log('res-DELIVERYDAATE', res);
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-1',
+          [
+            {
+              text: translate('Ok'),
+            },
+          ],
+        );
+      });
   };
 
   render() {
@@ -2176,7 +2225,7 @@ class EditDraftOrder extends Component {
                             flex: 1,
                           }}>
                           <Text style={{fontSize: 10}}>
-                            {translate('Ordered Val')}.
+                            {translate('Ordered Val')}
                           </Text>
                           <Text
                             style={{
@@ -2191,7 +2240,7 @@ class EditDraftOrder extends Component {
                             flex: 1,
                           }}>
                           <Text style={{fontSize: 10}}>
-                            {translate('Ordered Qty')}.
+                            {translate('Ordered Qty')}
                           </Text>
                           <Text
                             style={{
@@ -2715,6 +2764,7 @@ class EditDraftOrder extends Component {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => this.sendFun()}
+              // onPress={() => this.sendFunSec()}
               style={{
                 height: hp('7%'),
                 width: wp('87%'),
@@ -2902,9 +2952,7 @@ class EditDraftOrder extends Component {
             pickerModalStatus={duplicateModalStatus}
             headingText={translate('Duplicate')}
             crossFun={() => this.closeModalFun()}
-            bodyText={translate(
-              'Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?',
-            )}
+            bodyText={translate('WholeList')}
             cancelFun={() => this.closeModalFun()}
             saveFun={() => this.duplicateModalFunSec()}
             yesStatus
@@ -2914,7 +2962,7 @@ class EditDraftOrder extends Component {
             headingText={translate('Delete')}
             crossFun={() => this.closeModalFun()}
             bodyText={translate(
-              'Are you sure you want to delete this item from the list?',
+              'Are you sure you want to delete this draft from the list?',
             )}
             cancelFun={() => this.closeModalFun()}
             saveFun={() => this.deleteFun()}
@@ -3065,7 +3113,7 @@ class EditDraftOrder extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Package size')}.
+                              {translate('Package size')}
                             </Text>
                             <Text
                               numberOfLines={1}
@@ -3089,7 +3137,7 @@ class EditDraftOrder extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Ordered Val')}.
+                              {translate('Ordered Val')}
                             </Text>
                             <Text
                               numberOfLines={1}
@@ -3142,7 +3190,7 @@ class EditDraftOrder extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Ordered Qty')}.
+                              {translate('Ordered Qty')}
                             </Text>
                             <Text
                               numberOfLines={1}

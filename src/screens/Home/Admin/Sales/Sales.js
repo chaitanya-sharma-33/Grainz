@@ -131,7 +131,7 @@ class Sales extends Component {
   };
 
   handleConfirmStart = date => {
-    let newdate = moment(date).format('MM/DD/YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     this.setState({
       finalDateStart: newdate,
     });
@@ -144,7 +144,7 @@ class Sales extends Component {
   };
 
   handleConfirmEnd = date => {
-    let newdate = moment(date).format('MM/DD/YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     this.setState({
       finalDateEnd: newdate,
     });

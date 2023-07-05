@@ -1733,12 +1733,12 @@ class EditPurchase extends Component {
                                 }}
                                 numberOfLines={1}>
                                 {item.name === 'Kitchen'
-                                  ? '1 Selected'
+                                  ? `1 ${translate('Selected')}`
                                   : item.name === 'Bar'
-                                  ? '2 Selected'
+                                  ? `2 ${translate('Selected')}`
                                   : item.name === 'Retail'
-                                  ? '3 Selected'
-                                  : '4 Selected'}
+                                  ? `3 ${translate('Selected')}`
+                                  : `4 ${translate('Selected')}`}
                               </Text>
                             </View>
                           </View>
@@ -2466,7 +2466,7 @@ class EditPurchase extends Component {
                         flex: 1,
                       }}>
                       <Text style={{fontSize: 10}}>
-                        {translate('Ordered Val')}.
+                        {translate('Ordered Val')}
                       </Text>
                       <Text
                         style={{
@@ -2483,7 +2483,7 @@ class EditPurchase extends Component {
                         flex: 1,
                       }}>
                       <Text style={{fontSize: 10}}>
-                        {translate('Ordered Qty')}.
+                        {translate('Ordered Qty')}
                       </Text>
                       <Text
                         style={{

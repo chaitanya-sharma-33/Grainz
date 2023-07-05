@@ -168,12 +168,12 @@ class index extends Component {
     getCurrentUserApi()
       .then(res => {
         const {data} = res;
-        let todaydate = moment(new Date()).format('MM/DD/YYYY');
+        let todaydate = moment(new Date()).format('DD/MM/YYYY');
         let todaydateApi = new Date().toISOString();
         var currentTime = new Date();
         let periods = data && data.dashBoardPreferences.periods;
         currentTime.setDate(currentTime.getDate() - periods);
-        let previousDate = moment(currentTime).format('MM/DD/YYYY');
+        let previousDate = moment(currentTime).format('DD/MM/YYYY');
         let previousDateApi = currentTime.toISOString();
         this.setState(
           {
@@ -226,7 +226,7 @@ class index extends Component {
   };
 
   handleConfirmFirstDate = date => {
-    let newdate = moment(date).format('MM/DD/YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     let apiFirstDate = date.toISOString();
     this.setState(
       {
@@ -252,7 +252,7 @@ class index extends Component {
   };
 
   handleConfirmSecondDate = date => {
-    let newdate = moment(date).format('MM/DD/YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     let apiSecondDate = date.toISOString();
     this.setState(
       {

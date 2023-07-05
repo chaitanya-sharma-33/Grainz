@@ -3362,7 +3362,7 @@ class AddItems extends Component {
                             style={{
                               fontSize: 14,
                             }}>
-                            {translate('Package size')}.
+                            {translate('Package size')}
                           </Text>
                           <Text
                             numberOfLines={1}
@@ -3412,7 +3412,7 @@ class AddItems extends Component {
                             style={{
                               fontSize: 14,
                             }}>
-                            {translate('Ordered Qty')}.
+                            {translate('Ordered Qty')}
                           </Text>
                           <Text
                             numberOfLines={1}
@@ -3434,7 +3434,7 @@ class AddItems extends Component {
                             style={{
                               fontSize: 14,
                             }}>
-                            {translate('Ordered Val')}.
+                            {translate('Ordered Val')}
                           </Text>
                           <Text
                             numberOfLines={1}

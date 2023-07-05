@@ -2136,7 +2136,7 @@ class DepartmentPurchaseSec extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Ordered Qty')}.
+                              {translate('Ordered Qty')}
                             </Text>
                             <Text
                               numberOfLines={1}
@@ -2157,7 +2157,7 @@ class DepartmentPurchaseSec extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Package size')}.
+                              {translate('Package size')}
                             </Text>
                             <Text
                               numberOfLines={1}
@@ -2206,7 +2206,7 @@ class DepartmentPurchaseSec extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Ordered Val')}.
+                              {translate('Ordered Val')}
                             </Text>
                             <Text
                               numberOfLines={1}

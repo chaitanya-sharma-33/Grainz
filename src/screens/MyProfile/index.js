@@ -516,7 +516,7 @@ class index extends Component {
                     }}>
                     <RNPickerSelect
                       placeholder={{
-                        label: 'Please select location*',
+                        label: translate('Please select location*'),
                         value: null,
                         color: 'black',
                       }}

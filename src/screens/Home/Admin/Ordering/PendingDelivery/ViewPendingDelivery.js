@@ -251,7 +251,7 @@ class ViewPendingDelivery extends Component {
         console.log('ERR MEP', err);
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -476,7 +476,7 @@ class ViewPendingDelivery extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -512,7 +512,7 @@ class ViewPendingDelivery extends Component {
   };
 
   showDatePickerArrivalDateSpecific = () => {
-    Alert.alert(``, 'Clear date or select date', [
+    Alert.alert(``, '', [
       {
         text: translate('Cancel'),
         style: 'cancel',
@@ -528,7 +528,7 @@ class ViewPendingDelivery extends Component {
           }),
       },
       {
-        text: translate('Select'),
+        text: translate('Select date'),
         onPress: () => this.showDatePickerArrivalDateSpecificSec(),
       },
     ]);
@@ -650,16 +650,16 @@ class ViewPendingDelivery extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
                 onPress: () => this.props.navigation.goBack(),
               },
             ],
           );
         });
     } else {
-      Alert.alert(``, 'Kildly fill arrived date first', [
+      Alert.alert(``, translate('Please enter arrived date first.'), [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoader(),
         },
       ]);
@@ -773,7 +773,7 @@ class ViewPendingDelivery extends Component {
             () => this.getOrderFun(value),
             // Alert.alert(`Grainz`, 'Order processed successfully', [
             //   {
-            //     text: 'Okay',
+            //     text: translate('Ok'),
             //     onPress: () => this.getOrderFun(value),
             //   },
             // ]),
@@ -785,16 +785,16 @@ class ViewPendingDelivery extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
                 onPress: () => this.props.navigation.goBack(),
               },
             ],
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Kildly fill arrived date first', [
+      Alert.alert(``, translate('Please enter arrived date first.'), [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoader(),
         },
       ]);
@@ -884,7 +884,7 @@ class ViewPendingDelivery extends Component {
           'Something went wrong-Credit',
           [
             {
-              text: 'Okay',
+              text: translate('Ok'),
               onPress: () => this.props.navigation.goBack(),
             },
           ],
@@ -957,7 +957,7 @@ class ViewPendingDelivery extends Component {
           'Something went wrong-Inventory',
           [
             {
-              text: 'Okay',
+              text: translate('Ok'),
               onPress: () => this.props.navigation.goBack(),
             },
           ],
@@ -1154,7 +1154,7 @@ class ViewPendingDelivery extends Component {
         () => this.editStatusFun(value),
       );
     } else {
-      alert('Please select arrived date first.');
+      alert(translate('Please enter arrived date first.'));
     }
   };
 
@@ -1208,7 +1208,7 @@ class ViewPendingDelivery extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -1232,7 +1232,7 @@ class ViewPendingDelivery extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -1266,7 +1266,7 @@ class ViewPendingDelivery extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -1437,7 +1437,7 @@ class ViewPendingDelivery extends Component {
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
-            text: 'Okay',
+            text: translate('Ok'),
             onPress: () => this.props.navigation.goBack(),
           },
         ]);
@@ -1484,13 +1484,13 @@ class ViewPendingDelivery extends Component {
   };
 
   arrivedDateUpdateFun = () => {
-    Alert.alert(`Grainz`, 'Clear date or select date', [
+    Alert.alert(``, '', [
       {
-        text: 'Cancel',
+        text: translate('Cancel'),
         style: 'cancel',
       },
       {
-        text: 'Clear',
+        text: translate('Clear'),
         onPress: () =>
           this.setState({
             finalArrivedDate: '',
@@ -1499,7 +1499,7 @@ class ViewPendingDelivery extends Component {
           }),
       },
       {
-        text: 'Select Date',
+        text: translate('Select date'),
         onPress: () => this.showDatePickerFunArrived(),
       },
     ]);
@@ -1723,7 +1723,7 @@ class ViewPendingDelivery extends Component {
                           style={{
                             fontSize: 11,
                           }}>
-                          Arrived Date
+                          {translate('Arrived Date')}
                         </Text>
                       </View>
 
@@ -1735,7 +1735,7 @@ class ViewPendingDelivery extends Component {
                         }}>
                         <TextInput
                           value={finalArrivedDate}
-                          placeholder="DD/MM/YY"
+                          placeholder={translate('DD/MM/YY')}
                           placeholderTextColor={
                             finalArrivedDate ? 'black' : 'red'
                           }
@@ -2634,7 +2634,7 @@ class ViewPendingDelivery extends Component {
                                     flex: 1,
                                   }}>
                                   <Text style={{fontSize: 10}}>
-                                    {translate('Delivered No.')}
+                                    {translate('Delivered No')}
                                   </Text>
                                   <Text
                                     style={{
@@ -2649,7 +2649,9 @@ class ViewPendingDelivery extends Component {
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{fontSize: 10}}>Order Val.</Text>
+                                  <Text style={{fontSize: 10}}>
+                                    {translate('Order Val')}
+                                  </Text>
                                   <Text
                                     style={{
                                       marginTop: 10,
@@ -4272,11 +4274,11 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       fontSize: 15,
                                     }}>
-                                    {translate('Delivered No.')}
+                                    {translate('Delivered No')}
                                   </Text>
 
                                   <TextInput
-                                    placeholder={translate('Delivered No.')}
+                                    placeholder={translate('Delivered No')}
                                     value={String(item.quantityDelivered)}
                                     style={{
                                       width: 80,
@@ -4745,7 +4747,7 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Product code
+                                {translate('_Product code')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -4771,7 +4773,7 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Package size
+                                {translate('Package size')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -4801,7 +4803,7 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Ordered No.
+                                {translate('_Ordered No')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -4827,7 +4829,7 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                {translate('Ordered Qty')}.
+                                {translate('_Order Qty')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -4859,10 +4861,10 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Delivered No.
+                                {translate('_Delivered No')}
                               </Text>
                               <TextInput
-                                placeholder="Delivered"
+                                placeholder={translate('_Delivered No')}
                                 keyboardType="numeric"
                                 style={{
                                   width: 80,
@@ -4897,7 +4899,7 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Delivered Qty.
+                                {translate('_Delivered Qty')}
                               </Text>
                               <View
                                 style={{
@@ -4905,7 +4907,7 @@ class ViewPendingDelivery extends Component {
                                   alignItems: 'center',
                                 }}>
                                 <TextInput
-                                  placeholder="Delivered Qty."
+                                  placeholder={translate('_Delivered Qty')}
                                   value={
                                     modalUserQuantityDelivered &&
                                     String(modalUserQuantityDelivered)
@@ -4956,10 +4958,10 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Invoiced No.
+                                {translate('_Invoiced No')}
                               </Text>
                               <TextInput
-                                placeholder="Invoiced"
+                                placeholder={translate('_Invoiced No')}
                                 style={{
                                   width: 80,
                                   fontWeight: 'bold',
@@ -4999,7 +5001,7 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Invoiced Qty.
+                                {translate('_Invoiced Qty')}
                               </Text>
                               <View
                                 style={{
@@ -5007,7 +5009,7 @@ class ViewPendingDelivery extends Component {
                                   alignItems: 'center',
                                 }}>
                                 <TextInput
-                                  placeholder="Volume"
+                                  placeholder={translate('_Invoiced Qty')}
                                   style={{
                                     width: 80,
                                     marginTop: 5,
@@ -5056,10 +5058,10 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Ordered Val. Expected
+                                {translate('_Ordered Val Expected')}
                               </Text>
                               <TextInput
-                                placeholder="Expected"
+                                placeholder={translate('_Ordered Val Expected')}
                                 style={{
                                   width: 80,
                                   fontWeight: 'bold',
@@ -5089,7 +5091,7 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Ordered Val. Actual
+                                {translate('_Ordered Val Actual')}
                               </Text>
                               <View
                                 style={{
@@ -5097,7 +5099,7 @@ class ViewPendingDelivery extends Component {
                                   alignItems: 'center',
                                 }}>
                                 <TextInput
-                                  placeholder={translate('Order Value Ex-VAT')}
+                                  placeholder={translate('_Ordered Val Actual')}
                                   style={{
                                     width: 80,
                                     marginTop: 5,
@@ -5142,10 +5144,10 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Price Expected
+                                {translate('_Price Expected')}
                               </Text>
                               <TextInput
-                                placeholder="Price Expected"
+                                placeholder={translate('_Price Expected')}
                                 style={{
                                   width: 80,
                                   fontWeight: 'bold',
@@ -5170,10 +5172,10 @@ class ViewPendingDelivery extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Price Actual
+                                {translate('_Price Actual')}
                               </Text>
                               <TextInput
-                                placeholder="Price Actual"
+                                placeholder={translate('_Price Actual')}
                                 style={{
                                   width: 80,
                                   marginTop: 5,
@@ -5202,7 +5204,7 @@ class ViewPendingDelivery extends Component {
                                   style={{
                                     fontSize: 12,
                                   }}>
-                                  Credit Requested
+                                  {translate('_Credit Requested')}
                                 </Text>
                                 <View
                                   style={{
@@ -5210,7 +5212,7 @@ class ViewPendingDelivery extends Component {
                                     alignItems: 'center',
                                   }}>
                                   <TextInput
-                                    placeholder="Credit Requested"
+                                    placeholder={translate('_Credit Requested')}
                                     keyboardType="numeric"
                                     style={{
                                       width: 80,
@@ -5246,7 +5248,7 @@ class ViewPendingDelivery extends Component {
                                   style={{
                                     fontSize: 12,
                                   }}>
-                                  Credit Approved Value
+                                  {translate('_Credit Approved Value')}
                                 </Text>
                                 <View
                                   style={{
@@ -5254,7 +5256,9 @@ class ViewPendingDelivery extends Component {
                                     alignItems: 'center',
                                   }}>
                                   <TextInput
-                                    placeholder="Credit Approved Value"
+                                    placeholder={translate(
+                                      '_Credit Approved Value',
+                                    )}
                                     style={{
                                       width: 80,
                                       marginTop: 5,
@@ -5328,10 +5332,10 @@ class ViewPendingDelivery extends Component {
                                   style={{
                                     fontSize: 12,
                                   }}>
-                                  Net Value
+                                  {translate('_Net Value')}
                                 </Text>
                                 <TextInput
-                                  placeholder="Net Value"
+                                  placeholder={translate('_Net Value')}
                                   editable={false}
                                   style={{
                                     width: 80,
@@ -5374,7 +5378,7 @@ class ViewPendingDelivery extends Component {
                                 marginLeft: 10,
                               }}>
                               {' '}
-                              Not Arrived
+                              {translate('_Not Arrived')}
                             </Text>
                           </TouchableOpacity>
 
@@ -5478,7 +5482,7 @@ class ViewPendingDelivery extends Component {
                             fontFamily: 'Inter-Regular',
                             marginLeft: 10,
                           }}>
-                          Flagged
+                          {translate('_Flagged')}
                         </Text>
                       </TouchableOpacity>
 
@@ -5554,7 +5558,7 @@ class ViewPendingDelivery extends Component {
                                 marginLeft: 10,
                                 fontFamily: 'Inter-SemiBold',
                               }}>
-                              Credit note Requested
+                              {translate('_Credit note Requested')}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -5582,7 +5586,7 @@ class ViewPendingDelivery extends Component {
                                 marginLeft: 10,
                                 fontFamily: 'Inter-SemiBold',
                               }}>
-                              Request credit note
+                              {translate('_Request credit note')}
                             </Text>
                           </View>
                         </TouchableOpacity>

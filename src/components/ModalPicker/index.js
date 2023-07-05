@@ -15,6 +15,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {translate} from '../../utils/translations';
 
 class index extends Component {
   constructor(props) {
@@ -170,7 +171,7 @@ class index extends Component {
                 paddingLeft: 15,
               }}>
               <TextInput
-                placeholder="Search..."
+                placeholder={translate('SearchDot')}
                 placeholderTextColor="grey"
                 value={searchItem}
                 style={{

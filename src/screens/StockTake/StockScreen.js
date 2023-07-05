@@ -139,7 +139,7 @@ class StockScreen extends Component {
 
   getTopDataFun = () => {
     const {departmentId, topValue, pageDate} = this.state;
-    let newdate = moment(pageDate).format('MM/DD/YYYY');
+    let newdate = moment(pageDate).format('DD/MM/YYYY');
     getNewTopStockTakeApi(departmentId, newdate, topValue)
       .then(res => {
         this.setState({

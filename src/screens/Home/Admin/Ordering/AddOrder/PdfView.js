@@ -444,7 +444,7 @@ class PdfView extends Component {
                   fontSize: 15,
                   fontWeight: 'bold',
                 }}>
-                Download
+                {translate('Download')}
               </Text>
             </TouchableOpacity>
           </View>

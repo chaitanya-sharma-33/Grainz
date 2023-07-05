@@ -369,7 +369,7 @@ class NewOrderSec extends Component {
                         alignItems: 'center',
                       }}>
                       <TextInput
-                        placeholder="DD/MM/YY"
+                        placeholder={translate('DD/MM/YY')}
                         value={finalOrderDate}
                         editable={false}
                         style={{
@@ -417,7 +417,7 @@ class NewOrderSec extends Component {
                         marginTop: 10,
                       }}>
                       <TextInput
-                        placeholder="DD/MM/YY"
+                        placeholder={translate('DD/MM/YY')}
                         value={finalDeliveryDate}
                         editable={false}
                         style={{
@@ -452,7 +452,7 @@ class NewOrderSec extends Component {
                     padding: 12,
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>{translate('Placed By')}</Text>
+                    <Text style={{}}>{translate('Placed by')}</Text>
                   </View>
                   <View
                     style={{

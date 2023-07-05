@@ -153,17 +153,21 @@ class ViewDraftOrders extends Component {
 
   deleteFunSec = () => {
     setTimeout(() => {
-      Alert.alert('Grainz', 'Are you sure you want to delete this order?', [
-        {
-          text: 'Yes',
-          onPress: () => this.hitDeleteApi(),
-        },
-        {
-          text: 'No',
-          style: 'cancel',
-          onPress: () => this.closeLoaderComp(),
-        },
-      ]);
+      Alert.alert(
+        '',
+        translate('Are you sure you want to delete this draft from the list?'),
+        [
+          {
+            text: translate('Yes'),
+            onPress: () => this.hitDeleteApi(),
+          },
+          {
+            text: translate('No'),
+            style: 'cancel',
+            onPress: () => this.closeLoaderComp(),
+          },
+        ],
+      );
     }, 100);
   };
 
@@ -356,7 +360,7 @@ class ViewDraftOrders extends Component {
                   borderRadius: 5,
                 }}>
                 <TextInput
-                  placeholder="Placed by"
+                  placeholder={translate('Placed by')}
                   value={placedByName}
                   editable={false}
                 />

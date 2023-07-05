@@ -1578,9 +1578,7 @@ class PendingDelivery extends Component {
                 pickerModalStatus={duplicateModalStatus}
                 headingText={translate('Duplicate')}
                 crossFun={() => this.closeModalFun()}
-                bodyText={translate(
-                  'Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?',
-                )}
+                bodyText={translate('WholeList')}
                 cancelFun={() => this.closeModalFun()}
                 saveFun={() => this.duplicateModalFunSec()}
                 yesStatus

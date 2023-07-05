@@ -38,6 +38,7 @@ import {
   updateDraftOrderNewApi,
   lookupDepartmentsApi,
   validateUserApi,
+  setDeliveryDateApi,
 } from '../../../../../connectivity/api';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from 'react-native-modal';
@@ -405,6 +406,7 @@ class Basket extends Component {
 
   sendFun = () => {
     const {finalDataSec} = this.state;
+    console.log('FINALDATASEC', finalDataSec);
     if (finalDataSec.channel === 'Ftp') {
       Alert.alert(`Grainz`, 'Do yo want to send this order?', [
         {
@@ -427,6 +429,8 @@ class Basket extends Component {
   };
 
   sendFTPFun = () => {
+    const {finalDataSec} = this.state;
+    console.log('FINALDATASEC', finalDataSec);
     this.setState(
       {
         loaderCompStatus: true,
@@ -911,14 +915,17 @@ class Basket extends Component {
 
   handleConfirmDeliveryDate = date => {
     const {finalOrderDate} = this.state;
-    const finalDeliveryDate = moment(date).format('DD-MM-YY');
+    const finalDeliveryDate = moment(date).format('DD/MM/YYYY');
 
-    let newdate = moment(date).format('MM/DD/YYYY');
+    let newdate = moment(date).format('DD/MM/YYYY');
     let apiDeliveryDate = date.toISOString();
-    this.setState({
-      finalDeliveryDate: newdate,
-      apiDeliveryDate,
-    });
+    this.setState(
+      {
+        finalDeliveryDate: newdate,
+        apiDeliveryDate,
+      },
+      () => this.setDeliveryDateFun(),
+    );
     this.hideDatePickerDeliveryDate();
     // if (finalDeliveryDate < finalOrderDate) {
     //   alert('Delivery date cannot be less than or equal to order date');
@@ -931,6 +938,29 @@ class Basket extends Component {
     //   });
     //   this.hideDatePickerDeliveryDate();
     // }
+  };
+
+  setDeliveryDateFun = () => {
+    const {basketId, apiDeliveryDate} = this.state;
+    let payload = {};
+    console.log('apiDeliveryDate', apiDeliveryDate);
+    console.log('basketId', basketId);
+
+    setDeliveryDateApi(basketId, apiDeliveryDate, payload)
+      .then(res => {
+        console.log('res-DELIVERYDAATE', res);
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-1',
+          [
+            {
+              text: translate('Ok'),
+            },
+          ],
+        );
+      });
   };
 
   hideDatePickerDeliveryDate = () => {
@@ -2085,7 +2115,7 @@ class Basket extends Component {
                             flex: 1,
                           }}>
                           <Text style={{fontSize: 10}}>
-                            {translate('Ordered Val')}.
+                            {translate('Ordered Val')}
                           </Text>
                           <Text
                             style={{
@@ -2101,7 +2131,7 @@ class Basket extends Component {
                             flex: 1,
                           }}>
                           <Text style={{fontSize: 10}}>
-                            {translate('Ordered Qty')}.
+                            {translate('Ordered Qty')}
                           </Text>
                           <Text
                             style={{
@@ -2847,7 +2877,7 @@ class Basket extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Package size')}.
+                              {translate('Package size')}
                             </Text>
                             <Text
                               numberOfLines={1}
@@ -2871,7 +2901,7 @@ class Basket extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Ordered Val')}.
+                              {translate('Ordered Val')}
                             </Text>
                             <Text
                               numberOfLines={1}
@@ -2924,7 +2954,7 @@ class Basket extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              {translate('Ordered Qty')}.
+                              {translate('Ordered Qty')}
                             </Text>
                             <Text
                               numberOfLines={1}
@@ -3078,7 +3108,8 @@ class Basket extends Component {
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.sendFun()}
+              // onPress={() => this.sendFun()}
+              onPress={() => this.sendFTPFun()}
               style={{
                 height: hp('7%'),
                 width: wp('87%'),
@@ -3258,7 +3289,9 @@ class Basket extends Component {
                   }}>
                   <View style={{}}>
                     <View style={{backgroundColor: '#fff', padding: 5}}>
-                      <Text style={{fontSize: 11, paddingLeft: 15}}>From</Text>
+                      <Text style={{fontSize: 11, paddingLeft: 15}}>
+                        {translate('From')}
+                      </Text>
                       <TextInput
                         value={mailTitleValue}
                         placeholder={translate('From')}
@@ -3281,7 +3314,10 @@ class Basket extends Component {
                         backgroundColor: '#fff',
                         padding: 5,
                       }}>
-                      <Text style={{fontSize: 11, paddingLeft: 15}}> To </Text>
+                      <Text style={{fontSize: 11, paddingLeft: 15}}>
+                        {' '}
+                        {translate('To')}{' '}
+                      </Text>
                       <TextInput
                         value={toRecipientValue}
                         placeholder={translate('To')}
@@ -3393,7 +3429,7 @@ class Basket extends Component {
                         </TouchableOpacity>
                       )}
                       <TouchableOpacity
-                        // onPress={() => this.closeMailModal()}
+                        onPress={() => this.closeMailModal()}
                         style={{
                           width: wp('68%'),
                           height: hp('7%'),

@@ -404,7 +404,7 @@ class ViewPurchase extends Component {
               borderRadius: 5,
             }}>
             <TextInput
-              placeholder="Search"
+              placeholder={translate('Search')}
               style={{
                 padding: 12,
                 borderRadius: 5,

@@ -524,7 +524,7 @@ class index extends Component {
                       </View> */}
                       <View style={{}}>
                         <TextInput
-                          placeholder="Email"
+                          placeholder={translate('Email')}
                           value={resetEmail}
                           style={{
                             borderWidth: 1,

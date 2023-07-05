@@ -2219,7 +2219,7 @@ class ViewReviewOrder extends Component {
                                     flex: 1,
                                   }}>
                                   <Text style={{fontSize: 10}}>
-                                    Delivered No.
+                                    {translate('Delivered No')}
                                   </Text>
                                   <Text
                                     style={{
@@ -3556,7 +3556,7 @@ class ViewReviewOrder extends Component {
                                     style={{
                                       fontSize: 12,
                                     }}>
-                                    {translate('Ordered Qty')}.
+                                    {translate('Ordered Qty')}
                                   </Text>
                                   <Text
                                     numberOfLines={1}
@@ -3975,11 +3975,11 @@ class ViewReviewOrder extends Component {
                                     style={{
                                       fontSize: 12,
                                     }}>
-                                    Delivered No.
+                                    {translate('Delivered No')}
                                   </Text>
 
                                   <TextInput
-                                    placeholder="Delivered No."
+                                    placeholder={translate('Delivered No')}
                                     value={String(item.quantityDelivered)}
                                     style={{
                                       width: 80,
@@ -4394,7 +4394,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                {translate('Ordered Qty')}.
+                                {translate('Ordered Qty')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -4426,7 +4426,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Delivered No.
+                                {translate('Delivered No')}
                               </Text>
                               <TextInput
                                 placeholder="Delivered"
@@ -4623,7 +4623,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Ordered Val. Expected
+                                {translate('Ordered Val')} Expected
                               </Text>
                               <TextInput
                                 placeholder="Expected"
@@ -4656,7 +4656,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Ordered Val. Actual
+                                {translate('Ordered Val')} Actual
                               </Text>
                               <View
                                 style={{

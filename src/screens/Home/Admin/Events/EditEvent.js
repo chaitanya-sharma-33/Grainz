@@ -2024,7 +2024,7 @@ class EditEvent extends Component {
                       paddingLeft: 15,
                     }}>
                     <TextInput
-                      placeholder="Search..."
+                      placeholder={translate('SearchDot')}
                       placeholderTextColor="grey"
                       value={searchMenuItem}
                       style={{

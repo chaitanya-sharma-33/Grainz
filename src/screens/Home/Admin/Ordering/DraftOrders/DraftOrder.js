@@ -972,7 +972,7 @@ class DraftOrder extends Component {
                 pickerModalStatus={duplicateModalStatus}
                 headingText={translate('Duplicate')}
                 crossFun={() => this.closeModalFun()}
-                bodyText="Whole list of items from this order will be duplicated in a new draft. Are you sure you want to proceed?"
+                bodyText={translate('WholeList')}
                 cancelFun={() => this.closeModalFun()}
                 saveFun={() => this.duplicateModalFunSec()}
                 yesStatus
@@ -981,7 +981,9 @@ class DraftOrder extends Component {
                 pickerModalStatus={deleteModalStatus}
                 headingText={translate('Delete')}
                 crossFun={() => this.closeModalFun()}
-                bodyText="Are you sure you want to delete this item from the list?"
+                bodyText={translate(
+                  'Are you sure you want to delete this draft from the list?',
+                )}
                 cancelFun={() => this.closeModalFun()}
                 saveFun={() => this.deleteFun()}
                 yesStatus

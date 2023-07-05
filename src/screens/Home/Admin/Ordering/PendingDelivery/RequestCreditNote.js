@@ -651,10 +651,10 @@ export class RequestCreditNote extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      Ordered Value
+                      {translate('Ordered Val')}
                     </Text>
                     <TextInput
-                      placeholder="Ordered Value"
+                      placeholder={translate('Ordered Val')}
                       style={{
                         width: 80,
                         fontWeight: 'bold',

@@ -827,7 +827,7 @@ class EditHistoryOrder extends Component {
                     }}>
                     <TextInput
                       placeholder={moment(yourOrder.orderDate).format(
-                        'MM/DD/YYYY',
+                        'DD/MM/YYYY',
                       )}
                       value={finalDate}
                       editable={false}
