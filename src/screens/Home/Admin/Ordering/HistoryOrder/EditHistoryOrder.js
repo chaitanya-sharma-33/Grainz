@@ -1308,7 +1308,7 @@ class EditHistoryOrder extends Component {
                     marginTop: hp('3%'),
                   }}>
                   <TextInput
-                    placeholder="Notes"
+                    placeholder={translate('Notes')}
                     editable={!editDisabled}
                     style={{
                       paddingVertical: '40%',

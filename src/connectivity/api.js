@@ -837,10 +837,13 @@ export const updateInventoryProductApi = async payload => {
 export const lookupDepartmentsApi = async () => {
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
+  const lang = await AsyncStorage.getItem('Language');
+  console.log('LANG', lang);
   return axios.get(baseURL + `/Lookup/Departments`, {
     headers: {
       Authorization: `Bearer ${token}`,
       LocationId: location,
+      Language: lang,
     },
   });
 };

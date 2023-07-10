@@ -1393,7 +1393,7 @@ class PendingDelivery extends Component {
                               fontSize: 14,
                               fontWeight: 'bold',
                             }}>
-                            {translate('Move to Review')}
+                            {translate('Move to review')}
                           </Text>
                         </TouchableOpacity>
                       ) : null}

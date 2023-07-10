@@ -772,57 +772,65 @@ class AddItems extends Component {
                   // marginBottom:
                   //   index === section.content.length - 1 ? 30 : null,
                 }}>
-                <TouchableOpacity
-                  onPress={() => this.openModalFun(item, section, index)}
+                <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     flex: 1,
-                    marginVertical: 10,
                   }}>
-                  <View
+                  <TouchableOpacity
+                    onPress={() => this.openModalFun(item, section, index)}
                     style={{
-                      flex: 0.5,
-                      marginTop: 10,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      flex: 1,
+                      marginVertical: 10,
                     }}>
-                    {item.isInStock ? (
-                      <Image
-                        source={img.inStockIcon}
-                        style={{
-                          height: 15,
-                          width: 15,
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    ) : (
-                      <Image
-                        source={img.outStockIcon}
-                        style={{
-                          height: 15,
-                          width: 15,
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                  </View>
-                  <View style={{marginTop: 10, flex: 3}}>
                     <View
-                      // onPress={() =>
-                      //   this.props.navigation.navigate('SelectQuantityScreen', {
-                      //     finalData: item,
-                      //   })
-                      // }
-                      style={{}}>
-                      <Text>{item.productName}</Text>
+                      style={{
+                        flex: 0.5,
+                        marginTop: 10,
+                        marginRight: 10,
+                      }}>
+                      {item.isInStock ? (
+                        <Image
+                          source={img.inStockIcon}
+                          style={{
+                            height: 15,
+                            width: 15,
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      ) : (
+                        <Image
+                          source={img.outStockIcon}
+                          style={{
+                            height: 15,
+                            width: 15,
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
                     </View>
-                  </View>
-                  <View
+                    <View style={{marginTop: 10, flex: 3}}>
+                      <View
+                        // onPress={() =>
+                        //   this.props.navigation.navigate('SelectQuantityScreen', {
+                        //     finalData: item,
+                        //   })
+                        // }
+                        style={{}}>
+                        <Text>{item.productName}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                  {/* <View
                     style={{
                       flex: 1,
                       alignItems: 'flex-end',
                     }}>
                     <View>
-                      {/* {section.content[0] && section.content[0].deltaNew > 0 ? (
+                      {section.content[0] && section.content[0].deltaNew > 0 ? (
                         <Text
                           numberOfLines={1}
                           style={{
@@ -846,7 +854,7 @@ class AddItems extends Component {
                           }}>
                           Δ 0 {section.content[0] && section.content[0].unit}
                         </Text>
-                      )} */}
+                      )}
                       <Text
                         numberOfLines={1}
                         style={{
@@ -858,25 +866,25 @@ class AddItems extends Component {
                         {item.unit}
                       </Text>
                     </View>
-                  </View>
-                  {/* <View
+                  </View> */}
+                  <View
                     style={{
-                      width: wp('25%'),
+                      width: wp('20%'),
                       justifyContent: 'center',
                       marginLeft: wp('6%'),
                     }}>
                     <Text>
                       {item.comparePrice} / {item.compareUnit}
                     </Text>
-                  </View> */}
-                  {/* <View
+                  </View>
+                  <View
                     style={{
                       width: wp('30%'),
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderWidth: 1,
-                      borderRadius: 5,
+                      // borderWidth: 1,
+                      // borderRadius: 5,
                       height: hp('5%'),
                     }}>
                     <TouchableOpacity
@@ -895,7 +903,14 @@ class AddItems extends Component {
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}>
-                      <Text style={{}}>-</Text>
+                      <Text
+                        style={{
+                          color: '#5197C1',
+                          fontSize: 25,
+                          fontWeight: 'bold',
+                        }}>
+                        -
+                      </Text>
                     </TouchableOpacity>
                     <View
                       style={{
@@ -903,8 +918,8 @@ class AddItems extends Component {
                         height: hp('5%'),
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderRightWidth: 1,
-                        borderLeftWidth: 1,
+                        // borderRightWidth: 1,
+                        // borderLeftWidth: 1,
                       }}>
                       <TextInput
                         placeholder="0"
@@ -918,6 +933,7 @@ class AddItems extends Component {
                           width: wp('10%'),
                           height: hp('5%'),
                           paddingLeft: 6,
+                          // textAlign: 'center',
                         }}
                         onChangeText={value =>
                           this.editQuantityFun(
@@ -948,10 +964,17 @@ class AddItems extends Component {
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}>
-                      <Text style={{color: 'black', fontSize: 15}}>+</Text>
+                      <Text
+                        style={{
+                          color: '#5197C1',
+                          fontSize: 25,
+                          fontWeight: 'bold',
+                        }}>
+                        +
+                      </Text>
                     </TouchableOpacity>
-                  </View> */}
-                </TouchableOpacity>
+                  </View>
+                </View>
                 {/* <View>
                   <Text
                     style={{
@@ -1916,41 +1939,40 @@ class AddItems extends Component {
           }),
       );
     } else {
-      if (finalBasketData.length > 0 || basketId) {
-        if (navigateType === 'EditDraft') {
-          console.log('EditDraft');
-          this.setState(
-            {
-              basketLoader: false,
-            },
-            () => this.navigateToEditDraft(res),
-          );
-        } else {
-          console.log('EditDraft->ELSE');
-
-          this.setState(
-            {
-              basketLoader: false,
-              draftStatus: true,
-            },
-            () => this.navigateToBasket(),
-          );
-        }
-      } else {
-        Alert.alert('', translate('Please add atleast one item'), [
-          {
-            text: translate('Ok'),
-            onPress: () => this.closeBasketLoader(),
-            style: 'default',
-          },
-        ]);
-      }
+      console.log('SAVEEEEE');
+      this.saveChangesFun();
     }
 
     // else {
-    //   console.log('SAVEEEEE');
+    //   if (finalBasketData.length > 0 || basketId) {
+    //     if (navigateType === 'EditDraft') {
+    //       console.log('EditDraft');
+    //       this.setState(
+    //         {
+    //           basketLoader: false,
+    //         },
+    //         () => this.navigateToEditDraft(res),
+    //       );
+    //     } else {
+    //       console.log('EditDraft->ELSE');
 
-    //   this.saveChangesFun();
+    //       this.setState(
+    //         {
+    //           basketLoader: false,
+    //           draftStatus: true,
+    //         },
+    //         () => this.navigateToBasket(),
+    //       );
+    //     }
+    //   } else {
+    //     Alert.alert('', translate('Please add atleast one item'), [
+    //       {
+    //         text: translate('Ok'),
+    //         onPress: () => this.closeBasketLoader(),
+    //         style: 'default',
+    //       },
+    //     ]);
+    //   }
     // }
   };
 
@@ -3313,13 +3335,13 @@ class AddItems extends Component {
                       </Text>
                     </View>
                     <TouchableOpacity
-                      // onPress={() =>
-                      //   this.setState({
-                      //     orderingThreeModal: false,
-                      //     modalQuantity: '0',
-                      //   })
-                      // }
-                      onPress={() => this.confirmQuantityFun()}
+                      onPress={() =>
+                        this.setState({
+                          orderingThreeModal: false,
+                          modalQuantity: '0',
+                        })
+                      }
+                      // onPress={() => this.confirmQuantityFun()}
                       style={{
                         backgroundColor: '#fff',
                         borderRadius: 100,
@@ -3505,7 +3527,7 @@ class AddItems extends Component {
                           </View> */}
                       </View>
 
-                      <View
+                      {/* <View
                         style={{
                           flex: 0.7,
                           alignItems: 'center',
@@ -3563,7 +3585,7 @@ class AddItems extends Component {
                             +
                           </Text>
                         </TouchableOpacity>
-                      </View>
+                      </View> */}
 
                       <View
                         style={{

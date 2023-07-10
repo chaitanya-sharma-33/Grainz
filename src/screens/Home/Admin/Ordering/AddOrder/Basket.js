@@ -502,7 +502,7 @@ class Basket extends Component {
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Please select all values.', [
+      Alert.alert(``, translate('Please select all values'), [
         {
           text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
@@ -738,7 +738,7 @@ class Basket extends Component {
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Please select all values.', [
+      Alert.alert(``, translate('Please select all values'), [
         {
           text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
@@ -829,7 +829,7 @@ class Basket extends Component {
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Please select all values.', [
+      Alert.alert(``, translate('Please select all values'), [
         {
           text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
@@ -2977,7 +2977,7 @@ class Basket extends Component {
                             marginTop: hp('3%'),
                           }}>
                           <View style={{}}>
-                            <Text style={{}}>Note</Text>
+                            <Text style={{}}>{translate('Notes')}</Text>
                           </View>
                           <View
                             style={{

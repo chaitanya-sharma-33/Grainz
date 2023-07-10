@@ -110,7 +110,7 @@ class EditDraftOrder extends Component {
         let finalArray = res.data.map((item, index) => {
           return {
             id: item.id,
-            name: item.name,
+            name: item.displayName,
           };
         });
         this.setState({
@@ -153,10 +153,10 @@ class EditDraftOrder extends Component {
       },
       shopingBasketId: basketId,
     };
-    console.log('payload->validateUserApi', payload);
+    // console.log('payload->validateUserApi', payload);
     validateUserApi(payload)
       .then(res => {
-        console.log('res-Validate', res);
+        // console.log('res-Validate', res);
         if (res.data === '') {
           this.optionFun(data, res);
         } else {
@@ -241,7 +241,7 @@ class EditDraftOrder extends Component {
         totalValue: draftsOrderData.totalValue,
         shopingBasketItemList: finalApiData,
       };
-      console.log('payload', payload);
+      // console.log('payload', payload);
       updateDraftOrderNewApi(payload)
         .then(res => {
           this.setState(
@@ -257,15 +257,15 @@ class EditDraftOrder extends Component {
             'Something went wrong-1',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
               },
             ],
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Please select all values.', [
+      Alert.alert(``, translate('Please select all values'), [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
         },
       ]);
@@ -274,7 +274,7 @@ class EditDraftOrder extends Component {
 
   optionFun = (data, res) => {
     const {channel} = this.state;
-    console.log('CHANNEL', channel);
+    // console.log('CHANNEL', channel);
     if (channel === 'Ftp') {
       this.setState(
         {
@@ -319,10 +319,10 @@ class EditDraftOrder extends Component {
       totalValue: draftsOrderData.totalValue,
       shopingBasketItemList: finalApiData,
     };
-    console.log('payload-updateDraftFun', payload);
+    // console.log('payload-updateDraftFun', payload);
     updateDraftOrderNewApi(payload)
       .then(res => {
-        console.log('res-updateDraftFun', res);
+        // console.log('res-updateDraftFun', res);
         this.setState({
           loaderCompStatus: false,
           finalDeliveryDate:
@@ -522,15 +522,15 @@ class EditDraftOrder extends Component {
             'Something went wrong-3',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
               },
             ],
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Please select all values.', [
+      Alert.alert(``, translate('Please select all values'), [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
         },
       ]);
@@ -687,11 +687,11 @@ class EditDraftOrder extends Component {
         translate('Are you sure you want to delete this draft from the list?'),
         [
           {
-            text: 'Yes',
+            text: translate('Yes'),
             onPress: () => this.hitDeleteApi(),
           },
           {
-            text: 'No',
+            text: translate('No'),
             style: 'cancel',
           },
         ],
@@ -741,7 +741,7 @@ class EditDraftOrder extends Component {
 
   getInventoryFun = () => {
     const {productId, basketId, apiDeliveryDate} = this.state;
-    console.log('BASKWTID', basketId);
+    // console.log('BASKWTID', basketId);
 
     getBasketApi(basketId)
       .then(res => {
@@ -834,15 +834,15 @@ class EditDraftOrder extends Component {
   editQuantityFun = (index, type, value, data, valueType) => {
     const {inventoryData} = this.state;
 
-    console.log('data', data);
+    // console.log('data', data);
 
     const valueSec = data.quantity === '' ? Number(0) : Number(data.quantity);
     const volume = data.inventoryMapping && data.inventoryMapping.volume;
     const valueMinus = valueSec - Number(1);
-    console.log('valueMinus--> ', valueMinus);
+    // console.log('valueMinus--> ', valueMinus);
 
     const valueAdd = Number(1) + valueSec;
-    console.log('valueAdd--> ', valueAdd);
+    // console.log('valueAdd--> ', valueAdd);
 
     const finalQuantityMinus = volume * valueMinus;
     const finalQuantityAdd = volume * valueAdd;
@@ -855,7 +855,7 @@ class EditDraftOrder extends Component {
     const finalValueInput =
       data.inventoryMapping.price * data.inventoryMapping.packSize * value;
 
-    console.log('inven-->', inventoryData);
+    // console.log('inven-->', inventoryData);
 
     if (valueType === 'minus') {
       let newArr = inventoryData.map((item, i) =>
@@ -904,7 +904,7 @@ class EditDraftOrder extends Component {
           : item,
       );
 
-      console.log();
+      // console.log();
 
       this.setState({
         inventoryData: [...newArr],
@@ -930,7 +930,7 @@ class EditDraftOrder extends Component {
       shopingBasketItemList: finalApiData,
       id: basketId,
     };
-    console.log('payload', payload);
+    // console.log('payload', payload);
     updateBasketApi(payload)
       .then(res => {
         this.setState(
@@ -1036,7 +1036,7 @@ class EditDraftOrder extends Component {
 
   deleteFun = () => {
     const {productId} = this.state;
-    console.log('productId', productId);
+    // console.log('productId', productId);
     this.setState(
       {
         modalLoaderDrafts: true,
@@ -1075,7 +1075,7 @@ class EditDraftOrder extends Component {
 
   saveNoteFun = () => {
     const {inventoryData, itemNotes, lineIndex} = this.state;
-    console.log('lineIndex', lineIndex);
+    // console.log('lineIndex', lineIndex);
     let newArr = inventoryData.map((item, i) =>
       lineIndex === i
         ? {
@@ -1105,12 +1105,12 @@ class EditDraftOrder extends Component {
 
   editModalQuantityFun = (type, value) => {
     const {modalQuantity} = this.state;
-    console.log('modalQuantity', modalQuantity);
-    console.log('value', value);
+    // console.log('modalQuantity', modalQuantity);
+    // console.log('value', value);
 
     if (type === 'minus' && modalQuantity !== 0) {
       const valFinal = parseInt(modalQuantity) - parseInt(value);
-      console.log('valFinal', valFinal);
+      // console.log('valFinal', valFinal);
       this.setState({
         modalQuantity: valFinal,
       });
@@ -1120,7 +1120,7 @@ class EditDraftOrder extends Component {
       });
     } else if (type === 'add') {
       const valFinal = parseInt(modalQuantity) + parseInt(value);
-      console.log('valFinal', valFinal);
+      // console.log('valFinal', valFinal);
       this.setState({
         modalQuantity: valFinal,
       });
@@ -1174,7 +1174,7 @@ class EditDraftOrder extends Component {
       () =>
         duplicateApi(param.id)
           .then(res => {
-            console.log('Res', res);
+            // console.log('Res', res);
             this.setState(
               {
                 recipeLoader: false,
@@ -1214,12 +1214,12 @@ class EditDraftOrder extends Component {
   setDeliveryDateFun = () => {
     const {basketId, apiDeliveryDate} = this.state;
     let payload = {};
-    console.log('apiDeliveryDate', apiDeliveryDate);
-    console.log('basketId', basketId);
+    // console.log('apiDeliveryDate', apiDeliveryDate);
+    // console.log('basketId', basketId);
 
     setDeliveryDateApi(basketId, apiDeliveryDate, payload)
       .then(res => {
-        console.log('res-DELIVERYDAATE', res);
+        // console.log('res-DELIVERYDAATE', res);
       })
       .catch(err => {
         Alert.alert(
@@ -1282,8 +1282,8 @@ class EditDraftOrder extends Component {
       emailData,
     } = this.state;
 
-    console.log('finalData', finalData);
-    console.log('validateData', validateData);
+    // console.log('finalData', finalData);
+    // console.log('validateData', validateData);
 
     return (
       <View style={styles.container}>
@@ -1960,7 +1960,7 @@ class EditDraftOrder extends Component {
             <View style={{marginTop: hp('2%'), marginBottom: hp('2%')}}>
               {inventoryData &&
                 inventoryData.map((item, index) => {
-                  console.log('item--11-1-1-1>', item);
+                  // console.log('item--11-1-1-1>', item);
                   return (
                     <View
                       style={{
@@ -3166,7 +3166,7 @@ class EditDraftOrder extends Component {
                               style={{
                                 fontSize: 12,
                               }}>
-                              Price
+                              {translate('Price')}
                             </Text>
                             <Text
                               style={{
@@ -3213,7 +3213,7 @@ class EditDraftOrder extends Component {
                             marginTop: hp('3%'),
                           }}>
                           <View style={{}}>
-                            <Text style={{}}>Note</Text>
+                            <Text style={{}}>{translate('Notes')}</Text>
                           </View>
                           <View
                             style={{
@@ -3282,7 +3282,9 @@ class EditDraftOrder extends Component {
                             alignSelf: 'center',
                             marginTop: hp('20%'),
                           }}>
-                          <Text style={styles.signInStylingText}>Save</Text>
+                          <Text style={styles.signInStylingText}>
+                            {translate('Save')}
+                          </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() =>
@@ -3296,7 +3298,7 @@ class EditDraftOrder extends Component {
                             marginTop: hp('2%'),
                           }}>
                           <Text style={{color: '#5297C1', fontWeight: 'bold'}}>
-                            Cancel
+                            {translate('Cancel')}
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -3424,7 +3426,7 @@ class EditDraftOrder extends Component {
                       </Text>
                       <TextInput
                         value={mailMessageValue}
-                        placeholder="Note"
+                        placeholder={translate('Note')}
                         style={{
                           width: '100%',
 
@@ -3570,8 +3572,8 @@ class EditDraftOrder extends Component {
                         fontWeight: 'bold',
                       }}>
                       {validateData && validateData.data.severity < 3
-                        ? 'No'
-                        : 'Ok'}
+                        ? translate('No')
+                        : translate('Ok')}
                     </Text>
                   </TouchableOpacity>
 
@@ -3604,7 +3606,7 @@ class EditDraftOrder extends Component {
                           fontSize: 14,
                           fontWeight: 'bold',
                         }}>
-                        Yes
+                        {translate('Yes')}
                       </Text>
                     </TouchableOpacity>
                   ) : null}

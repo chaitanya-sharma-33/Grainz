@@ -657,7 +657,7 @@ class ViewPendingDelivery extends Component {
           );
         });
     } else {
-      Alert.alert(``, translate('Please enter arrived date first.'), [
+      Alert.alert(``, translate('Please enter arrived date first'), [
         {
           text: translate('Ok'),
           onPress: () => this.closeLoader(),
@@ -792,7 +792,7 @@ class ViewPendingDelivery extends Component {
           );
         });
     } else {
-      Alert.alert(``, translate('Please enter arrived date first.'), [
+      Alert.alert(``, translate('Please enter arrived date first'), [
         {
           text: translate('Ok'),
           onPress: () => this.closeLoader(),
@@ -1154,7 +1154,7 @@ class ViewPendingDelivery extends Component {
         () => this.editStatusFun(value),
       );
     } else {
-      alert(translate('Please enter arrived date first.'));
+      alert(translate('Please enter arrived date first'));
     }
   };
 
@@ -1352,7 +1352,7 @@ class ViewPendingDelivery extends Component {
         deliveryChecklistStatus: true,
       });
     } else {
-      alert(translate('Please enter arrived date first.'));
+      alert(translate('Please enter arrived date first'));
     }
   };
 
@@ -1794,7 +1794,7 @@ class ViewPendingDelivery extends Component {
                         marginLeft: 10,
                         fontFamily: 'Inter-SemiBold',
                       }}>
-                      {translate('Delivery checklist')}
+                      {translate('Checklist')}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -4050,7 +4050,7 @@ class ViewPendingDelivery extends Component {
                             flex: 4,
                           }}>
                           <Text style={styles.textStylingLogo}>
-                            {translate('Delivery checklist')}
+                            {translate('Checklist')}
                           </Text>
                         </View>
                       </TouchableOpacity>
@@ -4247,7 +4247,7 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       fontSize: 15,
                                     }}>
-                                    {translate('Ordered No.')}
+                                    {translate('Ordered No')}
                                   </Text>
                                   <Text
                                     numberOfLines={1}

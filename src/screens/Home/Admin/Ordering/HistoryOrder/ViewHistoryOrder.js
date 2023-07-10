@@ -3800,9 +3800,9 @@ class ViewHistoryOrder extends Component {
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Kildly fill arrived date first', [
+      Alert.alert(``, translate('Kildly fill arrived date first'), [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoader(),
         },
       ]);
@@ -4139,7 +4139,7 @@ class ViewHistoryOrder extends Component {
                             fontWeight: 'bold',
                             color: '#66A4C8',
                           }}>
-                          See details
+                          {translate('See details')}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -4239,7 +4239,7 @@ class ViewHistoryOrder extends Component {
                         marginLeft: 10,
                         fontFamily: 'Inter-SemiBold',
                       }}>
-                      Checklist
+                      {translate('Checklist')}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -5034,7 +5034,9 @@ class ViewHistoryOrder extends Component {
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{fontSize: 10}}>Order Val.</Text>
+                                  <Text style={{fontSize: 10}}>
+                                    {translate('Order Val')}
+                                  </Text>
                                   <Text
                                     style={{
                                       marginTop: 10,
@@ -5096,7 +5098,7 @@ class ViewHistoryOrder extends Component {
                                     flex: 1,
                                   }}>
                                   <Text style={{fontSize: 10}}>
-                                    Arrived date
+                                    {translate('Arrived date')}
                                   </Text>
                                   <Text
                                     style={{
@@ -5676,7 +5678,7 @@ class ViewHistoryOrder extends Component {
                                               fontSize: 12,
                                               fontFamily: 'Inter-SemiBold',
                                             }}>
-                                            Arrived Date
+                                            {translate('Arrived Date')}
                                           </Text>
                                         </View>
                                         <View
@@ -5925,8 +5927,7 @@ class ViewHistoryOrder extends Component {
                         style={{
                           color: 'grey',
                         }}>
-                        Audit complete(You can select when all items are checked
-                        correct)
+                        {translate('Audit Complete')}
                       </Text>
                     </View>
                   </View>
@@ -5982,7 +5983,7 @@ class ViewHistoryOrder extends Component {
                         marginLeft: 10,
                         fontFamily: 'Inter-SemiBold',
                       }}>
-                      Move to Review
+                      {translate('Move to review')}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -6051,7 +6052,7 @@ class ViewHistoryOrder extends Component {
                                 flex: 4,
                               }}>
                               <Text style={styles.textStylingLogo}>
-                                Checklist
+                                {translate('Checklist')}
                               </Text>
                             </View>
                           </View>
@@ -6103,7 +6104,7 @@ class ViewHistoryOrder extends Component {
                                         style={{
                                           fontSize: 12,
                                         }}>
-                                        Ordered No.
+                                        {translate('Ordered No')}
                                       </Text>
                                       <Text
                                         numberOfLines={1}
@@ -6155,7 +6156,7 @@ class ViewHistoryOrder extends Component {
                                         style={{
                                           fontSize: 12,
                                         }}>
-                                        {translate('Delivered No')}
+                                        {translate('_Delivered No')}
                                       </Text>
                                       <Text
                                         style={{
@@ -6175,7 +6176,7 @@ class ViewHistoryOrder extends Component {
                                         style={{
                                           fontSize: 12,
                                         }}>
-                                        Delivered Qty.
+                                        {translate('_Delivered Qty')}
                                       </Text>
                                       <Text
                                         numberOfLines={1}
@@ -6204,7 +6205,7 @@ class ViewHistoryOrder extends Component {
                                         style={{
                                           fontSize: 12,
                                         }}>
-                                        Invoiced No.
+                                        {translate('_Invoiced No')}
                                       </Text>
                                       <Text
                                         style={{
@@ -6224,7 +6225,7 @@ class ViewHistoryOrder extends Component {
                                         style={{
                                           fontSize: 12,
                                         }}>
-                                        Invoiced Qty.
+                                        {translate('_Invoiced Qty')}
                                       </Text>
                                       <Text
                                         numberOfLines={1}
@@ -6249,7 +6250,7 @@ class ViewHistoryOrder extends Component {
                             alignItems: 'center',
                           }}>
                           <TextInput
-                            placeholder="Notes"
+                            placeholder={translate('Notes')}
                             multiline
                             style={{
                               padding: 10,
@@ -6294,7 +6295,7 @@ class ViewHistoryOrder extends Component {
                               marginLeft: 10,
                               fontFamily: 'Inter-SemiBold',
                             }}>
-                            Save
+                            {translate('Save')}
                           </Text>
                         </View>
                       </TouchableOpacity>
@@ -6859,7 +6860,7 @@ class ViewHistoryOrder extends Component {
                                   fontFamily: 'Inter-SemiBold',
                                   textAlign: 'center',
                                 }}>
-                                Arrived Date
+                                {translate('Arrived Date')}
                               </Text>
                             </View>
                             <View
@@ -6935,7 +6936,7 @@ class ViewHistoryOrder extends Component {
                                   fontSize: 12,
                                   fontFamily: 'Inter-SemiBold',
                                 }}>
-                                Notes
+                                {translate('Notes')}
                               </Text>
                             </View>
                             <View
@@ -6945,7 +6946,7 @@ class ViewHistoryOrder extends Component {
                                 marginLeft: wp('5%'),
                               }}>
                               <TextInput
-                                placeholder="Notes"
+                                placeholder={translate('Notes')}
                                 multiline
                                 style={{
                                   borderWidth: 0.5,

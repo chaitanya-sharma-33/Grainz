@@ -238,15 +238,15 @@ class PdfViewDraft extends Component {
             'Something went wrong',
             [
               {
-                text: 'Okay',
+                text: translate('Ok'),
               },
             ],
           );
         });
     } else {
-      Alert.alert(`Grainz`, 'Please select all values.', [
+      Alert.alert(``, translate('Please select all values'), [
         {
-          text: 'Okay',
+          text: translate('Ok'),
           onPress: () => this.closeLoaderComp(),
         },
       ]);

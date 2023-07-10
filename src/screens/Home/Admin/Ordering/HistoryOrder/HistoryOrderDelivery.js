@@ -330,7 +330,7 @@ class HistoryOrderDelivery extends Component {
                     marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Order No.</Text>
+                    <Text style={{}}>{translate('Order No')}.</Text>
                   </View>
                   <View
                     style={{
@@ -372,7 +372,7 @@ class HistoryOrderDelivery extends Component {
                       borderRadius: 6,
                     }}>
                     <View style={{}}>
-                      <Text>Delivery Date</Text>
+                      <Text>{translate('Delivery Date')}</Text>
                     </View>
                     <View
                       style={{
@@ -420,7 +420,7 @@ class HistoryOrderDelivery extends Component {
                       borderRadius: 6,
                     }}>
                     <View style={{}}>
-                      <Text>Arrived Date</Text>
+                      <Text>{translate('Arrived Date')}</Text>
                     </View>
                     <View
                       style={{
@@ -469,7 +469,7 @@ class HistoryOrderDelivery extends Component {
                       borderRadius: 6,
                     }}>
                     <View style={{}}>
-                      <Text>Order Date</Text>
+                      <Text>{translate('Order Date')}</Text>
                     </View>
                     <View
                       style={{
@@ -591,7 +591,7 @@ class HistoryOrderDelivery extends Component {
                     marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Invoice Number</Text>
+                    <Text style={{}}>{translate('Invoice Number')}</Text>
                   </View>
                   <View
                     style={{
@@ -622,7 +622,9 @@ class HistoryOrderDelivery extends Component {
                     marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Delivery Note reference</Text>
+                    <Text style={{}}>
+                      {translate('Delivery Note reference')}
+                    </Text>
                   </View>
                   <View
                     style={{
@@ -654,7 +656,7 @@ class HistoryOrderDelivery extends Component {
                     marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Ambient Temperature</Text>
+                    <Text style={{}}>{translate('Ambient Temperature')}</Text>
                   </View>
                   <View
                     style={{
@@ -686,7 +688,7 @@ class HistoryOrderDelivery extends Component {
                     marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Chilled Temperature</Text>
+                    <Text style={{}}>{translate('Chilled Temperature')}</Text>
                   </View>
                   <View
                     style={{
@@ -718,7 +720,7 @@ class HistoryOrderDelivery extends Component {
                     marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Frozen Temperature</Text>
+                    <Text style={{}}>{translate('Frozen Temperature')}</Text>
                   </View>
                   <View
                     style={{
@@ -751,7 +753,7 @@ class HistoryOrderDelivery extends Component {
                     height: hp('20%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Notes</Text>
+                    <Text style={{}}>{translate('Notes')}</Text>
                   </View>
                   <View
                     style={{

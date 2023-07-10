@@ -141,7 +141,7 @@ class index extends Component {
     }
   };
 
-  signInFun = async () => {
+  loginInFun = async () => {
     if (this.verification()) {
       const {email, password, switchValueRemember} = this.state;
       const payload = {
@@ -228,6 +228,14 @@ class index extends Component {
 
   sendLinkFun = () => {
     const {resetEmail} = this.state;
+
+    if (resetEmail) {
+      this.sendLinkFunSec();
+    }
+  };
+
+  sendLinkFunSec = () => {
+    const {resetEmail} = this.state;
     let payload = {
       email: resetEmail,
       clientURI: 'string',
@@ -252,6 +260,10 @@ class index extends Component {
           },
         ]);
       });
+  };
+
+  signInFun = () => {
+    this.props.navigation.navigate('SignUpScreen');
   };
 
   render() {
@@ -451,6 +463,13 @@ class index extends Component {
                 <TouchableOpacity
                   onPress={() => this.signInFun()}
                   style={styles.signInStyling}>
+                  <Text style={styles.signInStylingText}>
+                    {translate('SignUp')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => this.loginInFun()}
+                  style={styles.LoginStyling}>
                   {this.state.buttonLoader ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (

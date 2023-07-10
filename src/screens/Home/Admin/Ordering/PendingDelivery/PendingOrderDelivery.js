@@ -589,7 +589,7 @@ class PendingOrderDelivery extends Component {
                     marginBottom: hp('2%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>{translate('Order No.')}</Text>
+                    <Text style={{}}>{translate('Order No')}</Text>
                   </View>
                   <View
                     style={{
@@ -1015,7 +1015,7 @@ class PendingOrderDelivery extends Component {
                     height: hp('20%'),
                   }}>
                   <View style={{}}>
-                    <Text style={{}}>Notes</Text>
+                    <Text style={{}}>{translate('Notes')}</Text>
                   </View>
                   <View
                     style={{

@@ -245,7 +245,7 @@ class SupplierDetail extends Component {
                     flexDirection: 'row',
                     alignItems: 'center',
                   }}>
-                  <Image
+                  {/* <Image
                     source={img.addIcon}
                     style={{
                       height: 22,
@@ -253,13 +253,12 @@ class SupplierDetail extends Component {
                       resizeMode: 'contain',
                       tintColor: '#5197C1',
                     }}
-                  />
+                  /> */}
                   <Text
                     style={{
                       paddingVertical: 10,
                       fontWeight: 'bold',
                       color: 'black',
-                      marginLeft: 10,
                       color: '#5197C1',
                       textDecorationLine: 'underline',
                     }}>

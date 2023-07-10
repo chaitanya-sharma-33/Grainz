@@ -340,11 +340,11 @@ class ViewReviewOrder extends Component {
 
   deleteFun = item => {
     Alert.alert(
-      `Grainz`,
-      'Are you sure you want to delete this order line item?',
+      ``,
+      translate('Are you sure you want to delete this order line item?'),
       [
         {
-          text: 'Yes',
+          text: translate('Yes'),
           onPress: () =>
             this.setState(
               {
@@ -354,7 +354,7 @@ class ViewReviewOrder extends Component {
             ),
         },
         {
-          text: 'No',
+          text: translate('No'),
         },
       ],
     );
@@ -1295,7 +1295,7 @@ class ViewReviewOrder extends Component {
                             fontWeight: 'bold',
                             color: '#66A4C8',
                           }}>
-                          See details
+                          {translate('See details')}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -1380,7 +1380,7 @@ class ViewReviewOrder extends Component {
                         marginLeft: 10,
                         fontFamily: 'Inter-SemiBold',
                       }}>
-                      {translate('Delivery checklist')}
+                      {translate('Checklist')}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -2234,7 +2234,9 @@ class ViewReviewOrder extends Component {
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <Text style={{fontSize: 10}}>Order Val.</Text>
+                                  <Text style={{fontSize: 10}}>
+                                    {translate('Order Val')}
+                                  </Text>
                                   <Text
                                     style={{
                                       marginTop: 10,
@@ -2257,7 +2259,7 @@ class ViewReviewOrder extends Component {
                                     style={{
                                       marginRight: 10,
                                     }}>
-                                    Correct
+                                    {translate('Correct')}
                                   </Text>
                                   <Switch
                                     thumbColor={'#fff'}
@@ -3154,7 +3156,7 @@ class ViewReviewOrder extends Component {
                             fontSize: 15,
                             fontWeight: 'bold',
                           }}>
-                          Mark all as Correct
+                          {translate('Mark all as Correct')}
                         </Text>
                       </View>
 
@@ -3258,7 +3260,7 @@ class ViewReviewOrder extends Component {
                           marginLeft: 10,
                           textAlign: 'center',
                         }}>
-                        Audit Complete
+                        {translate('Audit Complete')}
                         {/* (You can select when all items are checked
                         correct) */}
                       </Text>
@@ -3815,7 +3817,7 @@ class ViewReviewOrder extends Component {
                             flex: 4,
                           }}>
                           <Text style={styles.textStylingLogo}>
-                            {translate('Delivery checklist')}
+                            {translate('Checklist')}
                           </Text>
                         </View>
                       </TouchableOpacity>
@@ -3945,7 +3947,7 @@ class ViewReviewOrder extends Component {
                                     style={{
                                       fontSize: 12,
                                     }}>
-                                    Ordered No.
+                                    {translate('Ordered No')}
                                   </Text>
                                   <Text
                                     numberOfLines={1}
@@ -4139,7 +4141,7 @@ class ViewReviewOrder extends Component {
                               fontSize: 15,
                               fontWeight: 'bold',
                             }}>
-                            Mark all as Correct
+                            {translate('Mark all as Correct')}
                           </Text>
                         </View>
 
@@ -4180,7 +4182,7 @@ class ViewReviewOrder extends Component {
                           marginLeft: 10,
                           fontFamily: 'Inter-SemiBold',
                         }}>
-                        Save
+                        {translate('Save')}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -4312,7 +4314,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Product code
+                                {translate('Product Code')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -4338,7 +4340,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Package size
+                                {translate('Package size')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -4368,7 +4370,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Ordered No.
+                                {translate('Ordered No')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -4464,7 +4466,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Delivered Qty.
+                                {translate('_Delivered Qty')}
                               </Text>
                               <View
                                 style={{
@@ -4523,10 +4525,10 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Invoiced No.
+                                {translate('_Invoiced No')}
                               </Text>
                               <TextInput
-                                placeholder="Invoiced"
+                                placeholder={translate('_Invoiced No')}
                                 style={{
                                   width: 80,
                                   fontWeight: 'bold',
@@ -4566,7 +4568,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Invoiced Qty.
+                                {translate('_Invoiced Qty')}
                               </Text>
                               <View
                                 style={{
@@ -4574,7 +4576,7 @@ class ViewReviewOrder extends Component {
                                   flexDirection: 'row',
                                 }}>
                                 <TextInput
-                                  placeholder="Volume"
+                                  placeholder={translate('_Invoiced Qty')}
                                   style={{
                                     width: 80,
                                     marginTop: 5,
@@ -4623,10 +4625,10 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                {translate('Ordered Val')} Expected
+                                {translate('_Ordered Val Expected')}
                               </Text>
                               <TextInput
-                                placeholder="Expected"
+                                placeholder={translate('_Ordered Val Expected')}
                                 style={{
                                   width: 80,
                                   fontWeight: 'bold',
@@ -4656,7 +4658,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                {translate('Ordered Val')} Actual
+                                {translate('_Ordered Val Actual')}
                               </Text>
                               <View
                                 style={{
@@ -4709,10 +4711,10 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Price Expected
+                                {translate('_Price Expected')}
                               </Text>
                               <TextInput
-                                placeholder="Price Expected"
+                                placeholder={translate('_Price Expected')}
                                 style={{
                                   width: 80,
                                   fontWeight: 'bold',
@@ -4737,10 +4739,10 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Price Actual
+                                {translate('_Price Actual')}
                               </Text>
                               <TextInput
-                                placeholder="Price Actual"
+                                placeholder={translate('_Price Actual')}
                                 style={{
                                   width: 80,
                                   marginTop: 5,
@@ -4782,7 +4784,7 @@ class ViewReviewOrder extends Component {
                                 marginLeft: 10,
                               }}>
                               {' '}
-                              Not Arrived
+                              {translate('_Not Arrived')}
                             </Text>
                           </TouchableOpacity>
 
@@ -4807,10 +4809,10 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                Arrived Date
+                                {translate('Arrived Date')}
                               </Text>
                               <TextInput
-                                placeholder="Arrived Date"
+                                placeholder={translate('Arrived Date')}
                                 editable={false}
                                 style={{
                                   width: 100,
@@ -4839,7 +4841,7 @@ class ViewReviewOrder extends Component {
                             alignItems: 'center',
                           }}>
                           <TextInput
-                            placeholder="Notes"
+                            placeholder={translate('Notes')}
                             multiline
                             style={{
                               padding: 10,
@@ -4883,7 +4885,7 @@ class ViewReviewOrder extends Component {
                             fontFamily: 'Inter-Regular',
                             marginLeft: 10,
                           }}>
-                          Flagged
+                          {translate('_Flagged')}
                         </Text>
                       </TouchableOpacity>
                       {modalData.hasCreditNote > 0 ? (
@@ -4909,7 +4911,7 @@ class ViewReviewOrder extends Component {
                                 marginLeft: 10,
                                 fontFamily: 'Inter-SemiBold',
                               }}>
-                              Credit note Requested
+                              {translate('Credit note Requested')}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -4937,7 +4939,7 @@ class ViewReviewOrder extends Component {
                                 marginLeft: 10,
                                 fontFamily: 'Inter-SemiBold',
                               }}>
-                              Request credit note
+                              {translate('_Request credit note')}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -4966,7 +4968,7 @@ class ViewReviewOrder extends Component {
                               marginLeft: 10,
                               fontFamily: 'Inter-SemiBold',
                             }}>
-                            Save
+                            {translate('Save')}
                           </Text>
                         </View>
                       </TouchableOpacity>
@@ -4996,7 +4998,7 @@ class ViewReviewOrder extends Component {
                               marginLeft: 10,
                               fontFamily: 'Inter-SemiBold',
                             }}>
-                            Confirmed checked
+                            {translate('Confirmed checked')}
                           </Text>
                         </View>
                       </TouchableOpacity>

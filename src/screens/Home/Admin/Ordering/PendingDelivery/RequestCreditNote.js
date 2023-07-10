@@ -471,7 +471,7 @@ export class RequestCreditNote extends Component {
                   <Text style={styles.textStylingLogo}>Credit note</Text>
                 ) : (
                   <Text style={styles.textStylingLogo}>
-                    Request a credit note
+                    {translate('_Request credit note')}
                   </Text>
                 )}
               </View>
@@ -488,11 +488,11 @@ export class RequestCreditNote extends Component {
                 style={{
                   fontSize: 12,
                 }}>
-                From
+                {translate('From')}
               </Text>
               <TextInput
                 value={fromValue}
-                placeholder="From"
+                placeholder={translate('From')}
                 style={{
                   paddingVertical: 10,
                   fontWeight: 'bold',
@@ -515,12 +515,12 @@ export class RequestCreditNote extends Component {
                 style={{
                   fontSize: 12,
                 }}>
-                To
+                {translate('To')}
               </Text>
               <TextInput
                 value={toValue}
                 editable={hasCreditNoteStatus ? false : true}
-                placeholder="To"
+                placeholder={translate('To')}
                 style={{
                   paddingVertical: 8,
                   fontWeight: 'bold',
@@ -547,12 +547,12 @@ export class RequestCreditNote extends Component {
                 style={{
                   fontSize: 12,
                 }}>
-                Cc
+                {translate('CC')}
               </Text>
               <TextInput
                 value={ccValue}
                 editable={hasCreditNoteStatus ? false : true}
-                placeholder="Cc"
+                placeholder={translate('CC')}
                 style={{
                   paddingVertical: 8,
                   fontWeight: 'bold',
@@ -589,10 +589,10 @@ export class RequestCreditNote extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      Ordered No.
+                      {translate('_Ordered No')}
                     </Text>
                     <TextInput
-                      placeholder="Ordered No."
+                      placeholder={translate('_Ordered No')}
                       style={{
                         width: 80,
                         marginTop: 5,
@@ -618,7 +618,7 @@ export class RequestCreditNote extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      Delivered Qty.
+                      {translate('_Delivered Qty')}
                     </Text>
                     <TextInput
                       placeholder="Delivered Qty."
@@ -681,10 +681,10 @@ export class RequestCreditNote extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      Requested Price
+                      {translate('Requested price')}
                     </Text>
                     <TextInput
-                      placeholder="Requested Price"
+                      placeholder={translate('Requested price')}
                       editable={hasCreditNoteStatus ? false : true}
                       style={{
                         width: 80,
@@ -715,7 +715,7 @@ export class RequestCreditNote extends Component {
                   style={{
                     fontSize: 12,
                   }}>
-                  Credit Requested Qty.
+                  {translate('Credit Requested Qty')}
                 </Text>
                 <View
                   style={{
@@ -783,7 +783,7 @@ export class RequestCreditNote extends Component {
                   alignItems: 'center',
                 }}>
                 <TextInput
-                  placeholder="Message"
+                  placeholder={translate('Notes')}
                   multiline
                   style={{
                     padding: 10,
@@ -879,7 +879,7 @@ export class RequestCreditNote extends Component {
                       marginLeft: 10,
                       fontFamily: 'Inter-SemiBold',
                     }}>
-                    Send
+                    {translate('Send')}
                   </Text>
                 </View>
               </TouchableOpacity>
