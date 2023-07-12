@@ -21,10 +21,9 @@ import {
 import {UserTokenAction} from '../../../../redux/actions/UserTokenAction';
 import {
   getMyProfileApi,
-  draftOrderingApi,
-  duplicateApi,
-  orderByStatusApi,
-  getSupplierListApi,
+  getSupplierListNoAccApi,
+  createCollaborationApi,
+  getUserLocationApi,
 } from '../../../../connectivity/api';
 import moment from 'moment';
 import styles from './style';
@@ -34,7 +33,7 @@ import SurePopUp from '../../../../components/SurePopUp';
 import Modal from 'react-native-modal';
 import call from 'react-native-phone-call';
 
-class SupplierList extends Component {
+class SupplierListNoAcc extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -50,10 +49,11 @@ class SupplierList extends Component {
       arrangeStatusHTVA: 0,
       pickerModalStatus: false,
       param: '',
-      duplicateModalStatus: false,
       pageSize: '10',
       selectedPage: '1',
       loadMoreStatus: false,
+      selectAllStatus: false,
+      payloadArr: [],
     };
   }
 
@@ -90,12 +90,13 @@ class SupplierList extends Component {
   };
 
   componentDidMount() {
-    this.props.navigation.addListener('focus', () => {
-      const {route} = this.props;
+    // this.props.navigation.addListener('focus', () => {
+    const {route} = this.props;
 
-      this.getSupplierListData();
-      this.getData();
-    });
+    this.getSupplierListData();
+    this.getUserLocationFun();
+    this.getData();
+    // });
   }
 
   getSupplierListData() {
@@ -104,9 +105,16 @@ class SupplierList extends Component {
         modalLoaderDrafts: true,
       },
       () =>
-        getSupplierListApi()
+        getSupplierListNoAccApi()
           .then(res => {
-            console.log('res', res);
+            console.log('res->getSupplierListNoAccApi', res);
+
+            let finalArray = res.data.map((item, index) => {
+              return {
+                name: item,
+                content: item,
+              };
+            });
 
             this.setState({
               draftsOrderData: res.data,
@@ -259,136 +267,192 @@ class SupplierList extends Component {
     }
   };
 
+  getUserLocationFun = () => {
+    getUserLocationApi()
+      .then(res => {
+        console.log('res-->LOC', res);
+        let finalUsersList = res.data.map((item, index) => {
+          return {
+            label: item.name,
+            value: item.id,
+          };
+        });
+
+        let defaultUser = res.data.map((item, index) => {
+          if (item.isCurrent === true) {
+            return item.id;
+          }
+        });
+        let finalData = defaultUser.filter(function (element) {
+          return element !== undefined;
+        });
+
+        let defaultUserName = res.data.map((item, index) => {
+          if (item.isCurrent === true) {
+            return item.name;
+          }
+        });
+        let finalDataName = defaultUserName.filter(function (element) {
+          return element !== undefined;
+        });
+
+        // console.warn('finalDataName', finalDataName[0]);
+
+        this.setState({
+          locationArr: finalUsersList,
+          finalLocation: finalData[0],
+          finalLocationName: finalDataName[0],
+        });
+      })
+      .catch(err => {
+        console.warn('ERr', err);
+      });
+  };
+
   myProfileFun = () => {
     this.props.navigation.navigate('MyProfile');
   };
 
-  closeModalFun = () => {
+  selectSupplierFun = (item, index) => {
+    console.log('ITEM', item);
+    console.log('index', index);
+
+    const {draftsOrderData, finalLocation} = this.state;
+
+    const isSelectedValue = item.isSelected === false ? true : false;
+
+    let newArr = draftsOrderData.map((item, i) =>
+      index === i
+        ? {
+            ...item,
+            ['isSelected']: isSelectedValue,
+          }
+        : {
+            ...item,
+          },
+    );
+
+    let selectedArr = newArr.map((item, index) => {
+      if (item.isSelected === true) {
+        return {
+          locationId: finalLocation,
+          supplierId: item.id,
+        };
+      }
+    });
+
+    var filteredArr = selectedArr.filter(function (el) {
+      return el != null;
+    });
+
+    console.log('filteredArr', filteredArr);
+
     this.setState({
-      pickerModalStatus: false,
-      duplicateModalStatus: false,
+      draftsOrderData: newArr,
+      draftsOrderDataBackup: newArr,
+      modalLoaderDrafts: false,
+      payloadArr: filteredArr,
     });
   };
 
-  duplicateModalFun = () => {
-    this.setState(
-      {
-        pickerModalStatus: false,
-      },
-      () =>
-        setTimeout(
-          () =>
-            this.setState({
-              duplicateModalStatus: true,
-            }),
-          1000,
-        ),
-    );
-  };
-
-  duplicateModalFunSec = () => {
-    const {param} = this.state;
-    this.setState(
-      {
-        recipeLoader: true,
-        duplicateModalStatus: false,
-      },
-      () =>
-        duplicateApi(param.id)
-          .then(res => {
-            this.setState(
-              {
-                recipeLoader: false,
-              },
-              () => this.getDraftOrderData(),
-            );
-          })
-          .catch(error => {
-            console.warn('Duplicateerror', error.response);
-          }),
-    );
-  };
-
-  pickerFun = item => {
-    console.log('item-->', item);
+  selectAllFun = () => {
+    const {selectAllStatus, draftsOrderData, finalLocation} = this.state;
     this.setState({
-      pickerModalStatus: true,
-      param: item,
+      selectAllStatus: !selectAllStatus,
+    });
+    const index = 0;
+    const i = 0;
+
+    let newArr = draftsOrderData.map((item, i) =>
+      index === i
+        ? {
+            ...item,
+            ['isSelected']: !selectAllStatus,
+          }
+        : {
+            ...item,
+            ['isSelected']: !selectAllStatus,
+          },
+    );
+
+    let finalArray = newArr.map((item, index) => {
+      if (item.isSelected === true) {
+        return {
+          locationId: finalLocation,
+          supplierId: item.id,
+        };
+      }
+    });
+
+    console.log('finalArray', finalArray);
+    console.log('selectAllStatus', !selectAllStatus);
+
+    this.setState({
+      draftsOrderData: newArr,
+      draftsOrderDataBackup: newArr,
+      modalLoaderDrafts: false,
+      payloadArr: !selectAllStatus && finalArray,
     });
   };
 
-  //   addMoreFun = () => {
-  //     const {selectedPage} = this.state;
-  //     const newPageNumber = parseInt(selectedPage) + 1;
-  //     this.setState(
-  //       {
-  //         selectedPage: newPageNumber,
-  //         modalLoaderDrafts: true,
-  //         loadMoreStatus: true,
-  //       },
-  //       () => this.getDraftOrderData(),
-  //     );
-  //   };
+  requestCollaborationFun = () => {
+    const {payloadArr} = this.state;
 
-  callSupplierFun = () => {
-    this.setState(
-      {
-        pickerModalStatus: false,
-      },
-      () =>
-        setTimeout(() => {
-          this.callSupplierFunSec();
-        }, 500),
-    );
+    if (payloadArr.length > 0) {
+      this.setState(
+        {
+          recipeLoader: true,
+        },
+        () => this.requestCollaborationFunSec(),
+      );
+    } else {
+      alert(translate('Please select supplier first'));
+    }
   };
-
-  callSupplierFunSec = () => {
-    const {param} = this.state;
-    console.log('param', param);
-    const args = {
-      number: param.telephone, // String value with the number to call
-      prompt: false, // Optional boolean property. Determines if the user should be prompted prior to the call
-      skipCanOpen: true, // Skip the canOpenURL check
+  requestCollaborationFunSec = () => {
+    const {payloadArr} = this.state;
+    const payload = {
+      suppliers: payloadArr,
     };
 
-    call(args).catch(console.error);
+    console.log('payload-->', payload);
+
+    createCollaborationApi(payload)
+      .then(res => {
+        console.log('res-CreateColl', res);
+        this.setState({
+          recipeLoader: false,
+        });
+      })
+      .catch(err => {
+        Alert.alert(
+          err.response.data && err.response.data.message,
+          err.response.data && err.response.data.errors[0].message,
+          [
+            {
+              text: translate('Ok'),
+              onPress: () =>
+                this.setState({
+                  recipeLoader: false,
+                  filteredArr: [],
+                }),
+            },
+          ],
+        );
+      });
   };
 
-  seeOrdersFun = () => {
-    const {param} = this.state;
-    console.log('param', param);
-    this.setState(
-      {
-        pickerModalStatus: false,
-      },
-      () =>
-        setTimeout(() => {
-          this.props.navigation.navigate('OrderingAdminScreen', {
-            item: param,
-          });
-        }, 100),
-    );
-  };
-
-  inviteNewSupplierFun = () => {
-    this.props.navigation.navigate('InviteSupplierScreen');
-  };
-
-  selectSupplierFun = () => {
-    this.props.navigation.navigate('SupplierListNoAccScreen');
-  };
   render() {
     const {
       recipeLoader,
       modalLoaderDrafts,
       draftsOrderData,
       searchItem,
-      pickerModalStatus,
-      duplicateModalStatus,
       param,
+      selectAllStatus,
     } = this.state;
 
-    console.log('  item: param,', param);
+    console.log('draftsOrderData', draftsOrderData);
 
     return (
       <View style={styles.container}>
@@ -408,7 +472,7 @@ class SupplierList extends Component {
                 </View>
                 <View style={styles.flex}>
                   <Text style={styles.adminTextStyle}>
-                    {translate('Suppliers')}
+                    {translate('Select supplier')}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -451,66 +515,6 @@ class SupplierList extends Component {
             </View>
           </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: hp('3%'),
-              justifyContent: 'center',
-            }}>
-            <TouchableOpacity
-              onPress={() => this.inviteNewSupplierFun()}
-              style={{
-                height: hp('7%'),
-                width: wp('40%'),
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: '#5197C1',
-              }}>
-              <View
-                style={{
-                  alignItems: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: '#5197C1',
-                    marginLeft: 10,
-                    fontFamily: 'Inter-SemiBold',
-                  }}>
-                  {translate('Invite new supplier')}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => this.selectSupplierFun()}
-              style={{
-                height: hp('7%'),
-                width: wp('40%'),
-                backgroundColor: '#5197C1',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 10,
-                marginLeft: wp('5%'),
-              }}>
-              <View
-                style={{
-                  alignItems: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    marginLeft: 10,
-                    fontFamily: 'Inter-SemiBold',
-                  }}>
-                  {translate('Grainz suppliers')}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
           {recipeLoader ? (
             <ActivityIndicator size="small" color="grey" />
           ) : (
@@ -537,12 +541,48 @@ class SupplierList extends Component {
                         borderColor: 'grey',
                       }}>
                       <TouchableOpacity
-                        onPress={() => this.arrangeListFun('SUPPLIER')}
+                        onPress={() => this.selectAllFun()}
                         style={{
-                          flex: 1,
+                          flex: 0.2,
                           justifyContent: 'center',
                           alignItems: 'center',
                           flexDirection: 'row',
+                        }}>
+                        <View
+                          style={{
+                            borderWidth: 0.5,
+                            borderRadius: 2,
+                            padding: 3,
+                            backgroundColor: '#fff',
+                            borderColor: 'grey',
+                          }}>
+                          {selectAllStatus ? (
+                            <Image
+                              style={{
+                                width: 15,
+                                height: 15,
+                                resizeMode: 'contain',
+                                marginLeft: 5,
+                                tintColor: '#5297c1',
+                              }}
+                              source={img.tickIcon}
+                            />
+                          ) : (
+                            <View
+                              style={{
+                                backgroundColor: '#fff',
+                                padding: 7,
+                              }}></View>
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => this.arrangeListFun('SUPPLIER')}
+                        style={{
+                          flex: 1,
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          marginLeft: wp('2%'),
                         }}>
                         <Text
                           style={{
@@ -564,38 +604,6 @@ class SupplierList extends Component {
                           />
                         </View>
                       </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => this.arrangeListFun('HTVA')}
-                        style={{
-                          flex: 1,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          flexDirection: 'row',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#161C27',
-                            fontFamily: 'Inter-SemiBold',
-                            fontSize: 14,
-                          }}>
-                          Contact
-                        </Text>
-                        <View></View>
-                      </TouchableOpacity>
-                      <View
-                        onPress={() => this.arrangeListFun('HTVA')}
-                        style={{
-                          flex: 0.5,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          flexDirection: 'row',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#161C27',
-                            fontFamily: 'Inter-SemiBold',
-                          }}></Text>
-                      </View>
                     </View>
                     {draftsOrderData &&
                       draftsOrderData.map((item, index) => {
@@ -613,10 +621,7 @@ class SupplierList extends Component {
                               }}>
                               <TouchableOpacity
                                 onPress={() =>
-                                  this.props.navigation.navigate(
-                                    'SupplierDetailScreen',
-                                    {supplierData: item},
-                                  )
+                                  this.selectSupplierFun(item, index)
                                 }
                                 style={{
                                   flexDirection: 'row',
@@ -625,9 +630,43 @@ class SupplierList extends Component {
                                 }}>
                                 <View
                                   style={{
-                                    flex: 1,
+                                    flex: 0.2,
                                     justifyContent: 'center',
                                     alignItems: 'center',
+                                  }}>
+                                  <View
+                                    style={{
+                                      borderWidth: 0.5,
+                                      borderRadius: 2,
+                                      padding: 3,
+                                      backgroundColor: '#fff',
+                                      borderColor: 'grey',
+                                    }}>
+                                    {item.isSelected ? (
+                                      <Image
+                                        style={{
+                                          width: 15,
+                                          height: 15,
+                                          resizeMode: 'contain',
+                                          marginLeft: 5,
+                                          tintColor: '#5297c1',
+                                        }}
+                                        source={img.tickIcon}
+                                      />
+                                    ) : (
+                                      <View
+                                        style={{
+                                          backgroundColor: '#fff',
+                                          padding: 7,
+                                        }}></View>
+                                    )}
+                                  </View>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    marginLeft: wp('2%'),
                                   }}>
                                   <Text
                                     style={{
@@ -637,38 +676,6 @@ class SupplierList extends Component {
                                     {item.name}
                                   </Text>
                                 </View>
-
-                                <View
-                                  style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                  }}>
-                                  <Text
-                                    style={{
-                                      color: '#161C27',
-                                      fontSize: 14,
-                                    }}>
-                                    {item.telephone}
-                                  </Text>
-                                </View>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                // onPress={() => this.pickerFun(item)}
-                                style={{
-                                  flex: 0.5,
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                }}>
-                                {/* <Image
-                                  style={{
-                                    width: 17,
-                                    height: 17,
-                                    resizeMode: 'contain',
-                                    tintColor: 'grey',
-                                  }}
-                                  source={img.threeDotsIcon}
-                                /> */}
                               </TouchableOpacity>
                             </View>
                           </View>
@@ -677,109 +684,49 @@ class SupplierList extends Component {
                   </View>
                 )}
               </ScrollView>
-              <Modal
-                isVisible={pickerModalStatus}
-                backdropOpacity={0.35}
-                animationIn="bounceInRight">
-                <View
-                  style={{
-                    width: wp('80%'),
-                    height: hp('20%'),
-                    backgroundColor: '#fff',
-                    alignSelf: 'center',
-                    borderRadius: 6,
-                  }}>
-                  <View
-                    style={{
-                      height: hp('5%'),
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <View
-                      style={{
-                        flex: 3,
-                      }}></View>
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flex: 1,
-                      }}>
-                      <TouchableOpacity
-                        onPress={() =>
-                          this.setState({
-                            pickerModalStatus: false,
-                          })
-                        }>
-                        <Image
-                          source={img.cancelIcon}
-                          style={{
-                            height: 22,
-                            width: 22,
-                            resizeMode: 'contain',
-                          }}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <ScrollView>
-                    <View style={{padding: hp('3%')}}>
-                      <TouchableOpacity
-                        onPress={() => this.callSupplierFun()}
-                        style={{
-                          width: wp('70%'),
-                          height: hp('5%'),
-                          backgroundColor: '#5297c1',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          borderRadius: 6,
-                          marginBottom: 5,
-                          alignSelf: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#fff',
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                          }}>
-                          Call supplier
-                        </Text>
-                      </TouchableOpacity>
 
-                      <TouchableOpacity
-                        onPress={() => this.seeOrdersFun()}
-                        style={{
-                          width: wp('90%'),
-                          height: hp('5%'),
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          borderRadius: 10,
-                          marginBottom: 5,
-                          alignSelf: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: 'black',
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                          }}>
-                          See Orders
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </ScrollView>
-                </View>
-              </Modal>
-              <SurePopUp
-                pickerModalStatus={duplicateModalStatus}
-                headingText={translate('Duplicate')}
-                crossFun={() => this.closeModalFun()}
-                bodyText={translate('WholeList')}
-                cancelFun={() => this.closeModalFun()}
-                saveFun={() => this.duplicateModalFunSec()}
-                yesStatus
-              />
+              <TouchableOpacity
+                onPress={() => this.requestCollaborationFun()}
+                style={{
+                  width: wp('90%'),
+                  height: hp('7%'),
+                  backgroundColor: '#5297c1',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  alignSelf: 'center',
+                  marginTop: hp('3%'),
+                }}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('Request collaboration')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => this.props.navigation.goBack()}
+                style={{
+                  width: wp('90%'),
+                  height: hp('7%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  alignSelf: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#5297c1',
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('Cancel')}
+                </Text>
+              </TouchableOpacity>
 
               {/* <TouchableOpacity
                 // onPress={() => this.addMoreFun()}
@@ -814,4 +761,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, {UserTokenAction})(SupplierList);
+export default connect(mapStateToProps, {UserTokenAction})(SupplierListNoAcc);

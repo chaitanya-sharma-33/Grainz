@@ -720,7 +720,7 @@
   "Fruit & veg": "Fruits & légumes",
   "Soft": "Softs",
   "Wine": "Vins",
-  "Select Supplier": "Sélectionner un fournisseur",
+  "Select supplier": "Sélectionner un fournisseur",
   "Select suppliers": "Sélectionner fournisseur",
   "GM": "MB",
   "Weekly": "Hebdomadaire",
@@ -967,5 +967,14 @@
   "Requested price": "Prix ​​demandé",
   "Credit Requested Qty": "Crédit demandé Qté",
   "Please select all values": "Veuillez sélectionner toutes les valeurs.",
-  "Confirmed checked": "Confirmé vérifié"
+  "Confirmed checked": "Confirmé vérifié",
+  "Invite new supplier": "Inviter un nouveau fournisseur",
+  "Grainz suppliers": "Fournisseurs Grainz",
+  "Contact person": "Contact person",
+  "Ordering Email": "E-mail de commande",
+  "Request collaboration": "Demander une collaboration",
+  "Supplier List": "Liste des fournisseurs",
+  "Please select supplier first": "Veuillez d'abord sélectionner le fournisseur",
+  "Thank you. Your invitation has been sent. We will take it from here": "Merci. Votre invitation a été envoyée. Nous allons le prendre à partir d'ici!",
+  "We will let you know when supplier's catalog has been uploaded after which you will be able to place orders": "Nous vous informerons lorsque le catalogue du fournisseur aura été téléchargé, après quoi vous pourrez passer des commandes."
 }

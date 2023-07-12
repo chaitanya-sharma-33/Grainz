@@ -1065,6 +1065,7 @@ class ViewPendingDelivery extends Component {
             width: 300,
             height: 400,
             cropping: true,
+            includeBase64: true,
           }).then(image => {
             this.setState({
               modalVisibleEditElement: true,

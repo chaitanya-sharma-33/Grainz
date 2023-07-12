@@ -37,7 +37,6 @@ import {
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {translate} from '../../../../../utils/translations';
-import ImagePicker from 'react-native-image-crop-picker';
 import Modal from 'react-native-modal';
 import styles from '../style';
 import RNPickerSelect from 'react-native-picker-select';

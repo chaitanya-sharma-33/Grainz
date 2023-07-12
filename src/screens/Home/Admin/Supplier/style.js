@@ -256,6 +256,19 @@ const styles = StyleSheet.create({
     height: hp('100%'),
   },
   flex: {flex: 1, marginLeft: wp('3%')},
+
+  dataFirstContainer: {
+    flex: 1.5,
+    justifyContent: 'center',
+  },
+  dataSecondContainer: {flex: 3, justifyContent: 'center'},
+
+  logOutIconStyling: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
+    marginLeft: '5%',
+  },
 });
 
 export default styles;

@@ -88,6 +88,8 @@ import OrderCreationScreen from '../screens/Home/Admin/Ordering/AddOrder/OrderCr
 import FilterOrderScreen from '../screens/Home/Admin/Ordering/FilterOrder';
 import SupplierAdminScreen from '../screens/Home/Admin/Supplier/SupplierList';
 import SupplierDetailScreen from '../screens/Home/Admin/Supplier/SupplierDetail';
+import InviteSupplierScreen from '../screens/Home/Admin/Supplier/InviteSupplier';
+import SupplierListNoAccScreen from '../screens/Home/Admin/Supplier/SupplierListNoAcc';
 
 const AppNav = createStackNavigator();
 
@@ -332,6 +334,16 @@ export default function AppNavFun() {
       <AppNav.Screen
         name="NewOrderThirdScreen"
         component={NewOrderThirdScreen}
+      />
+
+      <AppNav.Screen
+        name="InviteSupplierScreen"
+        component={InviteSupplierScreen}
+      />
+
+      <AppNav.Screen
+        name="SupplierListNoAccScreen"
+        component={SupplierListNoAccScreen}
       />
     </AppNav.Navigator>
   );

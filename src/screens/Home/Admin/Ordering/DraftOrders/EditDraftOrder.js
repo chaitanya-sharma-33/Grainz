@@ -684,7 +684,7 @@ class EditDraftOrder extends Component {
     setTimeout(() => {
       Alert.alert(
         '',
-        translate('Are you sure you want to delete this draft from the list?'),
+        translate('Are you sure you want to delete this order line item?'),
         [
           {
             text: translate('Yes'),
