@@ -34,7 +34,6 @@ let baseURL = url['STAGING_TWO'].BaseURL;
 
 export const loginApi = payload => {
   const url = 'https://web-grainz-uat.azurewebsites.net/connect/token';
-  console.log('URL', url);
   return axios.post(url, payload, {
     headers: {
       Accept: '*/*',
@@ -342,7 +341,6 @@ export async function getCasualPurchasesApi() {
 }
 
 export const getCasualPurchasesByPageApi = async (pageNumber, pageSize) => {
-  console.log(pageNumber, pageSize);
   let url =
     baseURL +
     `/CasulPurchase/getlistbypage?PageNumber=${pageNumber}&PageSize=${pageSize}`;
@@ -360,7 +358,6 @@ export const getCasualPurchasesByPageApi = async (pageNumber, pageSize) => {
 };
 
 export const getSearchDataApi = async (criteria, pageNumber, pageSize) => {
-  console.log(pageNumber, pageSize);
   let url =
     baseURL +
     `/CasulPurchase/search?Criteria=${criteria}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
@@ -824,8 +821,6 @@ export const getOrderingCountApi = async id => {
     ? `/Order/orders count?supplierId=${id}`
     : `/Order/orders count`;
 
-  console.log('FINAL URL', finalURL);
-
   return axios.get(baseURL + finalURL, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -1040,7 +1035,6 @@ export const lookupDepartmentsApi = async () => {
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
 
-  console.log('LANG', lang);
   return axios.get(baseURL + `/Lookup/Departments`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -1412,7 +1406,6 @@ export const getSupplierCatalogApi = async id => {
 };
 
 export const getInventoryByDepartApi = async id => {
-  console.log(('dddd---->', id));
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
@@ -1438,7 +1431,6 @@ export const getSupplierProductsApi = async (id, catName, orderId) => {
     ? `/Product/Products by category and supplier id?SupplierId=${id}&Category=${catName}&shopingBasketId=${orderId}`
     : `/Product/Products by category and supplier id?SupplierId=${id}&Category=${catName}`;
 
-  console.log('FINALURL--> SUPPLIER', finalURL);
   return axios.get(baseURL + finalURL, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -1538,7 +1530,6 @@ export const getInsideInventoryNewApi = async (catId, supId, orderId) => {
     ? `/inventory/inventories by category and supplier?CategoryId=${catId}&SupplieId=${supId}&shopingBasketId=${orderId}`
     : `/inventory/inventories by category and supplier?CategoryId=${catId}&SupplieId=${supId}`;
 
-  console.log('FINALURL', finalURL);
   return axios.get(baseURL + finalURL, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -1807,7 +1798,6 @@ export const getCasualListNewApi = async () => {
 };
 
 export const getListByDepartment = async DepartmentId => {
-  console.log('ID--->', DepartmentId);
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
@@ -1843,7 +1833,6 @@ export const duplicateApi = async id => {
 };
 
 export const getOrdersByStatusApi = async (pageNumber, pageSize) => {
-  console.log(pageNumber, pageSize);
   let url =
     baseURL +
     `/CasulPurchase/getlistbypage?PageNumber=${pageNumber}&PageSize=${pageSize}`;
@@ -1967,7 +1956,6 @@ export const processDeliveredDateApi = async (
   deliveredDate,
   deliveryDate,
 ) => {
-  console.log(payload, id, deliveredDate, deliveryDate);
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
@@ -2001,7 +1989,6 @@ export const uploadImageApi = async payload => {
 };
 
 export const getImageApi = async id => {
-  console.log('ID--->', id);
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
@@ -2016,7 +2003,6 @@ export const getImageApi = async id => {
 };
 
 export const deleteImageApi = async (id, payload) => {
-  console.log('ID--->', id);
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
@@ -2036,7 +2022,6 @@ export const updateCreditNoteApi = async (
   notes,
   payload,
 ) => {
-  console.log('ID--->', orderItemId);
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
@@ -2056,7 +2041,6 @@ export const updateCreditNoteApi = async (
 };
 
 export const setDeliveryDateApi = async (id, date, payload) => {
-  console.log('ID--->', id);
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
@@ -2075,7 +2059,6 @@ export const setDeliveryDateApi = async (id, date, payload) => {
 };
 
 export const requestSupplierApi = async payload => {
-  console.log('ID--->', id);
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');
@@ -2094,7 +2077,6 @@ export const requestSupplierApi = async payload => {
 };
 
 export const createCollaborationApi = async payload => {
-  console.log('ID--->', id);
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');
   const language = await AsyncStorage.getItem('Language');

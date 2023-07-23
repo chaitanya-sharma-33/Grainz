@@ -442,13 +442,13 @@ class ViewReviewOrder extends Component {
   };
 
   showDatePickerArrivalDateSpecific = () => {
-    Alert.alert(`Grainz`, 'Clear date or select date', [
+    Alert.alert(``, '', [
       {
-        text: 'Cancel',
+        text: translate('Cancel'),
         style: 'cancel',
       },
       {
-        text: 'Clear',
+        text: translate('Clear'),
         onPress: () =>
           this.setState({
             finalArrivedDate: '',
@@ -458,7 +458,7 @@ class ViewReviewOrder extends Component {
           }),
       },
       {
-        text: 'Select Date',
+        text: translate('Select Date'),
         onPress: () => this.showDatePickerArrivalDateSpecificSec(),
       },
     ]);
@@ -560,6 +560,7 @@ class ViewReviewOrder extends Component {
       quantityOrdered: item.quantityOrdered,
       userQuantityDelivered: item.userQuantityDelivered,
       userQuantityInvoiced: item.userQuantityInvoiced,
+      isFlagged: item.isFlagged,
     };
     if (item.arrivedDate) {
       processPendingOrderItemApi(payload)
@@ -855,7 +856,7 @@ class ViewReviewOrder extends Component {
       orderId: modalData.orderId,
       orderValue: totalValue,
       orderedInventoryVolume: modalOrderedInventoryVolume,
-      // pricePaid: modalPricePaid,
+      pricePaid: modalPricePaid,
       quantityDelivered: Number(modalQuantityDelivered),
       quantityInvoiced: Number(modalQuantityInvoiced),
       quantityOrdered: modalQuantityOrdered,
@@ -863,7 +864,7 @@ class ViewReviewOrder extends Component {
       userQuantityInvoiced: Number(modalUserQuantityInvoiced),
       isFlagged: flagStatus,
     };
-    console.log('payload', payload);
+    console.log('payload->Saveinvventory', payload);
     processPendingOrderItemApi(payload)
       .then(res => {
         this.setState(
@@ -1211,7 +1212,7 @@ class ViewReviewOrder extends Component {
     } = this.state;
 
     console.log('pageData', pageData);
-    console.log('switchValueAll-->', switchValueAll);
+    console.log('isFreemium-->', typeof isFreemium);
 
     return (
       <View style={styles.container}>
@@ -1373,7 +1374,17 @@ class ViewReviewOrder extends Component {
                   <View
                     style={{
                       alignItems: 'center',
+                      flexDirection: 'row',
                     }}>
+                    <Image
+                      source={img.checkIcon}
+                      style={{
+                        height: 15,
+                        width: 15,
+                        resizeMode: 'contain',
+                        tintColor: '#5197C1',
+                      }}
+                    />
                     <Text
                       style={{
                         color: '#5197C1',
@@ -2076,137 +2087,138 @@ class ViewReviewOrder extends Component {
                               </View>
                             </View> */}
 
-                            {item.isFlagged === true ? (
-                              <View
-                                style={{
-                                  position: 'absolute',
-                                  flexDirection: 'row',
-                                  borderRadius: 5,
-                                  bottom: '80%',
-                                  left: '15%',
-                                  zIndex: 10,
-                                  padding: 5,
-                                }}>
-                                <View>
-                                  <Image
-                                    style={{
-                                      width: 25,
-                                      height: 25,
-                                      resizeMode: 'contain',
-                                    }}
-                                    source={img.flagIcon}
-                                  />
-                                </View>
-                              </View>
-                            ) : null}
                             <View style={{marginTop: hp('3%')}}>
                               <View
                                 style={{
-                                  flexDirection: 'row',
                                   borderTopLeftRadius: 6,
                                   borderTopRightRadius: 6,
                                   padding: 10,
                                   flex: 1,
                                   backgroundColor: '#fff',
-                                }}>
-                                <TouchableOpacity
-                                  onPress={() =>
-                                    this.showEditModal(item, index)
-                                  }
-                                  style={{
-                                    flex: 3,
-                                    padding: 10,
-                                  }}>
-                                  <Text
-                                    style={{
-                                      fontSize: 14,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    {item.inventoryMapping &&
-                                      item.inventoryMapping.inventoryName}
-                                  </Text>
-                                </TouchableOpacity>
-
-                                {item.hasCreditNote > 0 ? (
-                                  <TouchableOpacity
-                                    onPress={() =>
-                                      this.showEditModal(item, index)
-                                    }
-                                    style={{
-                                      flex: 1,
-                                      alignItems: 'center',
-                                    }}>
-                                    <Image
-                                      source={img.envolopeIcon}
-                                      style={{
-                                        width: 18,
-                                        height: 18,
-                                        resizeMode: 'contain',
-                                        tintColor: 'black',
-                                      }}
-                                    />
-                                  </TouchableOpacity>
-                                ) : null}
-
-                                {item.notes ? (
-                                  <TouchableOpacity
-                                    onPress={() =>
-                                      this.showEditModal(item, index)
-                                    }
-                                    style={{
-                                      flex: 1,
-                                      alignItems: 'center',
-                                    }}>
-                                    <Image
-                                      source={img.messageIcon}
-                                      style={{
-                                        width: 18,
-                                        height: 18,
-                                        resizeMode: 'contain',
-                                        tintColor: 'black',
-                                      }}
-                                    />
-                                  </TouchableOpacity>
-                                ) : null}
-
-                                <TouchableOpacity
-                                  onPress={() => this.deleteFun(item, index)}
-                                  style={{
-                                    flex: 1,
-                                    alignItems: 'flex-end',
-                                  }}>
-                                  <Image
-                                    source={img.deleteIconNew}
-                                    style={{
-                                      width: 15,
-                                      height: 15,
-                                      resizeMode: 'contain',
-                                      tintColor: 'red',
-                                    }}
-                                  />
-                                </TouchableOpacity>
-                              </View>
-                              <View
-                                style={{
-                                  flex: 1,
-                                  flexDirection: 'row',
-                                  padding: 10,
-                                  backgroundColor: '#fff',
                                   borderBottomWidth: 0.5,
                                   borderBottomColor: 'grey',
                                 }}>
-                                {isFreemium === 'false' ? (
-                                  <View
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      this.showEditModal(item, index)
+                                    }
+                                    style={{
+                                      flex: 3,
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                    }}>
+                                    <Text
+                                      style={{
+                                        fontSize: 14,
+                                        fontWeight: 'bold',
+                                      }}>
+                                      {item.inventoryMapping &&
+                                        item.inventoryMapping.inventoryName}
+                                    </Text>
+                                    {item.isFlagged === true ? (
+                                      <View
+                                        style={{
+                                          // position: 'absolute',
+                                          borderRadius: 5,
+                                          // bottom: '80%',
+                                          // left: '15%',
+                                          // zIndex: 10,
+                                          padding: 5,
+                                        }}>
+                                        <View>
+                                          <Image
+                                            style={{
+                                              width: 20,
+                                              height: 20,
+                                              resizeMode: 'contain',
+                                              marginLeft: 5,
+                                            }}
+                                            source={img.flagIcon}
+                                          />
+                                        </View>
+                                      </View>
+                                    ) : null}
+                                    {item.hasCreditNote > 0 ? (
+                                      <TouchableOpacity
+                                        onPress={() =>
+                                          this.showEditModal(item, index)
+                                        }
+                                        style={{}}>
+                                        <Image
+                                          source={img.envolopeIcon}
+                                          style={{
+                                            width: 18,
+                                            height: 18,
+                                            resizeMode: 'contain',
+                                            tintColor: 'black',
+                                            marginLeft: 5,
+                                          }}
+                                        />
+                                      </TouchableOpacity>
+                                    ) : null}
+
+                                    {item.notes ? (
+                                      <TouchableOpacity
+                                        onPress={() =>
+                                          this.showEditModal(item, index)
+                                        }
+                                        style={{}}>
+                                        <Image
+                                          source={img.messageIcon}
+                                          style={{
+                                            width: 18,
+                                            height: 18,
+                                            resizeMode: 'contain',
+                                            tintColor: 'black',
+                                            marginLeft: 7,
+                                          }}
+                                        />
+                                      </TouchableOpacity>
+                                    ) : null}
+                                  </TouchableOpacity>
+
+                                  <TouchableOpacity
+                                    onPress={() => this.deleteFun(item, index)}
                                     style={{
                                       flex: 1,
+                                      alignItems: 'flex-end',
+                                      padding: 10,
                                     }}>
-                                    <Text style={{}}>
-                                      {item.inventoryMapping &&
-                                        item.inventoryMapping.productName}
-                                    </Text>
-                                  </View>
-                                ) : null}
+                                    <Image
+                                      source={img.deleteIconNew}
+                                      style={{
+                                        width: 15,
+                                        height: 15,
+                                        resizeMode: 'contain',
+                                        tintColor: 'red',
+                                      }}
+                                    />
+                                  </TouchableOpacity>
+                                </View>
+                                <View
+                                  style={{
+                                    marginTop: 8,
+                                  }}>
+                                  {isFreemium === 'false' ? (
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                      }}>
+                                      <Text style={{}}>
+                                        {item.inventoryMapping &&
+                                          item.inventoryMapping
+                                            .productName}{' '}
+                                      </Text>
+                                    </View>
+                                  ) : null}
+                                </View>
                               </View>
+
                               <View
                                 style={{
                                   flex: 1,
@@ -3840,11 +3852,11 @@ class ViewReviewOrder extends Component {
                                 }}>
                                 <View
                                   style={{
-                                    flex: 4,
+                                    flex: 1,
                                   }}>
                                   <Text
                                     style={{
-                                      fontSize: 14,
+                                      fontSize: 15,
                                       fontWeight: 'bold',
                                       color: 'black',
                                     }}>
@@ -3853,7 +3865,7 @@ class ViewReviewOrder extends Component {
                                   {isFreemium === 'false' ? (
                                     <Text
                                       style={{
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         color: 'black',
                                         marginTop: 10,
                                       }}>
@@ -3865,18 +3877,47 @@ class ViewReviewOrder extends Component {
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <TouchableOpacity
-                                    onPress={() =>
-                                      this.flagFunctionChecklist(item)
-                                    }
+                                  <View
                                     style={{
                                       flex: 1,
                                       flexDirection: 'row',
                                       alignItems: 'center',
-                                      marginTop: hp('2%'),
-                                      marginHorizontal: wp('7%'),
-                                      alignSelf: 'flex-end',
+                                      justifyContent: 'flex-end',
                                     }}>
+                                    <Text
+                                      style={{
+                                        marginRight: 10,
+                                      }}>
+                                      {translate('Correct')}
+                                    </Text>
+                                    <Switch
+                                      thumbColor={'#fff'}
+                                      trackColor={{
+                                        false: 'grey',
+                                        true: '#5197C1',
+                                      }}
+                                      ios_backgroundColor="white"
+                                      onValueChange={value =>
+                                        this.checkSingleItemFun(
+                                          item,
+                                          value,
+                                          index,
+                                        )
+                                      }
+                                      value={item.isCorrect}
+                                    />
+                                  </View>
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 0.5,
+                                    alignItems: 'flex-end',
+                                  }}>
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      this.flagFunctionChecklist(item)
+                                    }
+                                    style={{}}>
                                     <Image
                                       source={img.flagIcon}
                                       style={{
@@ -3900,54 +3941,15 @@ class ViewReviewOrder extends Component {
                                   flex: 1,
                                   marginTop: hp('3%'),
                                 }}>
-                                {/* <View
-                                  style={{
-                                    flex: 1,
-                                    backgroundColor: '#fff',
-                                    padding: 8,
-                                    borderRadius: 6,
-                                  }}>
-                                  <Text
-                                    style={{
-                                      fontSize: 12,
-                                    }}>
-                                    Delivered Qty.
-                                  </Text>
-                                  <View
-                                    style={{
-                                      alignItems: 'center',
-                                      flexDirection: 'row',
-                                    }}>
-                                    <TextInput
-                                      placeholder="Delivered Qty."
-                                      value={String(item.userQuantityDelivered)}
-                                      style={{
-                                        width: 80,
-                                        marginTop: 5,
-                                        fontWeight: 'bold',
-                                      }}
-                                      onChangeText={value =>
-                                        this.editChecklistFun(
-                                          index,
-                                          'userQuantityDelivered',
-                                          value,
-                                          item,
-                                          'DeliveredQty',
-                                        )
-                                      }
-                                    />
-                                  </View>
-                                </View> */}
-
                                 <View
                                   style={{
                                     flex: 1,
                                   }}>
                                   <Text
                                     style={{
-                                      fontSize: 12,
+                                      fontSize: 14,
                                     }}>
-                                    {translate('Ordered No')}
+                                    {translate('_Ordered No')}
                                   </Text>
                                   <Text
                                     numberOfLines={1}
@@ -3956,15 +3958,10 @@ class ViewReviewOrder extends Component {
                                       fontWeight: 'bold',
                                       marginTop: 10,
                                     }}>
-                                    {item.grainzVolume * item.quantityOrdered}{' '}
-                                    {item.unit}
+                                    {item.displayQuantity.split('=')[0]}
+                                    {/* {item.unit} */}
                                   </Text>
                                 </View>
-
-                                <View
-                                  style={{
-                                    flex: 0.3,
-                                  }}></View>
 
                                 <View
                                   style={{
@@ -3975,17 +3972,18 @@ class ViewReviewOrder extends Component {
                                   }}>
                                   <Text
                                     style={{
-                                      fontSize: 12,
+                                      fontSize: 14,
                                     }}>
-                                    {translate('Delivered No')}
+                                    {translate('_Delivered No')}
                                   </Text>
 
                                   <TextInput
-                                    placeholder={translate('Delivered No')}
+                                    placeholder={translate('_Delivered No')}
                                     value={String(item.quantityDelivered)}
+                                    keyboardType="number-pad"
                                     style={{
-                                      width: 80,
-                                      marginTop: 5,
+                                      width: 30,
+                                      marginTop: 10,
                                       fontWeight: 'bold',
                                     }}
                                     onChangeText={value =>
@@ -3999,115 +3997,39 @@ class ViewReviewOrder extends Component {
                                     }
                                   />
                                 </View>
-                              </View>
-
-                              <View
-                                style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  flex: 1,
-                                  marginTop: hp('2%'),
-                                }}>
-                                {/* <View
+                                <View
                                   style={{
                                     flex: 1,
                                     backgroundColor: '#fff',
                                     padding: 8,
                                     borderRadius: 6,
+                                    marginLeft: 10,
                                   }}>
                                   <Text
                                     style={{
-                                      fontSize: 12,
+                                      fontSize: 14,
                                     }}>
-                                    Delivered No.
+                                    {translate('_Invoiced Qty')}
                                   </Text>
-
                                   <TextInput
-                                    placeholder="Delivered No."
-                                    value={String(item.quantityDelivered)}
+                                    placeholder={translate('_Invoiced Qty')}
+                                    value={String(item.quantityInvoiced)}
+                                    keyboardType="number-pad"
                                     style={{
-                                      width: 80,
-                                      marginTop: 5,
+                                      width: 30,
                                       fontWeight: 'bold',
+                                      marginTop: 10,
                                     }}
                                     onChangeText={value =>
                                       this.editChecklistFun(
                                         index,
-                                        'quantityDelivered',
+                                        'quantityInvoiced',
                                         value,
                                         item,
-                                        'DeliveredNo',
+                                        'InvoicedQty',
                                       )
                                     }
                                   />
-                                </View> */}
-                                {/* 
-                                <View
-                                  style={{
-                                    flex: 0.3,
-                                  }}></View> */}
-
-                                <View
-                                  style={{
-                                    flex: 1,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                  }}>
-                                  <Text
-                                    style={{
-                                      marginRight: 10,
-                                    }}>
-                                    Correct
-                                  </Text>
-                                  <Switch
-                                    thumbColor={'#fff'}
-                                    trackColor={{
-                                      false: 'grey',
-                                      true: '#5197C1',
-                                    }}
-                                    ios_backgroundColor="white"
-                                    onValueChange={value =>
-                                      this.checkSingleItemFun(
-                                        item,
-                                        value,
-                                        index,
-                                      )
-                                    }
-                                    value={item.isCorrect}
-                                  />
-                                </View>
-
-                                <View
-                                  style={{
-                                    flex: 1,
-                                    padding: 8,
-                                    borderRadius: 6,
-                                  }}>
-                                  {/* <Text
-                                    style={{
-                                      fontSize: 12,
-                                    }}>
-                                    Delivered Qty.
-                                  </Text>
-
-                                  <TextInput
-                                    placeholder="Delivered Qty."
-                                    value={String(item.userQuantityDelivered)}
-                                    style={{
-                                      width: 80,
-                                      marginTop: 5,
-                                      fontWeight: 'bold',
-                                    }}
-                                    onChangeText={value =>
-                                      this.editChecklistFun(
-                                        index,
-                                        'userQuantityDelivered',
-                                        value,
-                                        item,
-                                        'DeliveredQty',
-                                      )
-                                    }
-                                  /> */}
                                 </View>
                               </View>
                             </View>
@@ -4911,7 +4833,7 @@ class ViewReviewOrder extends Component {
                                 marginLeft: 10,
                                 fontFamily: 'Inter-SemiBold',
                               }}>
-                              {translate('Credit note Requested')}
+                              {translate('_Credit note Requested')}
                             </Text>
                           </View>
                         </TouchableOpacity>

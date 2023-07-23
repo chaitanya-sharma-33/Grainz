@@ -3424,25 +3424,21 @@ class ViewHistoryOrder extends Component {
   };
 
   deleteFun = item => {
-    Alert.alert(
-      `Grainz`,
-      'Are you sure you want to delete this order line item?',
-      [
-        {
-          text: 'Yes',
-          onPress: () =>
-            this.setState(
-              {
-                loaderCompStatus: true,
-              },
-              () => this.hitDeleteApi(item),
-            ),
-        },
-        {
-          text: 'No',
-        },
-      ],
-    );
+    Alert.alert(``, 'Are you sure you want to delete this order line item?', [
+      {
+        text: 'Yes',
+        onPress: () =>
+          this.setState(
+            {
+              loaderCompStatus: true,
+            },
+            () => this.hitDeleteApi(item),
+          ),
+      },
+      {
+        text: 'No',
+      },
+    ]);
   };
 
   hitDeleteApi = item => {
@@ -4936,24 +4932,19 @@ class ViewHistoryOrder extends Component {
                             </View> */}
                             <View
                               style={{
-                                marginTop: hp('2%'),
-                                marginBottom: hp('2%'),
+                                marginTop: hp('3%'),
                               }}>
                               <View
                                 style={{
-                                  flexDirection: 'row',
-                                  borderColor: 'grey',
                                   borderTopLeftRadius: 6,
                                   borderTopRightRadius: 6,
                                   padding: 10,
                                   flex: 1,
-                                  marginTop: 10,
                                   backgroundColor: '#fff',
+                                  borderBottomWidth: 0.5,
+                                  borderBottomColor: 'grey',
                                 }}>
-                                <View
-                                  style={{
-                                    flex: 3,
-                                  }}>
+                                <View style={{}}>
                                   <Text
                                     style={{
                                       fontSize: 14,
@@ -4962,6 +4953,22 @@ class ViewHistoryOrder extends Component {
                                     {item.inventoryMapping &&
                                       item.inventoryMapping.inventoryName}
                                   </Text>
+                                  <View
+                                    style={{
+                                      marginTop: 10,
+                                    }}>
+                                    {isFreemium === 'false' ? (
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                        }}>
+                                        <Text style={{}}>
+                                          {item.inventoryMapping &&
+                                            item.inventoryMapping.productName}
+                                        </Text>
+                                      </View>
+                                    ) : null}
+                                  </View>
                                 </View>
 
                                 {/* {item.notes ? (
@@ -5002,27 +5009,7 @@ class ViewHistoryOrder extends Component {
                                   />
                                 </TouchableOpacity> */}
                               </View>
-                              <View
-                                style={{
-                                  flex: 1,
-                                  flexDirection: 'row',
-                                  borderBottomWidth: 0.5,
-                                  borderColor: 'grey',
-                                  padding: 10,
-                                  backgroundColor: '#fff',
-                                }}>
-                                {isFreemium === 'false' ? (
-                                  <View
-                                    style={{
-                                      flex: 1,
-                                    }}>
-                                    <Text style={{}}>
-                                      {item.inventoryMapping &&
-                                        item.inventoryMapping.productName}
-                                    </Text>
-                                  </View>
-                                ) : null}
-                              </View>
+
                               <View
                                 style={{
                                   flex: 1,
@@ -5990,9 +5977,11 @@ class ViewHistoryOrder extends Component {
 
                 <SurePopUp
                   pickerModalStatus={reviewModalStatus}
-                  headingText="Move to review"
+                  headingText={translate('Move to review')}
                   crossFun={() => this.closeModalFun()}
-                  bodyText="Are you sure you want to move this to review?"
+                  bodyText={translate(
+                    'Are you sure you want to move this to review',
+                  )}
                   cancelFun={() => this.closeModalFun()}
                   saveFun={() => this.moveToReviewFunSec()}
                   yesStatus
@@ -6335,7 +6324,7 @@ class ViewHistoryOrder extends Component {
                   pickerModalStatus={cancelModalStatus}
                   // headingText="Move to review"
                   crossFun={() => this.closeModalFun()}
-                  bodyText="Are you sure?"
+                  bodyText={translate('Are you sure')}
                   cancelFun={() => this.closeModalFun()}
                   saveFun={() => this.cancelModalFun()}
                   yesStatus

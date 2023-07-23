@@ -175,7 +175,7 @@ class EditPurchase extends Component {
         let finalArray = res.data.map((item, index) => {
           return {
             id: item.id,
-            name: item.name,
+            name: item.displayName,
           };
         });
         this.setState({

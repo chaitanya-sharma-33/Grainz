@@ -411,6 +411,7 @@ class SupplierListNoAcc extends Component {
   };
   requestCollaborationFunSec = () => {
     const {payloadArr} = this.state;
+    console.log('par', payloadArr);
     const payload = {
       suppliers: payloadArr,
     };
@@ -423,8 +424,24 @@ class SupplierListNoAcc extends Component {
         this.setState({
           recipeLoader: false,
         });
+
+        Alert.alert(
+          translate(
+            `Thank you Your invitation has been sent We will take it from here`,
+          ),
+          translate(
+            `We will let you know when supplier's catalog has been uploaded after which you will be able to place orders`,
+          ),
+          [
+            {
+              text: translate('Supplier list'),
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ],
+        );
       })
       .catch(err => {
+        console.log('err', err);
         Alert.alert(
           err.response.data && err.response.data.message,
           err.response.data && err.response.data.errors[0].message,
@@ -493,7 +510,7 @@ class SupplierListNoAcc extends Component {
                 height: hp('7%'),
               }}>
               <TextInput
-                placeholder={translate('SearchDot')}
+                placeholder={translate('Search')}
                 style={{
                   padding: 12,
                   borderRadius: 5,

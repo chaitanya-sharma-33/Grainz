@@ -1831,7 +1831,7 @@ class AddNewEvent extends Component {
                     paddingLeft: 15,
                   }}>
                   <TextInput
-                    placeholder={translate('SearchDot')}
+                    placeholder={translate('Search')}
                     placeholderTextColor="grey"
                     value={searchMenuItem}
                     style={{

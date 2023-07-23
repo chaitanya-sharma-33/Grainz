@@ -110,7 +110,8 @@ class EditDraftOrder extends Component {
         let finalArray = res.data.map((item, index) => {
           return {
             id: item.id,
-            name: item.displayName,
+            name: item.name,
+            displayName: item.displayName,
           };
         });
         this.setState({
@@ -191,7 +192,11 @@ class EditDraftOrder extends Component {
         () => this.sendFunSec(),
       );
     } else {
-      alert(translate('Please select delivery date first'));
+      Alert.alert(``, translate('Please select delivery date first'), [
+        {
+          text: translate('Ok'),
+        },
+      ]);
     }
 
     // const {channel} = this.state;
@@ -754,6 +759,7 @@ class EditDraftOrder extends Component {
               id: item.id,
               name: item.name,
               count: item.count,
+              displayName: item.displayName,
             };
           });
         this.setState({
@@ -1064,7 +1070,7 @@ class EditDraftOrder extends Component {
     const {supplierValue, placedByValue, basketId} = this.state;
     this.props.navigation.navigate('AddItemsOrderScreen', {
       departID: item.id,
-      departName: item.name,
+      departName: item.displayName,
       screen: 'Update',
       navigateType: 'EditDraft',
       basketId: basketId,
@@ -1925,7 +1931,7 @@ class EditDraftOrder extends Component {
                               color: '#fff',
                             }}
                             numberOfLines={1}>
-                            {item.name}
+                            {item.displayName}
                           </Text>
                         </View>
                         <View
@@ -2215,7 +2221,7 @@ class EditDraftOrder extends Component {
                               fontSize: 14,
                             }}>
                             {item.inventoryMapping &&
-                              item.inventoryMapping.price}{' '}
+                              item.inventoryMapping.price.toFixed(2)}{' '}
                             Є/
                             {item.inventoryMapping.productUnit}
                           </Text>

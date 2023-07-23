@@ -73,7 +73,6 @@ class InviteSupplierScreen extends Component {
 
         this.setState({
           countryArr: finalUsersList,
-          finalCountry: finalUsersList[0],
         });
       })
       .catch(err => {
@@ -136,10 +135,10 @@ class InviteSupplierScreen extends Component {
         });
         Alert.alert(
           translate(
-            'Thank you. Your invitation has been sent. We will take it from here',
+            `Thank you Your invitation has been sent We will take it from here`,
           ),
           translate(
-            "We will let you know when supplier's catalog has been uploaded after which you will be able to place orders",
+            `We will let you know when supplier's catalog has been uploaded after which you will be able to place orders`,
           ),
           [
             {
@@ -150,6 +149,9 @@ class InviteSupplierScreen extends Component {
         );
       })
       .catch(err => {
+        this.setState({
+          pageLoader: false,
+        });
         console.log('err', err.response);
         console.warn('ERr', err);
       });
@@ -174,7 +176,7 @@ class InviteSupplierScreen extends Component {
       note,
     } = this.state;
 
-    console.log('countryArr', countryArr);
+    console.log('finalCountry', finalCountry);
 
     return (
       <View style={styles.container}>
@@ -219,7 +221,7 @@ class InviteSupplierScreen extends Component {
                   style={{
                     fontSize: 12,
                   }}>
-                  {translate('Supplier Name')}
+                  {translate('Supplier Name')}*
                 </Text>
                 <TextInput
                   value={supplierName}
@@ -250,7 +252,7 @@ class InviteSupplierScreen extends Component {
                   style={{
                     fontSize: 12,
                   }}>
-                  {translate('Email')}
+                  {translate('Email')}*
                 </Text>
                 <TextInput
                   value={email}
@@ -281,7 +283,7 @@ class InviteSupplierScreen extends Component {
                   style={{
                     fontSize: 12,
                   }}>
-                  {translate('Country')}
+                  {translate('Country')}*
                 </Text>
                 <View
                   style={{
@@ -509,30 +511,12 @@ class InviteSupplierScreen extends Component {
 
               <TouchableOpacity
                 onPress={() => this.requestCollaborationFun()}
-                disabled={
-                  supplierName &&
-                  email &&
-                  finalCountry &&
-                  website &&
-                  contactPerson &&
-                  phoneNumber &&
-                  orderingEmail &&
-                  note
-                    ? false
-                    : true
-                }
+                disabled={supplierName && email && finalCountry ? false : true}
                 style={{
                   width: wp('90%'),
                   height: hp('7%'),
                   backgroundColor:
-                    supplierName &&
-                    email &&
-                    finalCountry &&
-                    website &&
-                    contactPerson &&
-                    phoneNumber &&
-                    orderingEmail &&
-                    note
+                    supplierName && email && finalCountry
                       ? '#5297c1'
                       : '#8BBBD7',
                   justifyContent: 'center',

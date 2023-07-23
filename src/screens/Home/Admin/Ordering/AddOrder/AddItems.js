@@ -179,6 +179,7 @@ class AddItems extends Component {
     const {supplierId} = this.state;
     getSupplierCatalogApi(supplierId)
       .then(res => {
+        console.log('res', res);
         let finalArray = res.data.map((item, index) => {
           return {
             title: item,
@@ -209,7 +210,7 @@ class AddItems extends Component {
     // console.log('FIRST');
     getInventoryBySupplierIdApi(supplierId)
       .then(res => {
-        // console.log('resInventory-->', res);
+        console.log('resInventory-->', res);
 
         var filteredArray = res.data.filter(function (itm) {
           return itm.departmentId === mainDepartId;
@@ -219,7 +220,7 @@ class AddItems extends Component {
 
         let finalArray = filteredArray.map((item, index) => {
           return {
-            title: item.name,
+            title: item.displayName,
             content: item.id,
             departmentName: item.departmentName,
           };
@@ -1012,7 +1013,7 @@ class AddItems extends Component {
     };
     updateInventoryProductApi(payload)
       .then(res => {
-        Alert.alert('Grainz', 'Inventory updated successfully', [
+        Alert.alert('', 'Inventory updated successfully', [
           {
             text: translate('Ok'),
             onPress: () =>

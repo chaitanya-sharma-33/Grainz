@@ -786,7 +786,7 @@ class PendingDelivery extends Component {
                 borderRadius: 5,
               }}>
               <TextInput
-                placeholder={translate('SearchDot')}
+                placeholder={translate('Search')}
                 style={{
                   padding: 12,
                   borderRadius: 5,
@@ -919,14 +919,6 @@ class PendingDelivery extends Component {
                     }}>
                     <View
                       style={{
-                        // paddingVertical: 15,
-                        // paddingHorizontal: 5,
-                        // marginTop: 10,
-                        // flexDirection: 'row',
-                        // justifyContent: 'space-between',
-                        // backgroundColor: '#EFFBCF',
-                        // borderTopLeftRadius: 5,
-                        // borderTopRightRadius: 5,
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         flex: 1,
@@ -934,36 +926,16 @@ class PendingDelivery extends Component {
                         paddingVertical: hp('2%'),
                         borderTopLeftRadius: 5,
                         borderTopRightRadius: 5,
-                        paddingHorizontal: wp('2%'),
+                        paddingHorizontal: wp('3%'),
                         borderWidth: 0.2,
                         borderColor: 'grey',
                       }}>
-                      {/* <View
-                            style={{
-                              width: wp('30%'),
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={{
-                                color: '#161C27',
-                                fontFamily: 'Inter-SemiBold',
-                              }}>
-                              {translate('Order')}#
-                            </Text>
-                          </View> */}
-
                       <TouchableOpacity
                         onPress={() => this.arrangeListFun('DATE')}
                         style={{
-                          // width: wp('30%'),
-                          // alignItems: 'center',
-                          // flexDirection: 'row',
-                          // justifyContent: 'center',
                           flex: 1,
-                          justifyContent: 'center',
                           alignItems: 'center',
                           flexDirection: 'row',
-                          alignItems: 'center',
                         }}>
                         <Text
                           style={{
@@ -981,7 +953,6 @@ class PendingDelivery extends Component {
                               width: 15,
                               height: 15,
                               resizeMode: 'contain',
-                              marginLeft: 5,
                             }}
                             source={img.doubleArrowIconNew}
                           />
@@ -991,13 +962,8 @@ class PendingDelivery extends Component {
                         onPress={() => this.arrangeListFun('SUPPLIER')}
                         style={{
                           flex: 1,
-                          justifyContent: 'center',
                           alignItems: 'center',
                           flexDirection: 'row',
-                          // width: wp('30%'),
-                          // alignItems: 'center',
-                          // flexDirection: 'row',
-                          // justifyContent: 'center',
                         }}>
                         <Text
                           style={{
@@ -1023,13 +989,8 @@ class PendingDelivery extends Component {
                         onPress={() => this.arrangeListFun('HTVA')}
                         style={{
                           flex: 1,
-                          justifyContent: 'center',
                           alignItems: 'center',
                           flexDirection: 'row',
-                          // width: wp('30%'),
-                          // alignItems: 'center',
-                          // flexDirection: 'row',
-                          // justifyContent: 'center',
                         }}>
                         <Text
                           style={{
@@ -1054,20 +1015,8 @@ class PendingDelivery extends Component {
                       <View
                         style={{
                           flex: 0.2,
-                          justifyContent: 'center',
                           alignItems: 'center',
-                          flexDirection: 'row',
-                          // width: wp('30%'),
-                          // alignItems: 'center',
-                          // flexDirection: 'row',
-                          // justifyContent: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#161C27',
-                            fontFamily: 'Inter-SemiBold',
-                          }}></Text>
-                      </View>
+                        }}></View>
                     </View>
                     <View>
                       {deliveryPendingData && deliveryPendingData.length > 0
@@ -1116,11 +1065,8 @@ class PendingDelivery extends Component {
 
                                   <View
                                     style={{
-                                      // width: wp('30%'),
-                                      // alignItems: 'center',
                                       flex: 1,
                                       justifyContent: 'center',
-                                      alignItems: 'center',
                                     }}>
                                     <Text
                                       style={{
@@ -1148,13 +1094,11 @@ class PendingDelivery extends Component {
                                   <View
                                     style={{
                                       flex: 1,
-                                      justifyContent: 'center',
-                                      alignItems: 'center',
-                                      flexDirection: 'row',
-                                      alignItems: 'center',
-                                      marginLeft: 10,
                                     }}>
-                                    <View style={{}}>
+                                    <View
+                                      style={{
+                                        flexDirection: 'row',
+                                      }}>
                                       <Text
                                         style={{
                                           color:
@@ -1162,9 +1106,23 @@ class PendingDelivery extends Component {
                                               ? 'red'
                                               : 'black',
                                           fontSize: 14,
+                                          textAlign: 'left',
                                         }}>
                                         {item.supplierName}
                                       </Text>
+                                      <View>
+                                        {item.creditNotesCount > 0 ? (
+                                          <Image
+                                            source={img.envolopeIcon}
+                                            style={{
+                                              width: 16,
+                                              height: 16,
+                                              resizeMode: 'contain',
+                                              marginLeft: 5,
+                                            }}
+                                          />
+                                        ) : null}
+                                      </View>
                                     </View>
                                     {/* {item.flaggedCount > 0 ? (
                                       <Image
@@ -1176,19 +1134,7 @@ class PendingDelivery extends Component {
                                         }}
                                       />
                                     ) : null} */}
-                                    <View>
-                                      {item.creditNotesCount > 0 ? (
-                                        <Image
-                                          source={img.envolopeIcon}
-                                          style={{
-                                            width: 16,
-                                            height: 16,
-                                            resizeMode: 'contain',
-                                            marginLeft: 5,
-                                          }}
-                                        />
-                                      ) : null}
-                                    </View>
+
                                     <View>
                                       {item.notes ? (
                                         <Image
@@ -1209,7 +1155,6 @@ class PendingDelivery extends Component {
                                       // alignItems: 'center',
                                       flex: 1,
                                       justifyContent: 'center',
-                                      alignItems: 'center',
                                     }}>
                                     <Text
                                       style={{
@@ -1228,7 +1173,6 @@ class PendingDelivery extends Component {
                                   style={{
                                     flex: 0.2,
                                     justifyContent: 'center',
-                                    alignItems: 'center',
                                   }}>
                                   <Image
                                     style={{

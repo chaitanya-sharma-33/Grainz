@@ -249,7 +249,11 @@ class NewOrderSec extends Component {
         finalData,
       });
     } else {
-      alert('Please select all');
+      Alert.alert('', translate('Please select all values'), [
+        {
+          text: translate('Ok'),
+        },
+      ]);
     }
   }
 
@@ -332,7 +336,8 @@ class NewOrderSec extends Component {
                         fontSize: 14,
                         fontFamily: 'Inter-Regular',
                         fontWeight: 'bold',
-                      }}>
+                      }}
+                      numberOfLines={1}>
                       {supplierName ? supplierName : selectedTextUser}
                     </Text>
                     <Image

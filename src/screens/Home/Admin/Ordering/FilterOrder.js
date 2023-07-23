@@ -418,6 +418,7 @@ class FilterOrder extends Component {
                       <View
                         style={{
                           flexDirection: 'row',
+                          justifyContent: 'space-between',
                         }}>
                         <TextInput
                           placeholder={translate('DD-MM-YYYY')}
@@ -437,7 +438,6 @@ class FilterOrder extends Component {
                             width: 18,
                             height: 18,
                             resizeMode: 'contain',
-                            marginLeft: wp('8%'),
                             tintColor: 'grey',
                           }}
                         />

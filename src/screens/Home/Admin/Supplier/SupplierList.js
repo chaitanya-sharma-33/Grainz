@@ -429,7 +429,7 @@ class SupplierList extends Component {
                 height: hp('7%'),
               }}>
               <TextInput
-                placeholder={translate('SearchDot')}
+                placeholder={translate('Search')}
                 style={{
                   padding: 12,
                   borderRadius: 5,

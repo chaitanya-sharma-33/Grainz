@@ -208,11 +208,11 @@ export class RequestCreditNote extends Component {
       .then(res => {
         console.log('RES-PROCESS ORDER', res);
         Alert.alert(
-          `Grainz`,
-          'Your request for a credit note was sent successfully.',
+          ``,
+          translate('Your request for a credit note was sent successfully'),
           [
             {
-              text: 'Go back',
+              text: translate('GO BACK'),
               onPress: () => this.props.navigation.goBack(),
             },
           ],
@@ -619,10 +619,10 @@ export class RequestCreditNote extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      {translate('_Delivered Qty')}
+                      {translate('_Delivered Qty Sec')}
                     </Text>
                     <TextInput
-                      placeholder="Delivered Qty."
+                      placeholder={translate('_Delivered Qty Sec')}
                       value={deliveredQtyValue && String(deliveredQtyValue)}
                       style={{
                         width: 80,
@@ -682,10 +682,10 @@ export class RequestCreditNote extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      {translate('Requested price')}
+                      {translate('_Requested price')}
                     </Text>
                     <TextInput
-                      placeholder={translate('Requested price')}
+                      placeholder={translate('_Requested price')}
                       editable={hasCreditNoteStatus ? false : true}
                       style={{
                         width: 80,
@@ -716,7 +716,7 @@ export class RequestCreditNote extends Component {
                   style={{
                     fontSize: 12,
                   }}>
-                  {translate('Credit Requested Qty')}
+                  {translate('_Credit Requested Qty')}
                 </Text>
                 <View
                   style={{

@@ -213,6 +213,7 @@ class Basket extends Component {
               id: item.id,
               name: item.name,
               count: item.count,
+              displayName: item.displayName,
             };
           });
 
@@ -1208,7 +1209,7 @@ class Basket extends Component {
       basketId: basketId,
       supplierValue,
       departID: item.id,
-      departName: item.name,
+      departName: item.displayName,
       screen: 'Update',
       finalData: '',
       navigateType: 'Add',
@@ -1403,6 +1404,7 @@ class Basket extends Component {
                     }}>
                     <TextInput
                       value={finalDataSec.supplierName}
+                      numberOfLines={1}
                       editable={false}
                       style={{
                         fontSize: 14,
@@ -1640,7 +1642,7 @@ class Basket extends Component {
                                 color: '#fff',
                               }}
                               numberOfLines={1}>
-                              {item.name}
+                              {item.displayName}
                             </Text>
                           </View>
                           <View
@@ -2105,7 +2107,7 @@ class Basket extends Component {
                               fontWeight: 'bold',
                             }}>
                             {item.inventoryMapping &&
-                              item.inventoryMapping.price}{' '}
+                              item.inventoryMapping.price.toFixed(2)}{' '}
                             Є/
                             {item.inventoryMapping.productUnit}
                           </Text>
@@ -2939,7 +2941,7 @@ class Basket extends Component {
                                 marginTop: 10,
                               }}>
                               {lineData.inventoryMapping &&
-                                lineData.inventoryMapping.price}{' '}
+                                lineData.inventoryMapping.price.toFixed(2)}{' '}
                               €/
                               {lineData.inventoryMapping &&
                                 lineData.inventoryMapping.productUnit}
@@ -3258,7 +3260,7 @@ class Basket extends Component {
             <View
               style={{
                 width: wp('80%'),
-                height: hp('75%'),
+                height: hp('85%'),
                 alignSelf: 'center',
                 borderRadius: 6,
                 backgroundColor: '#F5F8FE',

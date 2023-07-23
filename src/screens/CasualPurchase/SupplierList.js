@@ -189,7 +189,7 @@ class SupplierList extends Component {
                 </View>
                 <View style={styles.flex}>
                   <Text style={styles.adminTextStyle}>
-                    {translate('Select Supplier')}
+                    {translate('Select supplier')}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -212,7 +212,7 @@ class SupplierList extends Component {
                           marginBottom: hp('3%'),
                         }}>
                         <TextInput
-                          placeholder={translate('SearchDot')}
+                          placeholder={translate('Search')}
                           placeholderTextColor="grey"
                           value={searchItem}
                           style={{

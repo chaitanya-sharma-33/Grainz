@@ -553,7 +553,7 @@ class DraftOrder extends Component {
                 borderRadius: 5,
               }}>
               <TextInput
-                placeholder={translate('SearchDot')}
+                placeholder={translate('Search')}
                 style={{
                   padding: 12,
                   borderRadius: 5,
@@ -662,7 +662,6 @@ class DraftOrder extends Component {
                         style={{
                           flex: 1,
                           justifyContent: 'center',
-                          alignItems: 'center',
                           flexDirection: 'row',
                           alignItems: 'center',
                         }}>
@@ -690,9 +689,8 @@ class DraftOrder extends Component {
                         onPress={() => this.arrangeListFun('SUPPLIER')}
                         style={{
                           flex: 1,
-                          justifyContent: 'center',
-                          alignItems: 'center',
                           flexDirection: 'row',
+                          alignItems: 'center',
                         }}>
                         <Text
                           style={{
@@ -718,9 +716,8 @@ class DraftOrder extends Component {
                         onPress={() => this.arrangeListFun('HTVA')}
                         style={{
                           flex: 1,
-                          justifyContent: 'center',
-                          alignItems: 'center',
                           flexDirection: 'row',
+                          alignItems: 'center',
                         }}>
                         <Text
                           style={{
@@ -746,16 +743,8 @@ class DraftOrder extends Component {
                         onPress={() => this.arrangeListFun('HTVA')}
                         style={{
                           flex: 0.2,
-                          justifyContent: 'center',
                           alignItems: 'center',
-                          flexDirection: 'row',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#161C27',
-                            fontFamily: 'Inter-SemiBold',
-                          }}></Text>
-                      </View>
+                        }}></View>
                     </View>
                     {draftsOrderData &&
                       draftsOrderData.map((item, index) => {
@@ -807,7 +796,6 @@ class DraftOrder extends Component {
                                   style={{
                                     flex: 1,
                                     justifyContent: 'center',
-                                    alignItems: 'center',
                                   }}>
                                   <Text
                                     style={{
@@ -824,12 +812,12 @@ class DraftOrder extends Component {
                                   style={{
                                     flex: 1,
                                     justifyContent: 'center',
-                                    alignItems: 'center',
                                   }}>
                                   <Text
                                     style={{
                                       color: '#161C27',
                                       fontSize: 14,
+                                      textAlign: 'left',
                                     }}>
                                     {item.supplierName}
                                   </Text>
@@ -839,7 +827,6 @@ class DraftOrder extends Component {
                                   style={{
                                     flex: 1,
                                     justifyContent: 'center',
-                                    alignItems: 'center',
                                   }}>
                                   <Text
                                     style={{
@@ -855,7 +842,6 @@ class DraftOrder extends Component {
                                 style={{
                                   flex: 0.2,
                                   justifyContent: 'center',
-                                  alignItems: 'center',
                                 }}>
                                 <Image
                                   style={{

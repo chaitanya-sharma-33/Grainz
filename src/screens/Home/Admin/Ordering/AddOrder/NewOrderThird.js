@@ -164,6 +164,7 @@ class NewOrderThird extends Component {
           return {
             id: item.id,
             name: item.name,
+            displayName: item.displayName,
           };
         });
         this.setState({
@@ -172,7 +173,7 @@ class NewOrderThird extends Component {
         });
       })
       .catch(error => {
-        console.log('err', error.response);
+        console.log('err----->', error);
       });
   }
 
@@ -265,6 +266,7 @@ class NewOrderThird extends Component {
                         }}>
                         <TextInput
                           value={finalData.supplierName}
+                          numberOfLines={1}
                           editable={false}
                           style={{
                             fontSize: 14,
@@ -489,7 +491,7 @@ class NewOrderThird extends Component {
                                     color: '#fff',
                                   }}
                                   numberOfLines={1}>
-                                  {item.name}
+                                  {item.displayName}
                                 </Text>
                               </View>
                               <View
