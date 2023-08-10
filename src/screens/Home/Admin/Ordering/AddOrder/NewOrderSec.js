@@ -33,6 +33,7 @@ import {
   getInventoryListApi,
   getCasualListNewApi,
   lookupDepartmentsApi,
+  validateDeliveryDateApi,
 } from '../../../../../connectivity/api';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -163,10 +164,13 @@ class NewOrderSec extends Component {
 
   handleConfirmDelivery = date => {
     let newdate = moment(date).format('DD/MM/YYYY');
-    this.setState({
-      finalDeliveryDate: newdate,
-      productionDateDelivery: date,
-    });
+    this.setState(
+      {
+        finalDeliveryDate: newdate,
+        productionDateDelivery: date,
+      },
+      () => this.validateDateFun(),
+    );
 
     this.hideDatePickerDelivery();
   };
@@ -190,9 +194,19 @@ class NewOrderSec extends Component {
   };
 
   showDatePickerFunDelivery = () => {
-    this.setState({
-      isDatePickerVisibleDelivery: true,
-    });
+    const {supplierId} = this.state;
+
+    if (supplierId) {
+      this.setState({
+        isDatePickerVisibleDelivery: true,
+      });
+    } else {
+      Alert.alert('', translate('Please select supplier first'), [
+        {
+          text: translate('Ok'),
+        },
+      ]);
+    }
   };
 
   payloadValidation = () => {
@@ -256,6 +270,32 @@ class NewOrderSec extends Component {
       ]);
     }
   }
+
+  validateDateFun = () => {
+    const {supplierId, productionDateDelivery} = this.state;
+    console.log('supplierId', supplierId);
+    let payload = {};
+    console.log('productionDateDelivery', productionDateDelivery);
+    const finalDate = productionDateDelivery.toISOString();
+
+    validateDeliveryDateApi(payload, supplierId, finalDate)
+      .then(res => {
+        console.log('res-validateDateFun', res);
+      })
+      .catch(err => {
+        console.log('err', err);
+
+        // Alert.alert(
+        //   `Error - ${err.response.status}`,
+        //   'Something went wrong-1',
+        //   [
+        //     {
+        //       text: translate('Ok'),
+        //     },
+        //   ],
+        // );
+      });
+  };
 
   render() {
     const {

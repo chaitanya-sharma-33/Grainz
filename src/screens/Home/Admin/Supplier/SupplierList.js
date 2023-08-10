@@ -540,7 +540,6 @@ class SupplierList extends Component {
                         onPress={() => this.arrangeListFun('SUPPLIER')}
                         style={{
                           flex: 1,
-                          justifyContent: 'center',
                           alignItems: 'center',
                           flexDirection: 'row',
                         }}>
@@ -568,7 +567,6 @@ class SupplierList extends Component {
                         onPress={() => this.arrangeListFun('HTVA')}
                         style={{
                           flex: 1,
-                          justifyContent: 'center',
                           alignItems: 'center',
                           flexDirection: 'row',
                         }}>
@@ -627,7 +625,6 @@ class SupplierList extends Component {
                                   style={{
                                     flex: 1,
                                     justifyContent: 'center',
-                                    alignItems: 'center',
                                   }}>
                                   <Text
                                     style={{
@@ -642,7 +639,6 @@ class SupplierList extends Component {
                                   style={{
                                     flex: 1,
                                     justifyContent: 'center',
-                                    alignItems: 'center',
                                   }}>
                                   <Text
                                     style={{

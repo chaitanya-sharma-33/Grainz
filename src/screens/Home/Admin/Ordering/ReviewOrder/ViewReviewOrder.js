@@ -27,6 +27,8 @@ import {
   processPendingOrderApi,
   processPendingOrderItemApi,
   flagApi,
+  viewCreditNoteApi,
+  updateCreditNoteApi,
 } from '../../../../../connectivity/api';
 import styles from '../style';
 import {translate} from '../../../../../utils/translations';
@@ -56,6 +58,7 @@ class ViewReviewOrder extends Component {
       finalArrivalDate: '',
       apiArrivalDate: '',
       pageInvoiceNumber: '',
+      creditApprovedValue: '',
       pageDeliveryNoteReference: '',
       pageAmbientTemp: '',
       pageChilledTemp: '',
@@ -91,6 +94,8 @@ class ViewReviewOrder extends Component {
       listIndex: '',
       finalData: '',
       isFreemium: '',
+      creditRequested: '',
+      netValue: '',
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -732,36 +737,96 @@ class ViewReviewOrder extends Component {
 
   showEditModal = (item, index) => {
     console.log('ITEM', item);
-    this.setState({
-      modalData: item,
-      modalVisibleEditElement: true,
-      modalOrderedInventoryVolume: item.grainzVolume,
-      modalQuantityOrdered: item.quantityOrdered,
-      modalQuantityDelivered: item.quantityDelivered,
-      modalUserQuantityDelivered: item.userQuantityDelivered,
-      modalQuantityInvoiced: item.quantityInvoiced,
-      modalUserQuantityInvoiced: item.userQuantityInvoiced,
-      modalPricePaid: item.orderValue.toFixed(2),
-      modalNotes: item.notes,
-      finalArrivalDateSpecific:
-        item.arrivedDate && moment(item.arrivedDate).format('DD-MM-YYYY'),
-      apiArrivalDateSpecific: moment.utc(item.arrivedDate).format(),
-      volume: item.inventoryMapping
-        ? item.inventoryMapping.volume
-        : item.grainzVolume,
+    this.setState(
+      {
+        modalData: item,
+        modalVisibleEditElement: true,
+        modalOrderedInventoryVolume: item.grainzVolume,
+        modalQuantityOrdered: item.quantityOrdered,
+        modalQuantityDelivered: item.quantityDelivered,
+        modalUserQuantityDelivered: item.userQuantityDelivered,
+        modalQuantityInvoiced: item.quantityInvoiced,
+        modalUserQuantityInvoiced: item.userQuantityInvoiced,
+        modalPricePaid: item.orderValue.toFixed(2),
+        modalNotes: item.notes,
+        finalArrivalDateSpecific:
+          item.arrivedDate && moment(item.arrivedDate).format('DD-MM-YYYY'),
+        apiArrivalDateSpecific: moment.utc(item.arrivedDate).format(),
+        volume: item.inventoryMapping
+          ? item.inventoryMapping.volume
+          : item.grainzVolume,
 
-      packSize: item.inventoryMapping
-        ? item.inventoryMapping.packSize
-        : item.packSize,
-      unitPrizeModal: item.unitPrice,
-      inventoryName: item.inventoryName,
-      productName: item.productName,
-      productCode: item.productCode,
-      flagStatus: item.isFlagged,
-      orderValueExpected: item.orderValueExpected,
-      priceExpected: item.priceExpected,
-      priceActual: item.priceActual,
-      finalUnit: item.unit,
+        packSize: item.inventoryMapping
+          ? item.inventoryMapping.packSize
+          : item.packSize,
+        unitPrizeModal: item.unitPrice,
+        inventoryName: item.inventoryName,
+        productName: item.productName,
+        productCode: item.productCode,
+        flagStatus: item.isFlagged,
+        orderValueExpected: item.orderValueExpected,
+        priceExpected: item.priceExpected,
+        priceActual: item.priceActual,
+        finalUnit: item.unit,
+      },
+      () => this.getCreditNote(item.id),
+    );
+  };
+
+  getCreditNote = id => {
+    const {modalPricePaid} = this.state;
+    viewCreditNoteApi(id)
+      .then(res => {
+        const {data} = res;
+        this.setState({
+          creditRequested: data.requestedValue,
+          creditApprovedValue: data.creditValue,
+          netValue: (modalPricePaid - data.creditValue).toFixed(2),
+        });
+        // console.log('DATA1212121', data);
+      })
+      .catch(err => {
+        console.warn('ERr', err.response);
+      });
+  };
+
+  updateCreditNoteFun = () => {
+    const {modalNotes, modalData, creditApprovedValue} = this.state;
+    let payload = {};
+    // console.log('creditApprovedValue', creditApprovedValue);
+    // console.log('modalNotes', modalNotes);
+    // console.log('modalData', modalData.id);
+
+    updateCreditNoteApi(modalData.id, creditApprovedValue, modalNotes, payload)
+      .then(res => {
+        // console.log('res--> UPDATE CREDIT', res);
+        // this.setState({
+        //   loaderCompStatus: false,
+        //   modalVisibleEditElement: false,
+        // });
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-Credit',
+          [
+            {
+              text: translate('Ok'),
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ],
+        );
+      });
+  };
+
+  changeCreditRequestedFun = value => {
+    const {modalPricePaid} = this.state;
+
+    const finalPrice = parseFloat(modalPricePaid) - parseFloat(value);
+
+    this.setState({
+      creditApprovedValue: value,
+      netValue: finalPrice.toFixed(2),
     });
   };
 
@@ -826,6 +891,9 @@ class ViewReviewOrder extends Component {
       () =>
         setTimeout(() => {
           this.saveFunInventoryItemThird(flagStatus);
+          if (this.state.creditApprovedValue) {
+            this.updateCreditNoteFun();
+          }
         }, 300),
     );
   };
@@ -844,7 +912,9 @@ class ViewReviewOrder extends Component {
       modalNotes,
       totalValue,
       apiArrivalDateSpecific,
+      priceActual,
     } = this.state;
+    const finalPriceActual = priceActual && priceActual.split(' ')[0];
     let payload = {
       arrivedDate: apiArrivalDateSpecific,
       id: modalData.id,
@@ -854,9 +924,9 @@ class ViewReviewOrder extends Component {
       isCorrect: modalData.isCorrect,
       notes: modalNotes,
       orderId: modalData.orderId,
-      orderValue: totalValue,
+      orderValue: modalPricePaid,
       orderedInventoryVolume: modalOrderedInventoryVolume,
-      pricePaid: modalPricePaid,
+      pricePaid: finalPriceActual,
       quantityDelivered: Number(modalQuantityDelivered),
       quantityInvoiced: Number(modalQuantityInvoiced),
       quantityOrdered: modalQuantityOrdered,
@@ -1029,6 +1099,21 @@ class ViewReviewOrder extends Component {
         pageOrderItems: [...newArr],
         finalApiData: [...newArr],
       });
+    } else if (valueType === 'InvoicedQty') {
+      let newArr = pageOrderItems.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: finalValue,
+              ['action']: 'Update',
+            }
+          : item,
+      );
+
+      this.setState({
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      });
     } else if (valueType === 'DeliveredQty') {
       let newArr = pageOrderItems.map((item, i) =>
         index === i
@@ -1113,7 +1198,7 @@ class ViewReviewOrder extends Component {
         this.setState(
           {
             loaderCompStatus: false,
-            checklistModalStatus: false,
+            // checklistModalStatus: false,
           },
           () => this.navigateBackFun(),
         );
@@ -1130,9 +1215,9 @@ class ViewReviewOrder extends Component {
 
   navigateBackFun = () => {
     const {switchValueAll, isAuditStatus} = this.state;
-    if (switchValueAll && isAuditStatus) {
-      this.props.navigation.goBack();
-    }
+    // if (switchValueAll && isAuditStatus) {
+    this.props.navigation.goBack();
+    // }
   };
 
   requestCredtiNoteFun = () => {
@@ -1149,6 +1234,115 @@ class ViewReviewOrder extends Component {
           });
         }, 200),
     );
+  };
+
+  arrangeListFun = funType => {
+    console.log('funType', funType);
+    if (funType === 'Code') {
+      this.setState(
+        {
+          arrangeStatusCode: Number(1) + this.state.arrangeStatusCode,
+        },
+        () => this.arrangeListFunSec('Code'),
+      );
+    } else if (funType === 'Name') {
+      this.setState(
+        {
+          arrangeStatusName: Number(1) + this.state.arrangeStatusName,
+        },
+        () => this.arrangeListFunSec('Name'),
+      );
+    }
+  };
+
+  arrangeListFunSec = type => {
+    const {arrangeStatusCode, arrangeStatusName} = this.state;
+    const finalData =
+      type === 'Code'
+        ? arrangeStatusCode
+        : type === 'Name'
+        ? arrangeStatusName
+        : null;
+    if (finalData % 2 == 0) {
+      console.log('FINAL DATA', finalData);
+      this.reverseFun();
+    } else {
+      this.descendingOrderFun(type);
+    }
+  };
+
+  arrangeListFunSec = type => {
+    const {arrangeStatusCode, arrangeStatusName} = this.state;
+    const finalData =
+      type === 'Code'
+        ? arrangeStatusCode
+        : type === 'Name'
+        ? arrangeStatusName
+        : null;
+    if (finalData % 2 == 0) {
+      console.log('FINAL DATA', finalData);
+      this.reverseFun();
+    } else {
+      this.descendingOrderFun(type);
+    }
+  };
+
+  descendingOrderFun = type => {
+    const {pageOrderItems} = this.state;
+
+    if (type === 'Code') {
+      function dynamicSort(property) {
+        var sortOrder = 1;
+
+        if (property[0] === '-') {
+          sortOrder = -1;
+          property = property.substr(1);
+        }
+
+        return function (a, b) {
+          if (sortOrder == -1) {
+            return b[property].localeCompare(a[property]);
+          } else {
+            return a[property].localeCompare(b[property]);
+          }
+        };
+      }
+      const finalKeyValue = type === 'Code' ? 'code' : null;
+
+      const finalData = pageOrderItems.sort(dynamicSort(finalKeyValue));
+
+      this.setState({
+        deliveryPendingData: finalData,
+      });
+    } else {
+      function dynamicSort(property) {
+        var sortOrder = 1;
+        if (property[0] === '-') {
+          sortOrder = -1;
+          property = property.substr(1);
+        }
+        return function (a, b) {
+          var result =
+            a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0;
+          return result * sortOrder;
+        };
+      }
+      const finalKeyValue = type === 'Name' ? 'inventoryName' : null;
+      const finalData = pageOrderItems.sort(dynamicSort(finalKeyValue));
+
+      this.setState({
+        pageOrderItems: finalData,
+      });
+    }
+  };
+
+  reverseFun = () => {
+    const {pageOrderItems} = this.state;
+    const finalData = pageOrderItems.reverse();
+
+    this.setState({
+      pageOrderItems: finalData,
+    });
   };
 
   render() {
@@ -1209,6 +1403,9 @@ class ViewReviewOrder extends Component {
       orderValueExpected,
       isFreemium,
       finalUnit,
+      creditRequested,
+      creditApprovedValue,
+      netValue,
     } = this.state;
 
     console.log('pageData', pageData);
@@ -1927,6 +2124,75 @@ class ViewReviewOrder extends Component {
                 </View> */}
 
                 <View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      flex: 1,
+                      // backgroundColor: '#C9C9C9',
+                      backgroundColor: '#fff',
+                      paddingVertical: hp('2%'),
+                      borderTopLeftRadius: 5,
+                      borderTopRightRadius: 5,
+                      paddingHorizontal: wp('3%'),
+                      // borderWidth: 0.2,
+                      // borderColor: 'grey',
+                      marginTop: hp('2%'),
+                    }}>
+                    {/* <TouchableOpacity
+                        onPress={() => this.arrangeListFun('Code')}
+                        style={{
+                          flex: 1,
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                        }}>
+                        <Text
+                          style={{
+                            color: '#161C27',
+                            fontFamily: 'Inter-SemiBold',
+                            fontSize: 14,
+                          }}>
+                          {translate('Code')}
+                        </Text>
+                        <View>
+                          <Image
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                            }}
+                            source={img.doubleArrowIconNew}
+                          />
+                        </View>
+                      </TouchableOpacity> */}
+                    <TouchableOpacity
+                      onPress={() => this.arrangeListFun('Name')}
+                      style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                      }}>
+                      <Text
+                        style={{
+                          color: '#161C27',
+                          fontFamily: 'Inter-SemiBold',
+                          fontSize: 14,
+                        }}>
+                        {translate('Name')}
+                      </Text>
+                      <View>
+                        <Image
+                          style={{
+                            width: 15,
+                            height: 15,
+                            resizeMode: 'contain',
+                            marginLeft: 5,
+                          }}
+                          source={img.doubleArrowIconNew}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                   {/* <View
                       style={{
                         paddingVertical: 15,
@@ -4589,6 +4855,7 @@ class ViewReviewOrder extends Component {
                                 }}>
                                 <TextInput
                                   placeholder={translate('Order Value Ex-VAT')}
+                                  keyboardType="number-pad"
                                   style={{
                                     width: 80,
                                     marginTop: 5,
@@ -4675,6 +4942,167 @@ class ViewReviewOrder extends Component {
                               />
                             </View>
                           </View>
+
+                          {modalData.hasCreditNote > 0 ? (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                flex: 1,
+                                marginTop: hp('2%'),
+                              }}>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  padding: 8,
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                  }}>
+                                  {translate('_Credit Requested')}
+                                </Text>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <TextInput
+                                    placeholder={translate('_Credit Requested')}
+                                    keyboardType="numeric"
+                                    style={{
+                                      width: 80,
+                                      fontWeight: 'bold',
+                                      marginTop: 5,
+                                    }}
+                                    value={String(creditRequested)}
+                                    editable={false}
+                                  />
+                                  <Text
+                                    style={{
+                                      fontWeight: 'bold',
+                                      marginTop: 5,
+                                    }}>
+                                    €
+                                  </Text>
+                                </View>
+                              </View>
+
+                              <View
+                                style={{
+                                  flex: 0.3,
+                                }}></View>
+
+                              <View
+                                style={{
+                                  flex: 1,
+                                  backgroundColor: '#fff',
+                                  padding: 8,
+                                  borderRadius: 6,
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                  }}>
+                                  {translate('_Credit Approved Value')}
+                                </Text>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <TextInput
+                                    placeholder={translate(
+                                      '_Credit Approved Value',
+                                    )}
+                                    style={{
+                                      width: 80,
+                                      marginTop: 5,
+                                      fontWeight: 'bold',
+                                    }}
+                                    value={String(creditApprovedValue)}
+                                    onChangeText={value =>
+                                      this.changeCreditRequestedFun(value)
+                                    }
+                                  />
+                                  <Text
+                                    style={{
+                                      fontWeight: 'bold',
+                                      marginTop: 5,
+                                    }}>
+                                    €
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                          ) : null}
+
+                          {modalData.hasCreditNote > 0 ? (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                flex: 1,
+                                marginTop: hp('2%'),
+                                borderBottomWidth: 0.5,
+                                borderBottomColor: 'grey',
+                                paddingBottom: 15,
+                              }}>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  padding: 5,
+                                }}>
+                                {/* <Text
+                                style={{
+                                  fontSize: 12,
+                                }}>
+                                Price Expected
+                              </Text>
+                              <TextInput
+                                placeholder="Price Expected"
+                                style={{
+                                  width: 80,
+                                  fontWeight: 'bold',
+                                  marginTop: 5,
+                                }}
+                                value={priceExpected && String(priceExpected)}
+                                editable={false}
+                              /> */}
+                              </View>
+
+                              <View
+                                style={{
+                                  flex: 0.3,
+                                }}></View>
+
+                              <View
+                                style={{
+                                  flex: 1,
+                                  padding: 8,
+                                  // backgroundColor: '#fff',
+                                  // padding: 5,
+                                  // borderRadius: 6,
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                  }}>
+                                  {translate('_Net Value')}
+                                </Text>
+                                <TextInput
+                                  placeholder={translate('_Net Value')}
+                                  editable={false}
+                                  style={{
+                                    width: 80,
+                                    marginTop: 5,
+                                    fontWeight: 'bold',
+                                  }}
+                                  value={netValue && String(netValue) + ' Є '}
+                                />
+                              </View>
+                            </View>
+                          ) : null}
 
                           <TouchableOpacity
                             onPress={() =>

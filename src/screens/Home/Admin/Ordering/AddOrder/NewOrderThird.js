@@ -199,6 +199,8 @@ class NewOrderThird extends Component {
   render() {
     const {buttonsLoader, buttons, showMoreStatus, finalData} = this.state;
 
+    const trimmedName = finalData && finalData.supplierName.substring(0, 10);
+    console.log('trimmedName', trimmedName);
     return (
       <View style={styles.container}>
         <Header
@@ -265,7 +267,7 @@ class NewOrderThird extends Component {
                           marginTop: 10,
                         }}>
                         <TextInput
-                          value={finalData.supplierName}
+                          value={trimmedName}
                           numberOfLines={1}
                           editable={false}
                           style={{

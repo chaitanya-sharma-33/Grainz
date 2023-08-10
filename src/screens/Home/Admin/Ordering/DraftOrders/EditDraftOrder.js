@@ -36,7 +36,9 @@ import {
   deleteOrderApi,
   duplicateApi,
   validateUserApi,
+  checkStockApi,
   setDeliveryDateApi,
+  validateDeliveryDateApi,
 } from '../../../../../connectivity/api';
 import moment from 'moment';
 import styles from '../style';
@@ -98,8 +100,12 @@ class EditDraftOrder extends Component {
       totalHTVA: '',
       isFreemium: '',
       validateDateModalStatus: false,
+      stockStatus: false,
       validateData: '',
+      stockData: '',
       emailData: '',
+      validateDateData: '',
+      selectIndex: 0,
     };
   }
 
@@ -164,6 +170,36 @@ class EditDraftOrder extends Component {
           this.setState({
             validateDateModalStatus: true,
             validateData: res,
+            emailData: data,
+          });
+        }
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-1',
+          [
+            {
+              text: 'Okay',
+            },
+          ],
+        );
+      });
+  };
+
+  checkStockFun = data => {
+    const {basketId, supplierValue} = this.state;
+    let payload = {};
+    // console.log('payload->validateUserApi', payload);
+    checkStockApi(payload, basketId, supplierValue)
+      .then(res => {
+        console.log('res-checkStockFun', res);
+        if (res.data === '') {
+          this.optionFun(data, res);
+        } else {
+          this.setState({
+            stockStatus: true,
+            stockData: res,
             emailData: data,
           });
         }
@@ -252,8 +288,10 @@ class EditDraftOrder extends Component {
           this.setState(
             {
               loaderCompStatus: false,
+              // },
+              // () => this.validateDeliveryDateFun(res),
             },
-            () => this.validateDeliveryDateFun(res),
+            () => this.checkStockFun(res),
           );
         })
         .catch(err => {
@@ -279,8 +317,9 @@ class EditDraftOrder extends Component {
 
   optionFun = (data, res) => {
     const {channel} = this.state;
-    // console.log('CHANNEL', channel);
+    console.log('CHANNEL', channel);
     if (channel === 'Ftp') {
+      console.log('IF');
       this.setState(
         {
           toRecipientValue: data.data && data.data.emailDetails.toRecipient,
@@ -291,6 +330,7 @@ class EditDraftOrder extends Component {
         () => this.sendMailFun(),
       );
     } else {
+      console.log('ELSE');
       this.openMailModal(data);
     }
   };
@@ -632,7 +672,7 @@ class EditDraftOrder extends Component {
         finalDeliveryDate: newdate,
         apiDeliveryDate,
       },
-      () => this.setDeliveryDateFun(),
+      () => this.validateDateFun(),
     );
     this.hideDatePickerDeliveryDate();
   };
@@ -945,7 +985,9 @@ class EditDraftOrder extends Component {
             // editStatus: false,
             loaderCompStatus: false,
           },
-          () => this.getInventoryFun(),
+          () => this.props.navigation.goBack(),
+          // ,
+          // () => this.getInventoryFun(),
         );
       })
       .catch(err => {
@@ -984,6 +1026,7 @@ class EditDraftOrder extends Component {
       mailMessageValue,
       ccRecipientValue,
       mailTitleValue,
+      supplierValue,
     } = this.state;
     let payload = {
       emailDetails: {
@@ -993,6 +1036,8 @@ class EditDraftOrder extends Component {
         toRecipient: toRecipientValue,
       },
       shopingBasketId: basketId,
+      supplierId: supplierValue,
+      itemsToRemove: ['123229'],
     };
 
     sendOrderApi(payload)
@@ -1217,10 +1262,47 @@ class EditDraftOrder extends Component {
     this.props.navigation.navigate('DraftOrderAdminScreen');
   };
 
+  openDatePickerModal = res => {
+    this.setState({
+      validateDateStatus: true,
+      validateDateData: res.data,
+    });
+  };
+  validateDateFun = () => {
+    const {supplierValue, apiDeliveryDate} = this.state;
+    console.log('supplierValue', supplierValue);
+    let payload = {};
+    // console.log('apiDeliveryDate', apiDeliveryDate);
+    // console.log('basketId', basketId);
+
+    validateDeliveryDateApi(payload, supplierValue, apiDeliveryDate)
+      .then(res => {
+        console.log('res-validateDateFun', res);
+        console.log('res-validateDateFun', res.data);
+
+        if (res.data === '') {
+          this.setDeliveryDateFun();
+        } else {
+          this.openDatePickerModal(res);
+        }
+      })
+      .catch(err => {
+        // Alert.alert(
+        //   `Error - ${err.response.status}`,
+        //   'Something went wrong-1',
+        //   [
+        //     {
+        //       text: translate('Ok'),
+        //     },
+        //   ],
+        // );
+      });
+  };
+
   setDeliveryDateFun = () => {
     const {basketId, apiDeliveryDate} = this.state;
     let payload = {};
-    // console.log('apiDeliveryDate', apiDeliveryDate);
+    console.log('apiDeliveryDate', apiDeliveryDate);
     // console.log('basketId', basketId);
 
     setDeliveryDateApi(basketId, apiDeliveryDate, payload)
@@ -1238,6 +1320,35 @@ class EditDraftOrder extends Component {
           ],
         );
       });
+  };
+
+  updatedMailFun = () => {
+    const {emailData, stockData, channel} = this.state;
+
+    let finalArray =
+      stockData &&
+      stockData.data.stockDetails.map((item, index) => {
+        return item.code;
+      });
+
+    console.log('FINALARRRR', finalArray);
+    console.log('channel', channel);
+
+    if (channel === 'Ftp') {
+      this.setState(
+        {
+          toRecipientValue:
+            emailData.data && emailData.data.emailDetails.toRecipient,
+          ccRecipientValue:
+            emailData.data && emailData.data.emailDetails.ccRecipients,
+          mailTitleValue: emailData.data && emailData.data.emailDetails.subject,
+          mailMessageValue: emailData.data && emailData.data.emailDetails.text,
+        },
+        () => this.sendMailFun(finalArray),
+      );
+    } else {
+      this.openMailModal(emailData);
+    }
   };
 
   render() {
@@ -1284,12 +1395,17 @@ class EditDraftOrder extends Component {
       totalHTVA,
       isFreemium,
       validateDateModalStatus,
+      stockStatus,
       validateData,
+      stockData,
       emailData,
+      validateDateStatus,
+      validateDateData,
+      selectIndex,
     } = this.state;
 
     // console.log('finalData', finalData);
-    // console.log('validateData', validateData);
+    // console.log('stockData', stockData);
 
     return (
       <View style={styles.container}>
@@ -1972,9 +2088,10 @@ class EditDraftOrder extends Component {
                       style={{
                         marginHorizontal: wp('6%'),
                         marginBottom: 10,
-                        borderWidth: 1,
+                        // borderWidth: 1,
                         borderRadius: 6,
-                        borderColor: 'grey',
+                        // borderColor: 'grey',
+                        backgroundColor: '#fff',
                       }}>
                       {/* <View
                         style={{
@@ -2221,6 +2338,7 @@ class EditDraftOrder extends Component {
                               fontSize: 14,
                             }}>
                             {item.inventoryMapping &&
+                              item.inventoryMapping.price &&
                               item.inventoryMapping.price.toFixed(2)}{' '}
                             Є/
                             {item.inventoryMapping.productUnit}
@@ -3495,11 +3613,11 @@ class EditDraftOrder extends Component {
             </View>
           </Modal>
 
-          <Modal isVisible={validateDateModalStatus} backdropOpacity={0.35}>
+          <Modal isVisible={validateDateStatus} backdropOpacity={0.35}>
             <View
               style={{
                 width: wp('80%'),
-                height: hp('50%'),
+                height: hp('60%'),
                 backgroundColor: '#fff',
                 alignSelf: 'center',
                 borderRadius: 6,
@@ -3513,7 +3631,7 @@ class EditDraftOrder extends Component {
                           fontSize: 16,
                           fontWeight: 'bold',
                         }}>
-                        {validateData && validateData.data.header1}
+                        {translate('Delivery date warning')}
                       </Text>
                     </View>
                   </View>
@@ -3523,10 +3641,10 @@ class EditDraftOrder extends Component {
                         fontSize: 15,
                         color: 'black',
                       }}>
-                      {validateData && validateData.data.message}
+                      {validateDateData.message}
                     </Text>
                   </View>
-                  <View style={{marginTop: hp('2%')}}>
+                  {/* <View style={{marginTop: hp('2%')}}>
                     <Text
                       style={{
                         fontSize: 15,
@@ -3535,20 +3653,47 @@ class EditDraftOrder extends Component {
                       }}>
                       {validateData && validateData.data.header2}
                     </Text>
-                  </View>
-                  {validateData && validateData.data.parameters !== null ? (
+                  </View> */}
+                  {validateDateData &&
+                  validateDateData.datesAvailable !== null ? (
                     <View style={{marginTop: hp('2%')}}>
-                      {validateData &&
-                        validateData.data.parameters.map((item, index) => {
+                      {validateDateData &&
+                        validateDateData.datesAvailable.map((item, index) => {
                           return (
-                            <Text
+                            <TouchableOpacity
+                              onPress={() =>
+                                this.setState({
+                                  selectIndex: index,
+                                  apiDeliveryDate: item,
+                                  finalDeliveryDate:
+                                    moment(item).format('DD/MM/YYYY'),
+                                })
+                              }
                               style={{
-                                fontSize: 15,
-                                color: 'black',
-                                marginTop: 10,
+                                flexDirection: 'row',
+                                alignItems: 'center',
                               }}>
-                              {item}
-                            </Text>
+                              <View
+                                style={{
+                                  borderRadius: 50,
+                                  borderWidth: 0.5,
+                                  borderColor: 'grey',
+                                  padding: 8,
+                                  marginTop: 12,
+                                  backgroundColor:
+                                    index === selectIndex ? '#579BC3' : null,
+                                }}></View>
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  color: 'black',
+                                  marginTop: 12,
+                                  marginLeft: 10,
+                                  padding: 8,
+                                }}>
+                                {moment(item).format('DD/MM/YYYY')}
+                              </Text>
+                            </TouchableOpacity>
                           );
                         })}
                     </View>
@@ -3556,9 +3701,15 @@ class EditDraftOrder extends Component {
 
                   <TouchableOpacity
                     onPress={() =>
-                      this.setState({
-                        validateDateModalStatus: false,
-                      })
+                      this.setState(
+                        {
+                          validateDateStatus: false,
+                        },
+                        () =>
+                          setTimeout(() => {
+                            this.setDeliveryDateFun();
+                          }, 300),
+                      )
                     }
                     style={{
                       width: wp('70%'),
@@ -3577,45 +3728,194 @@ class EditDraftOrder extends Component {
                         fontSize: 14,
                         fontWeight: 'bold',
                       }}>
-                      {validateData && validateData.data.severity < 3
-                        ? translate('No')
-                        : translate('Ok')}
+                      {translate('Save')}
                     </Text>
                   </TouchableOpacity>
 
-                  {validateData && validateData.data.severity < 3 ? (
-                    <TouchableOpacity
-                      onPress={() =>
-                        this.setState(
-                          {
-                            validateDateModalStatus: false,
-                          },
-                          () =>
-                            setTimeout(() => {
-                              this.optionFun(emailData);
-                            }, 300),
-                        )
-                      }
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        validateDateStatus: false,
+                      })
+                    }
+                    style={{
+                      width: wp('90%'),
+                      height: hp('5%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('1%'),
+                    }}>
+                    <Text
                       style={{
-                        width: wp('90%'),
-                        height: hp('5%'),
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        borderRadius: 10,
-                        marginBottom: 5,
-                        alignSelf: 'center',
-                        marginTop: hp('1%'),
+                        color: '#5297c1',
+                        fontSize: 14,
+                        fontWeight: 'bold',
                       }}>
+                      {translate('Cancel')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </Modal>
+
+          <Modal isVisible={stockStatus} backdropOpacity={0.35}>
+            <View
+              style={{
+                width: wp('80%'),
+                height: hp('50%'),
+                backgroundColor: '#fff',
+                alignSelf: 'center',
+                borderRadius: 6,
+              }}>
+              <ScrollView>
+                <View style={{padding: hp('3%')}}>
+                  <View style={{}}>
+                    <View style={{}}>
                       <Text
                         style={{
-                          color: '#5297c1',
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: 'bold',
                         }}>
-                        {translate('Yes')}
+                        {translate('Current stock')}
                       </Text>
-                    </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                      }}>
+                      {stockData && stockData.data.message}
+                    </Text>
+                  </View>
+                  {/* <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        fontWeight: 'bold',
+                      }}>
+                      {validateData && validateData.data.header2}
+                    </Text>
+                  </View> */}
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        marginTop: 10,
+                      }}>
+                      {translate('Code')}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        marginTop: 10,
+                        marginLeft: 37,
+                      }}>
+                      {translate('Name')}
+                    </Text>
+                  </View>
+                  {stockData && stockData.data.stockDetails !== null ? (
+                    <View style={{marginTop: hp('2%')}}>
+                      {stockData &&
+                        stockData.data.stockDetails.map((item, index) => {
+                          return (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  color: 'black',
+                                  marginTop: 10,
+                                }}>
+                                {item.code}
+                              </Text>
+                              <Text
+                                numberOfLines={1}
+                                style={{
+                                  fontSize: 15,
+                                  color: 'black',
+                                  marginTop: 10,
+                                  marginLeft: 20,
+                                }}>
+                                {item.name}
+                              </Text>
+                            </View>
+                          );
+                        })}
+                    </View>
                   ) : null}
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState(
+                        {
+                          stockStatus: false,
+                        },
+                        () => this.updatedMailFun(),
+                      )
+                    }
+                    style={{
+                      width: wp('70%'),
+                      height: hp('5%'),
+                      backgroundColor: '#5297c1',
+                      borderRadius: 6,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('3%'),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Update')}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        stockStatus: false,
+                      })
+                    }
+                    style={{
+                      width: wp('90%'),
+                      height: hp('5%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('1%'),
+                    }}>
+                    <Text
+                      style={{
+                        color: '#5297c1',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Cancel')}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </ScrollView>
             </View>

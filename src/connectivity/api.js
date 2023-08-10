@@ -1932,6 +1932,43 @@ export const validateUserApi = async payload => {
   });
 };
 
+export const validateDeliveryDateApi = async (payload, supplierId, date) => {
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  const language = await AsyncStorage.getItem('Language');
+
+  return axios.post(
+    baseURL +
+      `/Order/validate delivery date?SupplierId=${supplierId}&DeliveryDate=${date}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        LocationId: location,
+        Language: language,
+      },
+    },
+  );
+};
+
+export const checkStockApi = async (payload, id, supplierId) => {
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  const language = await AsyncStorage.getItem('Language');
+
+  return axios.post(
+    baseURL + `/Order/check current stock?Id=${id}&SupplierId=${supplierId}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        LocationId: location,
+        Language: language,
+      },
+    },
+  );
+};
+
 export const flagApi = async (payload, id, status) => {
   const token = await AsyncStorage.getItem('@appToken');
   const location = await AsyncStorage.getItem('@location');

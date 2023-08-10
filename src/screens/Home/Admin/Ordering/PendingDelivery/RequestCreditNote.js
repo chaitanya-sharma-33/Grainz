@@ -233,13 +233,23 @@ export class RequestCreditNote extends Component {
     console.log('requestedPriceValue', requestedPriceValue);
 
     const Mainvalue = requestedPriceQty + 1;
+
+    console.log('requestedPriceValue', requestedPriceValue);
+    console.log('requestedPriceQty', requestedPriceQty);
+    console.log('mainPriceValue', mainPriceValue);
+
+    console.log('MAIN VALUE', Mainvalue);
     if (type === 'Minus') {
+      const finalRequestedPriceValue =
+        requestedPriceQty > 1
+          ? parseFloat(requestedPriceValue).toFixed(2) - mainPriceValue
+          : mainPriceValue;
       this.setState({
-        requestedPriceQty: parseInt(requestedPriceQty) - Number(1),
-        requestedPriceValue:
+        requestedPriceQty:
           requestedPriceQty > 1
-            ? parseFloat(requestedPriceValue).toFixed(2) - mainPriceValue
-            : mainPriceValue,
+            ? parseInt(requestedPriceQty) - Number(1)
+            : Number(1),
+        requestedPriceValue: finalRequestedPriceValue.toFixed(2),
       });
     } else if (type === 'Input') {
       this.setState({
@@ -250,12 +260,16 @@ export class RequestCreditNote extends Component {
             : mainPriceValue,
       });
     } else if (type === 'Add') {
+      const finalRequestedPriceValue =
+        requestedPriceQty > 0
+          ? parseFloat(mainPriceValue).toFixed(2) * Mainvalue
+          : mainPriceValue;
+
+      console.log('finalRequestedPriceValue-ADD', finalRequestedPriceValue);
+
       this.setState({
         requestedPriceQty: parseInt(requestedPriceQty) + Number(1),
-        requestedPriceValue:
-          requestedPriceQty > 0
-            ? parseFloat(mainPriceValue).toFixed(2) * Mainvalue
-            : mainPriceValue,
+        requestedPriceValue: finalRequestedPriceValue.toFixed(2),
       });
     }
   };

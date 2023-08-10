@@ -225,6 +225,7 @@
   "Delivered date": "Delivered date",
   "Invoice number": "Invoice number",
   "Invoice Number": "Invoice number",
+  "Number": "Number",
   "Frozen Temperature": "Frozen Temperature",
   "frozen temp is required": "frozen temp is required",
   "New Order": "New Order",
@@ -904,5 +905,6 @@
   "Supplier list": "Supplier list",
   "Please select supplier first": "Please select supplier first",
   "Thank you Your invitation has been sent We will take it from here": "Thank you. Your invitation has been sent. We will take it from here!",
-  "We will let you know when supplier's catalog has been uploaded after which you will be able to place orders": "We will let you know when supplier's catalog has been uploaded after which you will be able to place orders."
+  "We will let you know when supplier's catalog has been uploaded after which you will be able to place orders": "We will let you know when supplier's catalog has been uploaded after which you will be able to place orders.",
+  "Delivery date warning": "Delivery date warning"
 }

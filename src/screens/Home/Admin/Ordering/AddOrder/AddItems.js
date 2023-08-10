@@ -402,6 +402,7 @@ class AddItems extends Component {
   };
 
   editQuantityFun = (index, type, data, valueType, section, value) => {
+    console.log('1');
     this.setState(
       {
         inventoryId: data.id,
@@ -413,14 +414,24 @@ class AddItems extends Component {
   };
 
   editQuantityFunSec = (index, type, data, valueType, section, value) => {
+    console.log('2');
+
     // console.log('vaaaaa', value);
     if (valueType === 'add') {
+      console.log('3');
+
       this.editQuantityFunThird(index, type, data, valueType, section);
     } else if (valueType === 'minus') {
+      console.log('4');
+
       if (data.quantityProduct > 0) {
+        console.log('5');
+
         this.editQuantityFunThird(index, type, data, valueType, section);
       }
     } else if (valueType === 'input') {
+      console.log('6');
+
       this.editQuantityFunFourth(index, type, data, valueType, section, value);
     }
   };
@@ -615,7 +626,8 @@ class AddItems extends Component {
       const value = valueType === 'add' ? valueAdd : valueMinus;
       // console.log('value--> ', value);
 
-      const {screenType, SECTIONS, activeSections} = this.state;
+      const {screenType, SECTIONS, activeSections, SECTIONS_BACKUP} =
+        this.state;
       const deltaOriginal = Number(data.delta);
       const isSelectedValue = value !== '' && value > 0 ? true : false;
       const newDeltaVal =
@@ -653,6 +665,17 @@ class AddItems extends Component {
       );
 
       let LastArr = SECTIONS.map((item, i) =>
+        headerIndex === i
+          ? {
+              ...item,
+              ['content']: newArr,
+            }
+          : {
+              ...item,
+            },
+      );
+
+      let LastArrBackup = SECTIONS_BACKUP.map((item, i) =>
         headerIndex === i
           ? {
               ...item,
@@ -702,6 +725,7 @@ class AddItems extends Component {
 
       this.setState({
         SECTIONS: [...LastArr],
+        SECTIONS_BACKUP: [...LastArrBackup],
         finalBasketData: [...basketArr],
         draftStatus: false,
       });
@@ -760,7 +784,7 @@ class AddItems extends Component {
   };
 
   _renderContent = section => {
-    // console.log('sec', section);
+    console.log('sec', section);
     return (
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={{backgroundColor: '#fff', width: wp('87%')}}>
@@ -875,7 +899,7 @@ class AddItems extends Component {
                       marginLeft: wp('6%'),
                     }}>
                     <Text>
-                      {item.comparePrice} / {item.compareUnit}
+                      {item.comparePrice} € / {item.compareUnit}
                     </Text>
                   </View>
                   <View
@@ -1086,6 +1110,7 @@ class AddItems extends Component {
   };
 
   openModalFun = (item, section, index) => {
+    console.log('OPENMODAL');
     const priceFinal = item.price * item.packSize;
     const finalDiscountVal = priceFinal * (item.discount / 100);
 
@@ -1108,6 +1133,7 @@ class AddItems extends Component {
   };
 
   _updateSections = activeSections => {
+    console.log('ACTIVE SECTIONS', activeSections);
     this.setState({
       activeSections,
     });
@@ -1374,10 +1400,13 @@ class AddItems extends Component {
 
   navigateSubFun = item => {
     const {inventoryStatus, finalBasketData, supplierId} = this.state;
-    if (finalBasketData.length > 0) {
-      // console.log('addToBasketFunHorizontal-->');
-      this.addToBasketFunHorizontal();
-    }
+    // if (finalBasketData.length > 0) {
+    //   console.log(
+    //     'addToBasketFunHorizontal-->finalBasketData',
+    //     finalBasketData,
+    //   );
+    //   this.addToBasketFunHorizontal();
+    // }
     if (inventoryStatus) {
       const {
         SECTIONS,
@@ -1851,8 +1880,10 @@ class AddItems extends Component {
   };
 
   filterDataInventory = text => {
+    const {SECTIONS_BACKUP} = this.state;
     //passing the inserted text in textinput
-    const newData = this.state.SECTIONS_BACKUP.filter(function (item) {
+    const newData = SECTIONS_BACKUP.filter(function (item) {
+      console.log('SECTIONS_BACKUP', SECTIONS_BACKUP);
       //applying filter for the inserted text in search bar
       const itemData = item.title ? item.title.toUpperCase() : ''.toUpperCase();
       const textData = text.toUpperCase();
@@ -2346,10 +2377,11 @@ class AddItems extends Component {
     } = this.state;
 
     // console.log('PAGE DATA', pageData);
-    console.log('actionOpen', actionOpen);
-    console.log('draftStatus', draftStatus);
-    console.log('screenType', screenType);
-    console.log('basketID', basketId);
+    // console.log('actionOpen', actionOpen);
+    // console.log('draftStatus', draftStatus);
+    // console.log('screenType', screenType);
+    // console.log('basketID', basketId);
+    console.log('active Sessions', activeSections);
 
     return (
       <View style={styles.container}>
@@ -2688,13 +2720,13 @@ class AddItems extends Component {
                               <ActivityIndicator size="large" color="#5297c1" />
                             ) : (
                               <Accordion
-                                // expandMultiple
+                                expandMultiple
                                 underlayColor="#fff"
                                 sections={SECTIONS}
                                 activeSections={activeSections}
                                 renderHeader={this._renderHeader}
                                 renderContent={this._renderContent}
-                                onChange={this._updateSections}
+                                // onChange={this._updateSections}
                               />
                             )}
                           </View>

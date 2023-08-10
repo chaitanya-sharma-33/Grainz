@@ -39,6 +39,8 @@ import {
   lookupDepartmentsApi,
   validateUserApi,
   setDeliveryDateApi,
+  validateDeliveryDateApi,
+  checkStockApi,
 } from '../../../../../connectivity/api';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from 'react-native-modal';
@@ -107,6 +109,8 @@ class Basket extends Component {
       validateDateModalStatus: false,
       validateData: '',
       emailData: '',
+      validateDateData: '',
+      stockStatus: false,
     };
   }
 
@@ -476,7 +480,9 @@ class Basket extends Component {
             {
               loaderCompStatus: false,
             },
-            () => this.validateDeliveryDateFun(res),
+            () => this.checkStockFun(res),
+            // ,
+            // () => this.validateDeliveryDateFun(res),
           );
           // this.setState(
           //   {
@@ -510,6 +516,36 @@ class Basket extends Component {
         },
       ]);
     }
+  };
+
+  checkStockFun = data => {
+    const {basketId, supplierValue} = this.state;
+    let payload = {};
+    // console.log('payload->validateUserApi', payload);
+    checkStockApi(payload, basketId, supplierValue)
+      .then(res => {
+        console.log('res-checkStockFun', res);
+        if (res.data === '') {
+          this.optionFun(data, res);
+        } else {
+          this.setState({
+            stockStatus: true,
+            stockData: res,
+            emailData: data,
+          });
+        }
+      })
+      .catch(err => {
+        Alert.alert(
+          `Error - ${err.response.status}`,
+          'Something went wrong-1',
+          [
+            {
+              text: 'Okay',
+            },
+          ],
+        );
+      });
   };
 
   validateDeliveryDateFun = data => {
@@ -719,11 +755,11 @@ class Basket extends Component {
             {
               loaderCompStatus: false,
             },
-            // ,
-            // () =>
-            //   this.props.navigation.navigate('OrderingAdminScreen', {
-            //     item: '',
-            //   }),
+
+            () =>
+              this.props.navigation.navigate('OrderingAdminScreen', {
+                item: '',
+              }),
           );
         })
         .catch(err => {
@@ -925,7 +961,7 @@ class Basket extends Component {
         finalDeliveryDate: newdate,
         apiDeliveryDate,
       },
-      () => this.setDeliveryDateFun(),
+      () => this.validateDateFun(),
     );
     this.hideDatePickerDeliveryDate();
     // if (finalDeliveryDate < finalOrderDate) {
@@ -939,6 +975,44 @@ class Basket extends Component {
     //   });
     //   this.hideDatePickerDeliveryDate();
     // }
+  };
+
+  openDatePickerModal = res => {
+    this.setState({
+      validateDateStatus: true,
+      validateDateData: res.data,
+    });
+  };
+
+  validateDateFun = () => {
+    const {supplierValue, apiDeliveryDate} = this.state;
+    console.log('supplierValue', supplierValue);
+    let payload = {};
+    // console.log('apiDeliveryDate', apiDeliveryDate);
+    // console.log('basketId', basketId);
+
+    validateDeliveryDateApi(payload, supplierValue, apiDeliveryDate)
+      .then(res => {
+        console.log('res-validateDateFun', res);
+        console.log('res-validateDateFun', res.data);
+
+        if (res.data === '') {
+          this.setDeliveryDateFun();
+        } else {
+          this.openDatePickerModal(res);
+        }
+      })
+      .catch(err => {
+        // Alert.alert(
+        //   `Error - ${err.response.status}`,
+        //   'Something went wrong-1',
+        //   [
+        //     {
+        //       text: translate('Ok'),
+        //     },
+        //   ],
+        // );
+      });
   };
 
   setDeliveryDateFun = () => {
@@ -999,22 +1073,52 @@ class Basket extends Component {
       });
   };
 
-  sendMailFun = () => {
+  sendMailFun = finalArray => {
     this.setState(
       {
         loaderCompStatus: true,
       },
-      () => this.sendMailFunSec(),
+      () => this.sendMailFunSec(finalArray),
     );
   };
 
-  sendMailFunSec = () => {
+  updatedMailFun = () => {
+    const {emailData, stockData, finalDataSec} = this.state;
+
+    let finalArray =
+      stockData &&
+      stockData.data.stockDetails.map((item, index) => {
+        return item.code;
+      });
+
+    console.log('FINALARRRR', finalArray);
+    console.log('channel', finalDataSec);
+
+    if (finalDataSec.channel === 'Ftp') {
+      this.setState(
+        {
+          toRecipientValue:
+            emailData.data && emailData.data.emailDetails.toRecipient,
+          ccRecipientValue:
+            emailData.data && emailData.data.emailDetails.ccRecipients,
+          mailTitleValue: emailData.data && emailData.data.emailDetails.subject,
+          mailMessageValue: emailData.data && emailData.data.emailDetails.text,
+        },
+        () => this.sendMailFun(finalArray),
+      );
+    } else {
+      this.openMailModal(emailData);
+    }
+  };
+
+  sendMailFunSec = finalArray => {
     const {
       basketId,
       toRecipientValue,
       mailMessageValue,
       ccRecipientValue,
       mailTitleValue,
+      supplierValue,
     } = this.state;
     let payload = {
       emailDetails: {
@@ -1024,7 +1128,11 @@ class Basket extends Component {
         toRecipient: toRecipientValue,
       },
       shopingBasketId: basketId,
+      supplierId: supplierValue,
+      itemsToRemove: finalArray ? finalArray : null,
     };
+
+    console.log('PAYLOAD', payload);
 
     sendOrderApi(payload)
       .then(res => {
@@ -1040,6 +1148,7 @@ class Basket extends Component {
         );
       })
       .catch(err => {
+        console.log('err', err.response);
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
             text: translate('Ok'),
@@ -1334,6 +1443,11 @@ class Basket extends Component {
       validateDateModalStatus,
       emailData,
       validateData,
+      validateDateStatus,
+      validateDateData,
+      selectIndex,
+      stockStatus,
+      stockData,
     } = this.state;
 
     console.log('finalDataSec', finalDataSec);
@@ -2734,6 +2848,314 @@ class Basket extends Component {
             </View>
           )} */}
 
+          <Modal isVisible={validateDateStatus} backdropOpacity={0.35}>
+            <View
+              style={{
+                width: wp('80%'),
+                height: hp('60%'),
+                backgroundColor: '#fff',
+                alignSelf: 'center',
+                borderRadius: 6,
+              }}>
+              <ScrollView>
+                <View style={{padding: hp('3%')}}>
+                  <View style={{}}>
+                    <View style={{}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: 'bold',
+                        }}>
+                        {translate('Delivery date warning')}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                      }}>
+                      {validateDateData && validateDateData.message}
+                    </Text>
+                  </View>
+                  {/* <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        fontWeight: 'bold',
+                      }}>
+                      {validateData && validateData.data.header2}
+                    </Text>
+                  </View> */}
+                  {validateDateData &&
+                  validateDateData.datesAvailable !== null ? (
+                    <View style={{marginTop: hp('2%')}}>
+                      {validateDateData &&
+                        validateDateData.datesAvailable.map((item, index) => {
+                          return (
+                            <TouchableOpacity
+                              onPress={() =>
+                                this.setState({
+                                  selectIndex: index,
+                                  apiDeliveryDate: item,
+                                  finalDeliveryDate:
+                                    moment(item).format('DD/MM/YYYY'),
+                                })
+                              }
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}>
+                              <View
+                                style={{
+                                  borderRadius: 50,
+                                  borderWidth: 0.5,
+                                  borderColor: 'grey',
+                                  padding: 8,
+                                  marginTop: 12,
+                                  backgroundColor:
+                                    index === selectIndex ? '#579BC3' : null,
+                                }}></View>
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  color: 'black',
+                                  marginTop: 12,
+                                  marginLeft: 10,
+                                  padding: 8,
+                                }}>
+                                {moment(item).format('DD/MM/YYYY')}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                    </View>
+                  ) : null}
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState(
+                        {
+                          validateDateStatus: false,
+                        },
+                        () =>
+                          setTimeout(() => {
+                            this.setDeliveryDateFun();
+                          }, 300),
+                      )
+                    }
+                    style={{
+                      width: wp('70%'),
+                      height: hp('5%'),
+                      backgroundColor: '#5297c1',
+                      borderRadius: 6,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('3%'),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Save')}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        validateDateStatus: false,
+                      })
+                    }
+                    style={{
+                      width: wp('90%'),
+                      height: hp('5%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('1%'),
+                    }}>
+                    <Text
+                      style={{
+                        color: '#5297c1',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Cancel')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </Modal>
+
+          <Modal isVisible={stockStatus} backdropOpacity={0.35}>
+            <View
+              style={{
+                width: wp('80%'),
+                height: hp('50%'),
+                backgroundColor: '#fff',
+                alignSelf: 'center',
+                borderRadius: 6,
+              }}>
+              <ScrollView>
+                <View style={{padding: hp('3%')}}>
+                  <View style={{}}>
+                    <View style={{}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: 'bold',
+                        }}>
+                        {translate('Current stock')}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                      }}>
+                      {stockData && stockData.data.message}
+                    </Text>
+                  </View>
+                  {/* <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        fontWeight: 'bold',
+                      }}>
+                      {validateData && validateData.data.header2}
+                    </Text>
+                  </View> */}
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        marginTop: 10,
+                      }}>
+                      {translate('Code')}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        marginTop: 10,
+                        marginLeft: 20,
+                      }}>
+                      {translate('Name')}
+                    </Text>
+                  </View>
+                  {stockData && stockData.data.stockDetails !== null ? (
+                    <View style={{marginTop: hp('2%')}}>
+                      {stockData &&
+                        stockData.data.stockDetails.map((item, index) => {
+                          return (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  color: 'black',
+                                  marginTop: 10,
+                                }}>
+                                {item.code}
+                              </Text>
+                              <Text
+                                numberOfLines={1}
+                                style={{
+                                  fontSize: 15,
+                                  color: 'black',
+                                  marginTop: 10,
+                                  marginLeft: 20,
+                                }}>
+                                {item.name}
+                              </Text>
+                            </View>
+                          );
+                        })}
+                    </View>
+                  ) : null}
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState(
+                        {
+                          stockStatus: false,
+                        },
+                        () => this.updatedMailFun(),
+                      )
+                    }
+                    style={{
+                      width: wp('70%'),
+                      height: hp('5%'),
+                      backgroundColor: '#5297c1',
+                      borderRadius: 6,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('3%'),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Update')}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.setState({
+                        stockStatus: false,
+                      })
+                    }
+                    style={{
+                      width: wp('90%'),
+                      height: hp('5%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                      marginBottom: 5,
+                      alignSelf: 'center',
+                      marginTop: hp('1%'),
+                    }}>
+                    <Text
+                      style={{
+                        color: '#5297c1',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Cancel')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </Modal>
+
           <Modal isVisible={lineDetailsModalStatus} backdropOpacity={0.35}>
             <View
               style={{
@@ -3542,7 +3964,7 @@ class Basket extends Component {
             </View>
           </Modal>
 
-          <Modal isVisible={validateDateModalStatus} backdropOpacity={0.35}>
+          {/* <Modal isVisible={validateDateStatus} backdropOpacity={0.35}>
             <View
               style={{
                 width: wp('80%'),
@@ -3666,7 +4088,7 @@ class Basket extends Component {
                 </View>
               </ScrollView>
             </View>
-          </Modal>
+          </Modal> */}
         </ScrollView>
       </View>
     );

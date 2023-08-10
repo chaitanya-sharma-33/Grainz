@@ -225,6 +225,7 @@
   "Delivered Date": "Date de livraison",
   "Invoice number": "Numéro de facture",
   "Invoice Number": "Numéro de facture",
+  "Number": "Numéro",
   "Frozen Temperature": "T° surgelée",
   "frozen temp is required": "Température surgelée obligatoire",
   "New Order": "Nouveau",
@@ -983,5 +984,6 @@
   "Supplier list": "Liste des fournisseurs",
   "Please select supplier first": "Veuillez d'abord sélectionner le fournisseur",
   "Thank you Your invitation has been sent We will take it from here": "Merci. Votre invitation a été envoyée. Nous allons le prendre à partir d'ici!",
-  "We will let you know when supplier's catalog has been uploaded after which you will be able to place orders": "Nous vous informerons lorsque le catalogue du fournisseur aura été téléchargé, après quoi vous pourrez passer des commandes."
+  "We will let you know when supplier's catalog has been uploaded after which you will be able to place orders": "Nous vous informerons lorsque le catalogue du fournisseur aura été téléchargé, après quoi vous pourrez passer des commandes.",
+  "Delivery date warning": "Avertissement de date de livraison"
 }
