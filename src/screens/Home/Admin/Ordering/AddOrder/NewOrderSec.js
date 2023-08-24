@@ -34,6 +34,8 @@ import {
   getCasualListNewApi,
   lookupDepartmentsApi,
   validateDeliveryDateApi,
+  addBasketApi,
+  addDraftApi,
 } from '../../../../../connectivity/api';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -75,6 +77,11 @@ class NewOrderSec extends Component {
       customerNumber: '',
       channel: '',
       minTime: new Date(),
+      finalBasketData: [],
+      validateDateStatus: false,
+      validateDateData: '',
+      apiOrderDate: new Date().toISOString(),
+      apiDeliveryDate: '',
     };
   }
 
@@ -244,6 +251,7 @@ class NewOrderSec extends Component {
       placedByData,
       customerNumber,
       channel,
+      finalBasketData,
     } = this.state;
 
     let finalData = {
@@ -258,9 +266,102 @@ class NewOrderSec extends Component {
       channel,
     };
 
+    let payload = {
+      supplierId: supplierId,
+      shopingBasketItemList: finalBasketData,
+      customerNumber: finalData.customerNumber,
+      channel: finalData.channel,
+    };
+    console.log('Payload--> ADDITEMS', payload);
+    addBasketApi(payload)
+      .then(res => {
+        console.log('res', res);
+        this.setState(
+          {
+            firstBasketId: res.data && res.data.id,
+          },
+          () => this.AddDraftFun(),
+        );
+        console.log('res-->BASKET', res);
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: translate('Ok'),
+          },
+        ]);
+      });
+  }
+  AddDraftFun = () => {
+    const {
+      apiDeliveryDate,
+      apiOrderDate,
+      placedByValue,
+      supplierId,
+      firstBasketId,
+      finalApiData,
+      finalData,
+      customerNumber,
+      channel,
+    } = this.state;
+    let payload = {
+      id: firstBasketId,
+      supplierId: supplierId,
+      orderDate: apiOrderDate,
+      deliveryDate: apiDeliveryDate,
+      placedBy: '',
+      shopingBasketItemList: [],
+      customerNumber: customerNumber,
+      finalData: channel,
+    };
+
+    console.log('Payload--> ADD DRAFT', payload);
+    addDraftApi(payload)
+      .then(res => {
+        console.log('res->DRAFT', res);
+
+        this.createOrderSec();
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: translate('Ok'),
+            // onPress: () => this.closeLoaderComp(),
+          },
+        ]);
+      });
+  };
+
+  createOrderSec = () => {
+    const {
+      supplierName,
+      supplierId,
+      productionDateDelivery,
+      productionDateOrder,
+      finalDeliveryDate,
+      finalOrderDate,
+      placedByData,
+      customerNumber,
+      channel,
+      finalBasketData,
+      firstBasketId,
+    } = this.state;
+
+    let finalData = {
+      supplierName,
+      supplierId,
+      productionDateDelivery,
+      productionDateOrder,
+      finalDeliveryDate,
+      finalOrderDate,
+      placedByData,
+      customerNumber,
+      channel,
+    };
     if (finalDeliveryDate && supplierId) {
       this.props.navigation.navigate('NewOrderThirdScreen', {
         finalData,
+        firstBasketId,
       });
     } else {
       Alert.alert('', translate('Please select all values'), [
@@ -269,7 +370,7 @@ class NewOrderSec extends Component {
         },
       ]);
     }
-  }
+  };
 
   validateDateFun = () => {
     const {supplierId, productionDateDelivery} = this.state;
@@ -281,20 +382,21 @@ class NewOrderSec extends Component {
     validateDeliveryDateApi(payload, supplierId, finalDate)
       .then(res => {
         console.log('res-validateDateFun', res);
+
+        if (res.data !== '') {
+          this.openDatePickerModal(res);
+        }
       })
       .catch(err => {
         console.log('err', err);
-
-        // Alert.alert(
-        //   `Error - ${err.response.status}`,
-        //   'Something went wrong-1',
-        //   [
-        //     {
-        //       text: translate('Ok'),
-        //     },
-        //   ],
-        // );
       });
+  };
+
+  openDatePickerModal = res => {
+    this.setState({
+      validateDateStatus: true,
+      validateDateData: res.data,
+    });
   };
 
   render() {
@@ -314,6 +416,9 @@ class NewOrderSec extends Component {
       channel,
       productionDateOrder,
       minTime,
+      validateDateStatus,
+      validateDateData,
+      selectIndex,
     } = this.state;
 
     console.log('minTime', minTime);
@@ -573,6 +678,151 @@ class NewOrderSec extends Component {
             </View>
           </View>
         </ScrollView>
+
+        <Modal isVisible={validateDateStatus} backdropOpacity={0.35}>
+          <View
+            style={{
+              width: wp('80%'),
+              height: hp('60%'),
+              backgroundColor: '#fff',
+              alignSelf: 'center',
+              borderRadius: 6,
+            }}>
+            <ScrollView>
+              <View style={{padding: hp('3%')}}>
+                <View style={{}}>
+                  <View style={{}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('Delivery date warning')}
+                    </Text>
+                  </View>
+                </View>
+                <View style={{marginTop: hp('2%')}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: 'black',
+                    }}>
+                    {validateDateData && validateDateData.message}
+                  </Text>
+                </View>
+                {/* <View style={{marginTop: hp('2%')}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        fontWeight: 'bold',
+                      }}>
+                      {validateData && validateData.data.header2}
+                    </Text>
+                  </View> */}
+                {validateDateData &&
+                validateDateData.datesAvailable !== null ? (
+                  <View style={{marginTop: hp('2%')}}>
+                    {validateDateData &&
+                      validateDateData.datesAvailable.map((item, index) => {
+                        console.log('itm', item);
+                        return (
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.setState({
+                                selectIndex: index,
+                                productionDateDelivery: item,
+                                finalDeliveryDate:
+                                  moment(item).format('DD/MM/YYYY'),
+                              })
+                            }
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                            }}>
+                            <View
+                              style={{
+                                borderRadius: 50,
+                                borderWidth: 0.5,
+                                borderColor: 'grey',
+                                padding: 8,
+                                marginTop: 12,
+                                backgroundColor:
+                                  index === selectIndex ? '#579BC3' : null,
+                              }}></View>
+                            <Text
+                              style={{
+                                fontSize: 15,
+                                color: 'black',
+                                marginTop: 12,
+                                marginLeft: 10,
+                                padding: 8,
+                              }}>
+                              {moment(item).format('DD/MM/YYYY')}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                  </View>
+                ) : null}
+
+                <TouchableOpacity
+                  onPress={() =>
+                    this.setState({
+                      validateDateStatus: false,
+                    })
+                  }
+                  style={{
+                    width: wp('70%'),
+                    height: hp('5%'),
+                    backgroundColor: '#5297c1',
+                    borderRadius: 6,
+                    marginBottom: 5,
+                    alignSelf: 'center',
+                    marginTop: hp('3%'),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontSize: 14,
+                      fontWeight: 'bold',
+                    }}>
+                    {translate('Save')}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() =>
+                    this.setState({
+                      validateDateStatus: false,
+                    })
+                  }
+                  style={{
+                    width: wp('90%'),
+                    height: hp('5%'),
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 10,
+                    marginBottom: 5,
+                    alignSelf: 'center',
+                    marginTop: hp('1%'),
+                  }}>
+                  <Text
+                    style={{
+                      color: '#5297c1',
+                      fontSize: 14,
+                      fontWeight: 'bold',
+                    }}>
+                    {translate('Cancel')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </Modal>
+
         <View style={{}}>
           <View
             style={{

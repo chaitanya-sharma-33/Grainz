@@ -171,42 +171,46 @@ class Basket extends Component {
     this.getData();
     this.getUsersListData();
 
-    // this.props.navigation.addListener('focus', () => {
-    const {
-      finalData,
-      supplierId,
-      itemType,
-      productId,
-      supplierName,
-      finalDataSec,
-      basketId,
-    } = this.props.route && this.props.route.params;
-
-    this.setState(
-      {
+    this.props.navigation.addListener('focus', () => {
+      const {
+        finalData,
         supplierId,
         itemType,
-        basketId,
-        modalLoader: true,
-        finalOrderDate: moment(new Date()).format('DD-MM-YY'),
-        finalOrderMinDate: new Date(),
-        apiOrderDate: new Date().toISOString(),
         productId,
         supplierName,
         finalDataSec,
-        supplierValue: supplierId,
-        finalData,
-      },
-      () => this.getBasketDataFun(),
-    );
-    // });
+        basketId,
+        firstBasketId,
+      } = this.props.route && this.props.route.params;
+
+      this.setState(
+        {
+          supplierId,
+          itemType,
+          basketId: basketId ? basketId : firstBasketId,
+          modalLoader: true,
+          finalOrderDate: moment(new Date()).format('DD-MM-YY'),
+          finalOrderMinDate: new Date(),
+          apiOrderDate: new Date().toISOString(),
+          productId,
+          supplierName,
+          finalDataSec,
+          supplierValue: supplierId,
+          finalData,
+          firstBasketId,
+        },
+        () => this.getBasketDataFun(),
+      );
+    });
   }
 
   getBasketDataFun = () => {
-    const {basketId} = this.state;
+    const {basketId, firstBasketId} = this.state;
     console.log('basketId->BASKET', basketId);
 
-    getBasketApi(basketId)
+    const finalBaketId = basketId ? basketId : firstBasketId;
+
+    getBasketApi(finalBaketId)
       .then(res => {
         console.log('res->GetBasketId', res);
 
@@ -454,6 +458,7 @@ class Basket extends Component {
       apiDeliveryDate,
       totalHTVAVal,
       finalDataSec,
+      firstBasketId,
     } = this.state;
     if (
       apiOrderDate &&
@@ -463,7 +468,7 @@ class Basket extends Component {
       apiDeliveryDate
     ) {
       let payload = {
-        id: basketId,
+        id: basketId ? basketId : firstBasketId,
         supplierId: supplierId,
         orderDate: apiOrderDate,
         deliveryDate: apiDeliveryDate,
@@ -519,10 +524,11 @@ class Basket extends Component {
   };
 
   checkStockFun = data => {
-    const {basketId, supplierValue} = this.state;
+    const {basketId, supplierValue, firstBasketId} = this.state;
     let payload = {};
     // console.log('payload->validateUserApi', payload);
-    checkStockApi(payload, basketId, supplierValue)
+    const finalBaketId = basketId ? basketId : firstBasketId;
+    checkStockApi(payload, finalBaketId, supplierValue)
       .then(res => {
         console.log('res-checkStockFun', res);
         if (res.data === '') {
@@ -549,7 +555,7 @@ class Basket extends Component {
   };
 
   validateDeliveryDateFun = data => {
-    const {basketId} = this.state;
+    const {basketId, firstBasketId} = this.state;
     let payload = {
       emailDetails: {
         ccRecipients: data.data && data.data.emailDetails.ccRecipients,
@@ -557,7 +563,7 @@ class Basket extends Component {
         text: data.data && data.data.emailDetails.text,
         toRecipient: data.data && data.data.emailDetails.toRecipient,
       },
-      shopingBasketId: basketId,
+      shopingBasketId: basketId ? basketId : firstBasketId,
     };
     console.log('payload->validateUserApi', payload);
     validateUserApi(payload)
@@ -615,12 +621,12 @@ class Basket extends Component {
 
   sendOrderCheckFun = () => {
     // console.log('FTP');
-    const {finalDataSec, finalLanguage, basketId} = this.state;
+    const {finalDataSec, finalLanguage, basketId, firstBasketId} = this.state;
     if (finalDataSec.channel === 'Ftp') {
       // console.log('FTP-SEC');
 
       let payload = {
-        shopingBasketId: basketId,
+        shopingBasketId: basketId ? basketId : firstBasketId,
         lang: finalLanguage,
       };
 
@@ -685,7 +691,8 @@ class Basket extends Component {
   };
 
   hitDeleteApiFun = () => {
-    const {supplierId, basketId, finalArrData, finalDataSec} = this.state;
+    const {supplierId, basketId, finalArrData, finalDataSec, firstBasketId} =
+      this.state;
     // console.log(supplierId, basketId, finalArrData);
     let payload = {
       supplierId: supplierId,
@@ -702,7 +709,7 @@ class Basket extends Component {
           value: finalArrData.value,
         },
       ],
-      id: basketId,
+      id: basketId ? basketId : firstBasketId,
     };
 
     updateBasketApi(payload)
@@ -735,9 +742,10 @@ class Basket extends Component {
       modalData,
       totalHTVAVal,
       finalDataSec,
+      firstBasketId,
     } = this.state;
     let payload = {
-      id: basketId,
+      id: basketId ? basketId : firstBasketId,
       supplierId: supplierId,
       orderDate: apiOrderDate,
       deliveryDate: apiDeliveryDate,
@@ -826,9 +834,10 @@ class Basket extends Component {
       apiDeliveryDate,
       totalHTVAVal,
       finalDataSec,
+      firstBasketId,
     } = this.state;
     let payload = {
-      id: basketId,
+      id: basketId ? basketId : firstBasketId,
       supplierId: supplierId,
       orderDate: apiOrderDate,
       deliveryDate: apiDeliveryDate,
@@ -847,7 +856,8 @@ class Basket extends Component {
       apiDeliveryDate &&
       basketId &&
       finalApiData &&
-      supplierId
+      supplierId &&
+      firstBasketId
     ) {
       updateDraftOrderNewApi(payload)
         .then(res => {
@@ -876,11 +886,11 @@ class Basket extends Component {
   };
 
   viewFunSec = () => {
-    const {basketId} = this.state;
+    const {basketId, firstBasketId} = this.state;
 
-    console.log('basketId', basketId);
+    const finalBaketId = basketId ? basketId : firstBasketId;
 
-    viewHTMLApi(basketId)
+    viewHTMLApi(finalBaketId)
       .then(res => {
         console.log('res', res);
         this.setState(
@@ -908,6 +918,7 @@ class Basket extends Component {
       supplierId,
       finalApiData,
       apiDeliveryDate,
+      firstBasketId,
     } = this.state;
     this.props.navigation.navigate('PdfViewScreen', {
       htmlData: res.data,
@@ -915,7 +926,7 @@ class Basket extends Component {
       placedByValue,
       supplierId,
       finalApiData,
-      basketId,
+      basketId: basketId ? basketId : firstBasketId,
       apiDeliveryDate,
     });
   };
@@ -1016,12 +1027,14 @@ class Basket extends Component {
   };
 
   setDeliveryDateFun = () => {
-    const {basketId, apiDeliveryDate} = this.state;
+    const {basketId, apiDeliveryDate, firstBasketId} = this.state;
     let payload = {};
     console.log('apiDeliveryDate', apiDeliveryDate);
     console.log('basketId', basketId);
 
-    setDeliveryDateApi(basketId, apiDeliveryDate, payload)
+    const finalBaketId = basketId ? basketId : firstBasketId;
+
+    setDeliveryDateApi(finalBaketId, apiDeliveryDate, payload)
       .then(res => {
         console.log('res-DELIVERYDAATE', res);
       })
@@ -1045,11 +1058,12 @@ class Basket extends Component {
   };
 
   updateBasketFun = () => {
-    const {supplierId, basketId, modalData, finalDataSec} = this.state;
+    const {supplierId, basketId, modalData, finalDataSec, firstBasketId} =
+      this.state;
     let payload = {
       supplierId: supplierId,
       shopingBasketItemList: modalData,
-      id: basketId,
+      id: basketId ? basketId : firstBasketId,
       customerNumber: finalDataSec.customerNumber,
       channel: finalDataSec.channel,
     };
@@ -1119,6 +1133,7 @@ class Basket extends Component {
       ccRecipientValue,
       mailTitleValue,
       supplierValue,
+      firstBasketId,
     } = this.state;
     let payload = {
       emailDetails: {
@@ -1127,7 +1142,7 @@ class Basket extends Component {
         text: mailMessageValue,
         toRecipient: toRecipientValue,
       },
-      shopingBasketId: basketId,
+      shopingBasketId: basketId ? basketId : firstBasketId,
       supplierId: supplierValue,
       itemsToRemove: finalArray ? finalArray : null,
     };
@@ -1310,12 +1325,18 @@ class Basket extends Component {
   };
 
   onPressFun = item => {
-    const {supplierValue, placedByValue, basketId, finalDataSec} = this.state;
+    const {
+      supplierValue,
+      placedByValue,
+      basketId,
+      finalDataSec,
+      firstBasketId,
+    } = this.state;
     console.log('finalDataSec-->', finalDataSec);
     console.log('item-->', item);
 
     this.props.navigation.navigate('AddItemsOrderScreen', {
-      basketId: basketId,
+      basketId: basketId ? basketId : firstBasketId,
       supplierValue,
       departID: item.id,
       departName: item.displayName,
@@ -1382,13 +1403,19 @@ class Basket extends Component {
   };
 
   goBackFun = () => {
-    const {supplierValue, placedByValue, basketId, finalDataSec, finalData} =
-      this.state;
+    const {
+      supplierValue,
+      placedByValue,
+      basketId,
+      finalDataSec,
+      finalData,
+      firstBasketId,
+    } = this.state;
     console.log('finalDataSec-->', finalDataSec);
     console.log('finalData-->', finalData);
 
     this.props.navigation.navigate('AddItemsOrderScreen', {
-      basketId: basketId,
+      basketId: basketId ? basketId : firstBasketId,
       supplierValue,
       // departID: item.id,
       // departName: item.name,
@@ -2221,7 +2248,9 @@ class Basket extends Component {
                               fontWeight: 'bold',
                             }}>
                             {item.inventoryMapping &&
-                              item.inventoryMapping.price.toFixed(2)}{' '}
+                              Number(item.inventoryMapping.price).toFixed(
+                                2,
+                              )}{' '}
                             Є/
                             {item.inventoryMapping.productUnit}
                           </Text>

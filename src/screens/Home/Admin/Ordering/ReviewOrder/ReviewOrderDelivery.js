@@ -131,41 +131,44 @@ class ReviewOrderDelivery extends Component {
   };
 
   async componentDidMount() {
-    // this.props.navigation.addListener('focus', () => {
-    const {route} = this.props;
-    const finalData = route.params.finalData;
-    const finalArrivedDate = route.params.finalArrivedDate;
-    const pageOrderItems = route.params.pageOrderItems;
-    this.setState({
-      finalData,
-      finalOrderDate: moment(finalData.orderDate).format('DD/MM/YYYY'),
-      productionDateOrder: moment.utc(finalData.orderDate).format(),
-      finalDeliveryDate: moment(finalData.deliveryDate).format('DD/MM/YYYY'),
-      productionDateDelivery: moment.utc(finalData.deliveryDate).format(),
-      productionDateArrived: moment.utc(finalData.deliveredDate).format(),
-      deliveryReference: finalData.orderReference,
-      pageAmbientTemp: finalData.ambientTemp
-        ? finalData.ambientTemp.toString()
-        : '',
-      pageChilledTemp: finalData.chilledTemp
-        ? finalData.chilledTemp.toString()
-        : '',
-      pageFrozenTemp: finalData.frozenTemp
-        ? finalData.frozenTemp.toString()
-        : '',
-      pageNotes: finalData.notes,
-      finalArrivedDate:
-        finalData.deliveredDate &&
-        moment(finalData.deliveredDate).format('DD/MM/YYYY'),
-      itemId: finalData.id,
-      invoiceNumber: finalData.invoiceNumber,
-      pageOrderItems,
-      placedBy: finalData.placedBy,
-    });
-    this.getProfileDataFun();
-    this.getImageFun(finalData.id);
+    this.props.navigation.addListener('focus', () => {
+      const {route} = this.props;
+      const finalData = route.params.finalData;
+      console.log('finalData', finalData);
 
-    // });
+      const finalArrivedDate = route.params.finalArrivedDate;
+      const pageOrderItems = route.params.pageOrderItems;
+      const pageDetailsData = route.params.pageDetailsData;
+      this.setState({
+        pageDetailsData,
+        finalData,
+        finalOrderDate: moment(finalData.orderDate).format('DD/MM/YYYY'),
+        productionDateOrder: moment.utc(finalData.orderDate).format(),
+        finalDeliveryDate: moment(finalData.deliveryDate).format('DD/MM/YYYY'),
+        productionDateDelivery: moment.utc(finalData.deliveryDate).format(),
+        productionDateArrived: moment.utc(finalData.deliveredDate).format(),
+        deliveryReference: pageDetailsData && pageDetailsData.orderReference,
+        pageAmbientTemp: pageDetailsData.ambientTemp
+          ? pageDetailsData && pageDetailsData.ambientTemp.toString()
+          : '',
+        pageChilledTemp: pageDetailsData.chilledTemp
+          ? pageDetailsData && pageDetailsData.chilledTemp.toString()
+          : '',
+        pageFrozenTemp: pageDetailsData.frozenTemp
+          ? pageDetailsData && pageDetailsData.frozenTemp.toString()
+          : '',
+        pageNotes: pageDetailsData && pageDetailsData.notes,
+        finalArrivedDate:
+          finalData.deliveredDate &&
+          moment(finalData.deliveredDate).format('DD/MM/YYYY'),
+        itemId: finalData.id,
+        invoiceNumber: pageDetailsData && pageDetailsData.invoiceNumber,
+        pageOrderItems,
+        placedBy: finalData.placedBy,
+      });
+      this.getProfileDataFun();
+      this.getImageFun(finalData.id);
+    });
   }
 
   myProfileFun = () => {
@@ -299,7 +302,8 @@ class ReviewOrderDelivery extends Component {
       orderItems: pageOrderItems,
       orderReference: deliveryReference,
       placedBy: placedBy,
-      isChecked: false,
+      isChecked: true,
+      isAuditComplete: false,
     };
 
     console.log('PAYLOAD----->PROCESS ORDER', payload);
@@ -346,7 +350,7 @@ class ReviewOrderDelivery extends Component {
           {
             loaderCompStatus: false,
           },
-          () => this.props.navigation.navigate('PendingDeliveryAdminScreen'),
+          () => this.props.navigation.goBack(),
         );
       })
       .catch(err => {

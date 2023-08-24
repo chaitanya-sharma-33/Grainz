@@ -95,7 +95,10 @@ const AppNav = createStackNavigator();
 
 export default function AppNavFun() {
   return (
-    <AppNav.Navigator headerMode="none" initialRouteName="HomeScreen">
+    <AppNav.Navigator
+      headerMode="none"
+      initialRouteName="HomeScreen"
+      screenOptions={{gestureEnabled: false}}>
       <AppNav.Screen name="HomeScreen" component={HomeScreen} />
       <AppNav.Screen name="DashboardScreen" component={DashboardScreen} />
       <AppNav.Screen

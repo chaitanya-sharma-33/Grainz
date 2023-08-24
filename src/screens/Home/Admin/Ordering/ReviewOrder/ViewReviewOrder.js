@@ -76,6 +76,7 @@ class ViewReviewOrder extends Component {
       modalUserQuantityDelivered: '',
       modalQuantityInvoiced: '',
       modalUserQuantityInvoiced: '',
+      saveStatus: false,
       modalPricePaid: '',
       switchValueAll: false,
       flagStatus: false,
@@ -96,6 +97,8 @@ class ViewReviewOrder extends Component {
       isFreemium: '',
       creditRequested: '',
       netValue: '',
+      arrangeStatusName: 0,
+      arrangeStatusCode: 0,
       choicesProp: [
         {
           choiceCode: 'Y',
@@ -177,7 +180,16 @@ class ViewReviewOrder extends Component {
     getOrderByIdApi(productId)
       .then(res => {
         const {data} = res;
-        console.log('data', data);
+        console.log('data-->', data);
+
+        let finalOrderData = data.orderItems.map((item, index) => {
+          return {
+            ...item,
+            checklistModalHideStatus: false,
+          };
+        });
+
+        console.log('finalOrderData', finalOrderData);
         this.setState(
           {
             pageData: data,
@@ -189,12 +201,13 @@ class ViewReviewOrder extends Component {
             pageFrozenTemp: data.frozenTemp,
             pageNotes: data.notes,
             apiDeliveryDate: data.deliveryDate,
-            pageOrderItems: data.orderItems,
+            pageOrderItems: finalOrderData,
             apiArrivalDate: data.deliveredDate,
             emailDetails: data.emailDetails,
             finalArrivalDate: moment(data.deliveredDate).format('DD-MM-YYYY'),
             loaderCompStatus: false,
             totalValue: data.htva.toFixed(2),
+            pageDetailsData: res.data,
           },
           () => this.createFinalData(),
         );
@@ -298,7 +311,7 @@ class ViewReviewOrder extends Component {
       orderItems: finalApiData,
       orderReference: pageData.orderReference,
       placedBy: pageData.placedByNAme,
-      isChecked: switchValueAll,
+      isChecked: true,
     };
 
     processPendingOrderApi(payload)
@@ -567,36 +580,23 @@ class ViewReviewOrder extends Component {
       userQuantityInvoiced: item.userQuantityInvoiced,
       isFlagged: item.isFlagged,
     };
-    if (item.arrivedDate) {
-      processPendingOrderItemApi(payload)
-        .then(res => {
-          this.setState(
-            {
-              loaderCompStatus: false,
-            },
-            () => this.getOrderFun(),
-          );
-        })
-        .catch(err => {
-          Alert.alert(
-            `Error - ${err.response.status}`,
-            'Something went wrong',
-            [
-              {
-                text: 'Okay',
-                onPress: () => this.props.navigation.goBack(),
-              },
-            ],
-          );
-        });
-    } else {
-      Alert.alert(`Grainz`, 'Kildly fill arrived date first', [
-        {
-          text: 'Okay',
-          onPress: () => this.closeLoader(),
-        },
-      ]);
-    }
+    processPendingOrderItemApi(payload)
+      .then(res => {
+        this.setState(
+          {
+            loaderCompStatus: false,
+          },
+          () => this.getOrderFun(),
+        );
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: translate('Ok'),
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
   };
 
   closeLoader = () => {
@@ -1072,18 +1072,29 @@ class ViewReviewOrder extends Component {
   editChecklistFun = (index, type, value, data, valueType) => {
     const {pageOrderItems} = this.state;
 
-    console.log('data', data);
+    // console.log('data', data);
 
     const finalValue = value;
     const volume = data.inventoryMapping && data.inventoryMapping.volume;
     const modalQuantityOrdered = data.quantityOrdered;
     const finalValueSec = value * volume;
+    const packSize = data.inventoryMapping
+      ? data.inventoryMapping.packSize
+      : data.packSize;
 
     const finalValueThird =
       (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered;
+    const unitPrizeModal = data.unitPrice;
 
-    console.log('finalValue', finalValue);
+    const finalChecklist = !data.checklistModalHideStatus;
 
+    console.log('finalChecklist', finalChecklist);
+
+    const finalValueFourth = value * volume;
+    const finalValueFifth =
+      (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered;
+
+    const finalPriceInvoiced = (value * packSize * unitPrizeModal).toFixed(2);
     if (valueType === 'DeliveredNo') {
       let newArr = pageOrderItems.map((item, i) =>
         index === i
@@ -1099,12 +1110,64 @@ class ViewReviewOrder extends Component {
         pageOrderItems: [...newArr],
         finalApiData: [...newArr],
       });
+    } else if (valueType === 'DeliveredQuantity') {
+      let newArr = pageOrderItems.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: finalValue,
+              ['action']: 'Update',
+              ['quantityDelivered']: finalValueThird,
+            }
+          : item,
+      );
+
+      this.setState({
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      });
+    } else if (valueType === 'InvoicedNo') {
+      let newArr = pageOrderItems.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: finalValue,
+              ['action']: 'Update',
+              ['userQuantityInvoiced']: finalValueFourth,
+              ['orderValue']: finalPriceInvoiced,
+            }
+          : item,
+      );
+
+      this.setState({
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      });
     } else if (valueType === 'InvoicedQty') {
       let newArr = pageOrderItems.map((item, i) =>
         index === i
           ? {
               ...item,
               [type]: finalValue,
+              ['action']: 'Update',
+              ['quantityInvoiced']: finalValueFifth,
+            }
+          : item,
+      );
+
+      this.setState({
+        pageOrderItems: [...newArr],
+        finalApiData: [...newArr],
+      });
+    } else if (valueType === 'value') {
+      console.log('ORDER VALYE', valueType);
+      console.log('finalValue', finalValue);
+
+      let newArr = pageOrderItems.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              ['orderValue']: finalValue,
               ['action']: 'Update',
             }
           : item,
@@ -1114,31 +1177,18 @@ class ViewReviewOrder extends Component {
         pageOrderItems: [...newArr],
         finalApiData: [...newArr],
       });
-    } else if (valueType === 'DeliveredQty') {
+    } else if (valueType === 'checklist') {
+      console.log('finalChecklist', finalChecklist);
       let newArr = pageOrderItems.map((item, i) =>
         index === i
           ? {
               ...item,
-              [type]: finalValue,
-              ['quantityDelivered']: finalValueThird,
+              [type]: finalChecklist,
               ['action']: 'Update',
             }
           : item,
       );
-      this.setState({
-        pageOrderItems: [...newArr],
-        finalApiData: [...newArr],
-      });
-    } else if (valueType === 'Qty') {
-      let newArr = pageOrderItems.map((item, i) =>
-        index === i
-          ? {
-              ...item,
-              [type]: finalValue,
-              ['action']: 'Update',
-            }
-          : item,
-      );
+
       this.setState({
         pageOrderItems: [...newArr],
         finalApiData: [...newArr],
@@ -1188,7 +1238,8 @@ class ViewReviewOrder extends Component {
       orderItems: finalApiData,
       orderReference: pageData.orderReference,
       placedBy: pageData.placedByNAme,
-      isChecked: switchValueAll,
+      // isChecked: switchValueAll,
+      isChecked: true,
     };
 
     console.log('PAYLOAD----->PRO', payload);
@@ -1214,10 +1265,12 @@ class ViewReviewOrder extends Component {
   };
 
   navigateBackFun = () => {
-    const {switchValueAll, isAuditStatus} = this.state;
-    // if (switchValueAll && isAuditStatus) {
-    this.props.navigation.goBack();
-    // }
+    const {switchValueAll, isAuditStatus, saveStatus} = this.state;
+    if (switchValueAll && isAuditStatus) {
+      this.props.navigation.goBack();
+    } else if (saveStatus) {
+      this.props.navigation.goBack();
+    }
   };
 
   requestCredtiNoteFun = () => {
@@ -1256,22 +1309,7 @@ class ViewReviewOrder extends Component {
   };
 
   arrangeListFunSec = type => {
-    const {arrangeStatusCode, arrangeStatusName} = this.state;
-    const finalData =
-      type === 'Code'
-        ? arrangeStatusCode
-        : type === 'Name'
-        ? arrangeStatusName
-        : null;
-    if (finalData % 2 == 0) {
-      console.log('FINAL DATA', finalData);
-      this.reverseFun();
-    } else {
-      this.descendingOrderFun(type);
-    }
-  };
-
-  arrangeListFunSec = type => {
+    console.log('type', type);
     const {arrangeStatusCode, arrangeStatusName} = this.state;
     const finalData =
       type === 'Code'
@@ -1329,6 +1367,7 @@ class ViewReviewOrder extends Component {
       }
       const finalKeyValue = type === 'Name' ? 'inventoryName' : null;
       const finalData = pageOrderItems.sort(dynamicSort(finalKeyValue));
+      console.log('FINALDATA', finalData);
 
       this.setState({
         pageOrderItems: finalData,
@@ -1406,6 +1445,9 @@ class ViewReviewOrder extends Component {
       creditRequested,
       creditApprovedValue,
       netValue,
+      finalArrivedDate,
+      pageDetailsData,
+      saveStatus,
     } = this.state;
 
     console.log('pageData', pageData);
@@ -1482,7 +1524,12 @@ class ViewReviewOrder extends Component {
                         onPress={() =>
                           this.props.navigation.navigate(
                             'ReviewOrderDeliveryScreen',
-                            {finalData: finalData, pageOrderItems},
+                            {
+                              finalData: finalData,
+                              finalArrivedDate,
+                              pageOrderItems,
+                              pageDetailsData,
+                            },
                           )
                         }
                         style={{
@@ -2522,7 +2569,7 @@ class ViewReviewOrder extends Component {
                                       fontWeight: 'bold',
                                     }}>
                                     {/* {item.value.toFixed(2)} */}
-                                    {item.orderValue.toFixed(2)} €
+                                    {Number(item.orderValue).toFixed(2)} €
                                   </Text>
                                 </View>
 
@@ -3577,7 +3624,14 @@ class ViewReviewOrder extends Component {
                 </TouchableOpacity> */}
 
                 <TouchableOpacity
-                  onPress={() => this.processOrderFun()}
+                  onPress={() =>
+                    this.setState(
+                      {
+                        saveStatus: true,
+                      },
+                      () => this.processOrderFun(),
+                    )
+                  }
                   style={{
                     height: hp('7%'),
                     width: wp('87%'),
@@ -4099,7 +4153,55 @@ class ViewReviewOrder extends Component {
                           </Text>
                         </View>
                       </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={() => this.arrangeListFun('Name')}
+                        style={{
+                          flex: 1,
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          marginHorizontal: wp('8%'),
+                          marginTop: hp('2%'),
+                          backgroundColor: '#fff',
+                          padding: 10,
+                        }}>
+                        <Text
+                          style={{
+                            color: '#161C27',
+                            fontFamily: 'Inter-SemiBold',
+                            fontSize: 14,
+                          }}>
+                          {translate('Name')}
+                        </Text>
+                        <View>
+                          <Image
+                            style={{
+                              width: 15,
+                              height: 15,
+                              resizeMode: 'contain',
+                              marginLeft: 5,
+                            }}
+                            source={img.doubleArrowIconNew}
+                          />
+                        </View>
+                      </TouchableOpacity>
                       {pageOrderItems.map((item, index) => {
+                        console.log('ITEMMMMMMMMMM', item);
+                        const modalQuantityOrdered = item.quantityOrdered;
+                        const volume = item.inventoryMapping
+                          ? item.inventoryMapping.volume
+                          : item.grainzVolume;
+                        const modalQuantityDelivered =
+                          item.quantityDelivered.toFixed(2);
+                        const modalUserQuantityDelivered =
+                          item.userQuantityDelivered;
+                        const modalQuantityInvoiced =
+                          item.quantityInvoiced.toFixed(2);
+                        const modalUserQuantityInvoiced =
+                          item.userQuantityInvoiced;
+                        const modalPricePaid = Number(item.orderValue).toFixed(
+                          2,
+                        );
                         return (
                           <View
                             style={{
@@ -4116,10 +4218,7 @@ class ViewReviewOrder extends Component {
                                   alignItems: 'center',
                                   flex: 1,
                                 }}>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                  }}>
+                                <View style={{flex: 1}}>
                                   <Text
                                     style={{
                                       fontSize: 15,
@@ -4128,6 +4227,50 @@ class ViewReviewOrder extends Component {
                                     }}>
                                     {item.inventoryName}
                                   </Text>
+                                </View>
+
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-end',
+                                  }}>
+                                  <Text
+                                    style={{
+                                      marginRight: 10,
+                                    }}>
+                                    {translate('Correct')}
+                                  </Text>
+                                  <Switch
+                                    thumbColor={'#fff'}
+                                    trackColor={{
+                                      false: 'grey',
+                                      true: '#5197C1',
+                                    }}
+                                    ios_backgroundColor="white"
+                                    onValueChange={value =>
+                                      this.checkSingleItemFun(
+                                        item,
+                                        value,
+                                        index,
+                                      )
+                                    }
+                                    value={item.isCorrect}
+                                  />
+                                </View>
+                              </View>
+
+                              <View
+                                style={{
+                                  flex: 1,
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                  }}>
                                   {isFreemium === 'false' ? (
                                     <Text
                                       style={{
@@ -4139,64 +4282,91 @@ class ViewReviewOrder extends Component {
                                     </Text>
                                   ) : null}
                                 </View>
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    this.flagFunctionChecklist(item)
+                                  }
+                                  style={{
+                                    flex: 1,
+                                    alignItems: 'flex-end',
+                                    marginRight: 10,
+                                  }}>
+                                  <Image
+                                    source={img.flagIcon}
+                                    style={{
+                                      width: 25,
+                                      height: 25,
+                                      resizeMode: 'contain',
+                                      tintColor:
+                                        item.isFlagged === false
+                                          ? 'grey'
+                                          : null,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                              </View>
+
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  flex: 1,
+                                  marginTop: hp('2%'),
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 0.8,
+                                  }}>
+                                  {/* <Text
+                                    style={{
+                                      fontSize: 14,
+                                    }}>
+                                    {translate('Order')}
+                                  </Text> */}
+                                </View>
+
                                 <View
                                   style={{
                                     flex: 1,
                                   }}>
-                                  <View
+                                  <Text
                                     style={{
-                                      flex: 1,
-                                      flexDirection: 'row',
-                                      alignItems: 'center',
-                                      justifyContent: 'flex-end',
+                                      fontSize: 14,
                                     }}>
-                                    <Text
-                                      style={{
-                                        marginRight: 10,
-                                      }}>
-                                      {translate('Correct')}
-                                    </Text>
-                                    <Switch
-                                      thumbColor={'#fff'}
-                                      trackColor={{
-                                        false: 'grey',
-                                        true: '#5197C1',
-                                      }}
-                                      ios_backgroundColor="white"
-                                      onValueChange={value =>
-                                        this.checkSingleItemFun(
-                                          item,
-                                          value,
-                                          index,
-                                        )
-                                      }
-                                      value={item.isCorrect}
-                                    />
-                                  </View>
+                                    {translate('Number')}
+                                  </Text>
                                 </View>
                                 <View
                                   style={{
-                                    flex: 0.5,
-                                    alignItems: 'flex-end',
+                                    flex: 1.5,
+                                    marginLeft: 2,
                                   }}>
-                                  <TouchableOpacity
-                                    onPress={() =>
-                                      this.flagFunctionChecklist(item)
+                                  <Text
+                                    style={{
+                                      fontSize: 14,
+                                    }}>
+                                    {translate('Quantity')}
+                                  </Text>
+                                </View>
+
+                                <View
+                                  style={{
+                                    flex: 0.3,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}>
+                                  {/* <Image
+                                    source={
+                                      item.checklistModalHideStatus
+                                        ? img.upArrowIcon
+                                        : img.arrowDownIcon
                                     }
-                                    style={{}}>
-                                    <Image
-                                      source={img.flagIcon}
-                                      style={{
-                                        width: 25,
-                                        height: 25,
-                                        resizeMode: 'contain',
-                                        tintColor:
-                                          item.isFlagged === false
-                                            ? 'grey'
-                                            : null,
-                                      }}
-                                    />
-                                  </TouchableOpacity>
+                                    style={{
+                                      width: 20,
+                                      height: 20,
+                                      resizeMode: 'contain',
+                                    }}
+                                  /> */}
                                 </View>
                               </View>
 
@@ -4205,7 +4375,7 @@ class ViewReviewOrder extends Component {
                                   flexDirection: 'row',
                                   alignItems: 'center',
                                   flex: 1,
-                                  marginTop: hp('3%'),
+                                  marginTop: hp('2%'),
                                 }}>
                                 <View
                                   style={{
@@ -4215,89 +4385,498 @@ class ViewReviewOrder extends Component {
                                     style={{
                                       fontSize: 14,
                                     }}>
-                                    {translate('_Ordered No')}
-                                  </Text>
-                                  <Text
-                                    numberOfLines={1}
-                                    style={{
-                                      fontSize: 13,
-                                      fontWeight: 'bold',
-                                      marginTop: 10,
-                                    }}>
-                                    {item.displayQuantity.split('=')[0]}
-                                    {/* {item.unit} */}
+                                    {translate('Order')}
                                   </Text>
                                 </View>
 
                                 <View
                                   style={{
                                     flex: 1,
-                                    backgroundColor: '#fff',
+                                    backgroundColor: 'grey',
                                     padding: 8,
                                     borderRadius: 6,
                                   }}>
-                                  <Text
-                                    style={{
-                                      fontSize: 14,
-                                    }}>
-                                    {translate('_Delivered No')}
-                                  </Text>
-
                                   <TextInput
-                                    placeholder={translate('_Delivered No')}
-                                    value={String(item.quantityDelivered)}
-                                    keyboardType="number-pad"
+                                    placeholder={translate('Order')}
+                                    editable={false}
+                                    value={String(modalQuantityOrdered)}
                                     style={{
-                                      width: 30,
-                                      marginTop: 10,
+                                      width: '100%',
                                       fontWeight: 'bold',
+                                      color: '#fff',
                                     }}
-                                    onChangeText={value =>
-                                      this.editChecklistFun(
-                                        index,
-                                        'quantityDelivered',
-                                        value,
-                                        item,
-                                        'DeliveredNo',
-                                      )
-                                    }
+                                    keyboardType="number-pad"
                                   />
                                 </View>
                                 <View
                                   style={{
-                                    flex: 1,
-                                    backgroundColor: '#fff',
+                                    flex: 1.5,
+                                    backgroundColor: 'grey',
                                     padding: 8,
                                     borderRadius: 6,
                                     marginLeft: 10,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
                                   }}>
-                                  <Text
+                                  <View style={{flex: 1}}>
+                                    <TextInput
+                                      placeholder={translate('Quantity')}
+                                      editable={false}
+                                      value={String(
+                                        volume * modalQuantityOrdered,
+                                      )}
+                                      keyboardType="number-pad"
+                                      style={{
+                                        width: '100%',
+                                        fontWeight: 'bold',
+                                        color: '#fff',
+                                      }}
+                                    />
+                                  </View>
+                                  <View
                                     style={{
-                                      fontSize: 14,
+                                      flex: 1,
                                     }}>
-                                    {translate('_Invoiced Qty')}
-                                  </Text>
-                                  <TextInput
-                                    placeholder={translate('_Invoiced Qty')}
-                                    value={String(item.quantityInvoiced)}
-                                    keyboardType="number-pad"
-                                    style={{
-                                      width: 30,
-                                      fontWeight: 'bold',
-                                      marginTop: 10,
-                                    }}
-                                    onChangeText={value =>
-                                      this.editChecklistFun(
-                                        index,
-                                        'quantityInvoiced',
-                                        value,
-                                        item,
-                                        'InvoicedQty',
-                                      )
-                                    }
-                                  />
+                                    <Text
+                                      style={{
+                                        fontFamily: 'Inter-Regular',
+                                        marginLeft: 5,
+                                        color: '#fff',
+                                        fontWeight: 'bold',
+                                      }}
+                                      numberOfLines={1}>
+                                      {item.unit}
+                                    </Text>
+                                  </View>
                                 </View>
+
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    this.editChecklistFun(
+                                      index,
+                                      'checklistModalHideStatus',
+                                      'hide',
+                                      item,
+                                      'checklist',
+                                    )
+                                  }
+                                  style={{
+                                    flex: 0.3,
+                                    backgroundColor: '#fff',
+                                    borderRadius: 6,
+                                    marginLeft: 10,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: 6,
+                                  }}>
+                                  <Image
+                                    source={
+                                      item.checklistModalHideStatus
+                                        ? img.upArrowIcon
+                                        : img.arrowDownIcon
+                                    }
+                                    style={{
+                                      width: 20,
+                                      height: 20,
+                                      resizeMode: 'contain',
+                                    }}
+                                  />
+                                </TouchableOpacity>
                               </View>
+
+                              {item.checklistModalHideStatus ? (
+                                <View>
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      flex: 1,
+                                      marginTop: hp('3%'),
+                                    }}>
+                                    <View
+                                      style={{
+                                        flex: 1.1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 14,
+                                        }}>
+                                        {translate('Delivered')}
+                                      </Text>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                        backgroundColor: '#fff',
+                                        padding: 8,
+                                        borderRadius: 6,
+                                      }}>
+                                      <TextInput
+                                        placeholder={translate('Delivered No')}
+                                        value={String(modalQuantityDelivered)}
+                                        style={{
+                                          width: '100%',
+                                          fontWeight: 'bold',
+                                        }}
+                                        keyboardType="number-pad"
+                                        onChangeText={value =>
+                                          this.editChecklistFun(
+                                            index,
+                                            'quantityDelivered',
+                                            value,
+                                            item,
+                                            'DeliveredNo',
+                                          )
+                                        }
+                                      />
+                                    </View>
+                                    <View
+                                      style={{
+                                        flex: 1.5,
+                                        backgroundColor: '#fff',
+                                        padding: 8,
+                                        borderRadius: 6,
+                                        marginLeft: 10,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                      }}>
+                                      <View style={{flex: 1}}>
+                                        <TextInput
+                                          placeholder={translate('Quantity')}
+                                          value={String(
+                                            modalUserQuantityDelivered,
+                                          )}
+                                          keyboardType="number-pad"
+                                          style={{
+                                            width: '100%',
+                                            fontWeight: 'bold',
+                                          }}
+                                          onChangeText={value =>
+                                            this.editChecklistFun(
+                                              index,
+                                              'userQuantityDelivered',
+                                              value,
+                                              item,
+                                              'DeliveredQuantity',
+                                            )
+                                          }
+                                        />
+                                      </View>
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                        }}>
+                                        <Text
+                                          style={{
+                                            fontFamily: 'Inter-Regular',
+                                            marginLeft: 5,
+                                            fontWeight: 'bold',
+                                          }}
+                                          numberOfLines={1}>
+                                          {item.unit}
+                                        </Text>
+                                      </View>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 0.3,
+                                        // backgroundColor: '#fff',
+                                        padding: 8,
+                                        borderRadius: 6,
+                                        marginLeft: 10,
+                                      }}>
+                                      {/* <TextInput
+                                        placeholder={translate('_Invoiced Qty')}
+                                        value={String(item.quantityInvoiced)}
+                                        keyboardType="number-pad"
+                                        style={{
+                                          width: 30,
+                                          fontWeight: 'bold',
+                                          // marginTop: 10,
+                                          textAlign: 'center',
+                                        }}
+                                        onChangeText={value =>
+                                          this.editChecklistFun(
+                                            index,
+                                            'quantityInvoiced',
+                                            value,
+                                            item,
+                                            'InvoicedQty',
+                                          )
+                                        }
+                                      /> */}
+                                    </View>
+                                  </View>
+
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      flex: 1,
+                                      marginTop: hp('3%'),
+                                    }}>
+                                    <View
+                                      style={{
+                                        flex: 1.1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 14,
+                                        }}>
+                                        {translate('Invoiced')}
+                                      </Text>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                        backgroundColor: '#fff',
+                                        padding: 8,
+                                        borderRadius: 6,
+                                      }}>
+                                      <TextInput
+                                        placeholder={translate('Invoiced')}
+                                        value={String(modalQuantityInvoiced)}
+                                        style={{
+                                          width: '100%',
+                                          fontWeight: 'bold',
+                                        }}
+                                        keyboardType="number-pad"
+                                        onChangeText={value =>
+                                          this.editChecklistFun(
+                                            index,
+                                            'quantityInvoiced',
+                                            value,
+                                            item,
+                                            'InvoicedNo',
+                                          )
+                                        }
+                                      />
+                                    </View>
+                                    <View
+                                      style={{
+                                        flex: 1.5,
+                                        backgroundColor: '#fff',
+                                        padding: 8,
+                                        borderRadius: 6,
+                                        marginLeft: 10,
+                                        alignItems: 'center',
+                                        flexDirection: 'row',
+                                      }}>
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                        }}>
+                                        <TextInput
+                                          placeholder={translate(
+                                            '_Invoiced Qty',
+                                          )}
+                                          value={String(
+                                            modalUserQuantityInvoiced,
+                                          )}
+                                          keyboardType="number-pad"
+                                          style={{
+                                            width: '100%',
+                                            fontWeight: 'bold',
+                                          }}
+                                          onChangeText={value =>
+                                            this.editChecklistFun(
+                                              index,
+                                              'userQuantityInvoiced',
+                                              value,
+                                              item,
+                                              'InvoicedQty',
+                                            )
+                                          }
+                                        />
+                                      </View>
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                        }}>
+                                        <Text
+                                          style={{
+                                            fontFamily: 'Inter-Regular',
+                                            marginLeft: 5,
+                                            fontWeight: 'bold',
+                                          }}>
+                                          {item.unit}
+                                        </Text>
+                                      </View>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 0.3,
+                                        // backgroundColor: '#fff',
+                                        padding: 8,
+                                        borderRadius: 6,
+                                        marginLeft: 10,
+                                      }}>
+                                      {/* <TextInput
+                                        placeholder={translate('_Invoiced Qty')}
+                                        value={String(item.quantityInvoiced)}
+                                        keyboardType="number-pad"
+                                        style={{
+                                          width: 30,
+                                          fontWeight: 'bold',
+                                          // marginTop: 10,
+                                          textAlign: 'center',
+                                        }}
+                                        onChangeText={value =>
+                                          this.editChecklistFun(
+                                            index,
+                                            'quantityInvoiced',
+                                            value,
+                                            item,
+                                            'InvoicedQty',
+                                          )
+                                        }
+                                      /> */}
+                                    </View>
+                                  </View>
+
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      flex: 1,
+                                      marginTop: hp('3%'),
+                                    }}>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontSize: 14,
+                                        }}>
+                                        {translate('Value')}
+                                      </Text>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                        backgroundColor: '#fff',
+                                        padding: 8,
+                                        borderRadius: 6,
+                                        alignItems: 'center',
+                                        flexDirection: 'row',
+                                      }}>
+                                      <View style={{flex: 3}}>
+                                        <TextInput
+                                          placeholder={translate('Value')}
+                                          value={String(item.orderValue)}
+                                          keyboardType="number-pad"
+                                          style={{
+                                            width: '100%',
+                                            fontWeight: 'bold',
+                                          }}
+                                          onChangeText={value =>
+                                            this.editChecklistFun(
+                                              index,
+                                              'orderValue',
+                                              value,
+                                              item,
+                                              'value',
+                                            )
+                                          }
+                                        />
+                                      </View>
+                                      <View style={{flex: 1}}>
+                                        <Text
+                                          style={{
+                                            fontFamily: 'Inter-Regular',
+                                            marginLeft: 5,
+                                            fontWeight: 'bold',
+                                          }}>
+                                          €
+                                        </Text>
+                                      </View>
+                                    </View>
+                                    <View
+                                      style={{
+                                        flex: 1.5,
+                                        borderRadius: 6,
+                                        marginLeft: 10,
+                                      }}>
+                                      {/* <View
+                                        style={{
+                                          flex: 1,
+                                        }}>
+                                        <TextInput
+                                          placeholder={translate(
+                                            '_Invoiced Qty',
+                                          )}
+                                          value={String(
+                                            modalUserQuantityInvoiced,
+                                          )}
+                                          keyboardType="number-pad"
+                                          style={{
+                                            width: '100%',
+                                            fontWeight: 'bold',
+                                          }}
+                                          onChangeText={value =>
+                                            this.editChecklistFun(
+                                              index,
+                                              'userQuantityInvoiced',
+                                              value,
+                                              item,
+                                              'InvoicedQty',
+                                            )
+                                          }
+                                        />
+                                      </View>
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                        }}>
+                                        <Text
+                                          style={{
+                                            fontFamily: 'Inter-Regular',
+                                            marginLeft: 5,
+                                            fontWeight: 'bold',
+                                          }}>
+                                          {item.unit}
+                                        </Text>
+                                      </View> */}
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flex: 0.3,
+                                        // backgroundColor: '#fff',
+                                        padding: 8,
+                                        borderRadius: 6,
+                                        marginLeft: 10,
+                                      }}>
+                                      {/* <TextInput
+                                        placeholder={translate('_Invoiced Qty')}
+                                        value={String(item.quantityInvoiced)}
+                                        keyboardType="number-pad"
+                                        style={{
+                                          width: 30,
+                                          fontWeight: 'bold',
+                                          // marginTop: 10,
+                                          textAlign: 'center',
+                                        }}
+                                        onChangeText={value =>
+                                          this.editChecklistFun(
+                                            index,
+                                            'quantityInvoiced',
+                                            value,
+                                            item,
+                                            'InvoicedQty',
+                                          )
+                                        }
+                                      /> */}
+                                    </View>
+                                  </View>
+                                </View>
+                              ) : null}
                             </View>
                           </View>
                         );

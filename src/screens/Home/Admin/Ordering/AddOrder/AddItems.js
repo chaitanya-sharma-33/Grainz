@@ -9,6 +9,7 @@ import {
   TextInput,
   Alert,
   Platform,
+  BackHandler,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
@@ -32,6 +33,7 @@ import {
   updateInventoryProductApi,
   addDraftApi,
   getBasketApi,
+  getSearchInventoryApi,
 } from '../../../../../connectivity/api';
 import Accordion from 'react-native-collapsible/Accordion';
 import styles from '../style';
@@ -117,6 +119,7 @@ class AddItems extends Component {
       isFreemium: '',
       loadingImageIcon: true,
       closeButtonLoader: false,
+      modalNewData: [],
     };
   }
 
@@ -242,6 +245,17 @@ class AddItems extends Component {
       });
   };
 
+  componentWillUnmount() {
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.onBackButtonPressed,
+    );
+  }
+
+  onBackButtonPressed() {
+    return this.goBackFun();
+  }
+
   async componentDidMount() {
     this.getData();
 
@@ -256,9 +270,13 @@ class AddItems extends Component {
         departID,
         finalData,
         finalDataSec,
+        firstBasketId,
       } = this.props.route && this.props.route.params;
 
       console.log('screen', screen);
+      console.log('basketId', basketId);
+      console.log('firstBasketId', firstBasketId);
+
       this.setState(
         {
           supplierId: supplierValue,
@@ -279,10 +297,13 @@ class AddItems extends Component {
           mainDepartId: departID,
           finalBasketData: [],
           finalDataSec,
+          firstBasketId,
         },
         () => this.getManualLogsData(),
       );
     });
+
+    BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
   }
 
   myProfile = () => {
@@ -436,6 +457,61 @@ class AddItems extends Component {
     }
   };
 
+  editQuantitySearchFun = (
+    index,
+    type,
+    data,
+    valueType,
+    section,
+    value,
+    indexMain,
+  ) => {
+    console.log('2');
+
+    // console.log('vaaaaa', value);
+    if (valueType === 'add') {
+      console.log('3');
+
+      this.editQuantitySearchFunThird(
+        index,
+        type,
+        data,
+        valueType,
+        section,
+        value,
+        indexMain,
+      );
+    } else if (valueType === 'minus') {
+      console.log('4');
+
+      if (data.quantityProduct > 0) {
+        console.log('5');
+
+        this.editQuantitySearchFunThird(
+          index,
+          type,
+          data,
+          valueType,
+          section,
+          value,
+          indexMain,
+        );
+      }
+    } else if (valueType === 'input') {
+      console.log('6');
+
+      this.editQuantitySearchFunFourth(
+        index,
+        type,
+        data,
+        valueType,
+        section,
+        value,
+        indexMain,
+      );
+    }
+  };
+
   editQuantityFunFourth = (
     index,
     type,
@@ -509,7 +585,7 @@ class AddItems extends Component {
             },
       );
 
-      // console.log('LastArr--> ', LastArr);
+      console.log('LastArr--> ', LastArr);
 
       const finalArr = LastArr.map((item, index) => {
         const firstArr = item.content.filter(function (itm) {
@@ -533,12 +609,13 @@ class AddItems extends Component {
           inventoryProductMappingId: item.inventoryProductMappingId,
           unitPrice: item.price,
           quantity: Number(item.quantityProduct),
-          action:
-            screenType === 'New'
-              ? 'New'
-              : screenType === 'Update' && item.orderItemId !== null
-              ? 'Update'
-              : 'New',
+          action: 'New',
+          // action:
+          //   screenType === 'New'
+          //     ? 'New'
+          //     : screenType === 'Update' && item.orderItemId !== null
+          //     ? 'Update'
+          //     : 'New',
           value: Number(item.quantityProduct * item.price * item.packSize),
           headerIndex: headerIndex,
         });
@@ -590,12 +667,7 @@ class AddItems extends Component {
               item.inventoryMapping && item.inventoryMapping.id,
             unitPrice: item.price,
             quantity: Number(item.quantityProduct),
-            action:
-              screenType === 'New'
-                ? 'New'
-                : screenType === 'Update' && item.orderItemId !== null
-                ? 'Update'
-                : 'New',
+            action: 'New',
             value: Number(item.quantityProduct * item.price * item.packSize),
           });
         });
@@ -609,25 +681,34 @@ class AddItems extends Component {
     }
   };
 
-  editQuantityFunThird = (index, type, data, valueType, section) => {
+  editQuantitySearchFunFourth = (
+    index,
+    type,
+    data,
+    valueType,
+    section,
+    valueData,
+  ) => {
+    // console.log('valueData', valueData);
+
     const {inventoryStatus, finalBasketData} = this.state;
     if (inventoryStatus) {
       const headerIndex = section.headerIndex;
-      const valueSec =
-        data.quantityProduct === '' ? Number(0) : Number(data.quantityProduct);
-      // console.log('valueSec--> ', valueSec);
+      // const valueSec =
+      //   data.quantityProduct === '' || valueData === ''
+      //     ? Number(0)
+      //     : Number(data.quantityProduct);
+      // console.log('valueSec', valueSec);
 
-      const valueMinus = valueSec - Number(1);
-      // console.log('valueMinus--> ', valueMinus);
+      const valueMinus = Number(valueData);
+      // console.log('valueMinus', valueMinus);
 
-      const valueAdd = Number(1) + valueSec;
-      // console.log('valueAdd--> ', valueAdd);
+      const valueAdd = Number(valueData);
+      // console.log('valueAdd', valueAdd);
 
-      const value = valueType === 'add' ? valueAdd : valueMinus;
-      // console.log('value--> ', value);
-
-      const {screenType, SECTIONS, activeSections, SECTIONS_BACKUP} =
-        this.state;
+      const value = valueType === 'input' ? valueAdd : valueMinus;
+      // console.log('Value', value);
+      const {screenType, SECTIONS, activeSections} = this.state;
       const deltaOriginal = Number(data.delta);
       const isSelectedValue = value !== '' && value > 0 ? true : false;
       const newDeltaVal =
@@ -635,18 +716,16 @@ class AddItems extends Component {
           ? Number(data.delta) - Number(value) * Number(data.volume)
           : deltaOriginal;
       const newAddTotalQuantity =
-        Number(data.volume) *
-        (data.quantityProduct === null ? 1 : Number(data.quantityProduct) + 1);
+        Number(data.volume) * (data.quantityProduct === null ? 1 : valueData);
+      // console.log('newAddTotalQuantity', newAddTotalQuantity);
 
-      const newMinusTotalQuantity =
-        Number(data.totalQuantity) - Number(data.volume);
+      // const newMinusTotalQuantity =
+      //   Number(data.volume) * (data.quantityProduct === null ? 1 : valueData);
+      // console.log('newMinusTotalQuantity', newMinusTotalQuantity);
 
-      const finalTotalQuantity =
-        valueType === 'add' ? newAddTotalQuantity : newMinusTotalQuantity;
-
-      // console.log('data.quantityProduct', data.quantityProduct);
-      // console.log('newTotalQuantity', newTotalQuantity);
-      // console.log(' Number(data.volume)', Number(data.volume));
+      const finalTotalQuantity = newAddTotalQuantity;
+      // valueType === 'input' ? newAddTotalQuantity : newMinusTotalQuantity;
+      // console.log('finalTotalQuantity', finalTotalQuantity);
 
       let newArr = section.content.map((item, i) =>
         index === i
@@ -675,18 +754,7 @@ class AddItems extends Component {
             },
       );
 
-      let LastArrBackup = SECTIONS_BACKUP.map((item, i) =>
-        headerIndex === i
-          ? {
-              ...item,
-              ['content']: newArr,
-            }
-          : {
-              ...item,
-            },
-      );
-
-      // console.log('LastArr--> ', LastArr);
+      console.log('LastArr--> ', LastArr);
 
       const finalArr = LastArr.map((item, index) => {
         const firstArr = item.content.filter(function (itm) {
@@ -710,12 +778,8 @@ class AddItems extends Component {
           inventoryProductMappingId: item.inventoryProductMappingId,
           unitPrice: item.price,
           quantity: Number(item.quantityProduct),
-          action:
-            screenType === 'New'
-              ? 'New'
-              : screenType === 'Update' && item.orderItemId !== null
-              ? 'Update'
-              : 'New',
+
+          action: 'New',
           value: Number(item.quantityProduct * item.price * item.packSize),
           headerIndex: headerIndex,
         });
@@ -725,7 +789,182 @@ class AddItems extends Component {
 
       this.setState({
         SECTIONS: [...LastArr],
-        SECTIONS_BACKUP: [...LastArrBackup],
+        finalBasketData: [...basketArr],
+        draftStatus: false,
+      });
+    } else {
+      const valueMinus = Number(valueData);
+      // console.log('valueMinus-->', valueMinus);
+
+      const valueAdd = Number(valueData);
+      // console.log('valueAdd-->', valueAdd);
+
+      const value = valueType === 'input' ? valueAdd : valueMinus;
+      // console.log('value-->', value);
+
+      const {modalData, screenType} = this.state;
+      const isSelectedValue = value !== '' && value > 0 ? true : false;
+      if (data.isMapped === true) {
+        let newArr = modalData.map((item, i) =>
+          index === i
+            ? {
+                ...item,
+                [type]: value,
+                ['isSelected']: isSelectedValue,
+              }
+            : item,
+        );
+
+        var filteredArray = newArr.filter(function (itm) {
+          if (itm.quantityProduct !== '') {
+            return itm.isSelected === true;
+          }
+        });
+
+        const finalArr = [];
+        filteredArray.map(item => {
+          finalArr.push({
+            id: item.orderItemId ? item.orderItemId : null,
+            inventoryId:
+              item.inventoryMapping && item.inventoryMapping.inventoryId,
+            inventoryProductMappingId:
+              item.inventoryMapping && item.inventoryMapping.id,
+            unitPrice: item.price,
+            quantity: Number(item.quantityProduct),
+            action: 'New',
+            value: Number(item.quantityProduct * item.price * item.packSize),
+          });
+        });
+        this.setState({
+          modalData: [...newArr],
+          modalDataBackup: [...newArr],
+          finalBasketData: [...finalArr],
+          draftStatus: false,
+        });
+      }
+    }
+  };
+
+  editQuantitySearchFunThird = (
+    index,
+    type,
+    data,
+    valueType,
+    section,
+    value,
+    indexMain,
+  ) => {
+    console.log('inddex', index);
+    console.log('type', type);
+    console.log('data', data);
+    console.log('valueType', valueType);
+    console.log('section', section);
+
+    const {inventoryStatus, finalBasketData, searchItemInventory} = this.state;
+    if (inventoryStatus) {
+      const valueSec =
+        data.quantityProduct === '' || data.quantityProduct === undefined
+          ? Number(0)
+          : Number(data.quantityProduct);
+      console.log('valueSec--> ', valueSec);
+
+      const valueMinus = valueSec - Number(1);
+      console.log('valueMinus--> ', valueMinus);
+
+      const valueAdd = Number(1) + valueSec;
+      console.log('valueAdd--> ', valueAdd);
+
+      const value = valueType === 'add' ? valueAdd : valueMinus;
+      console.log('value--> ', value);
+
+      const {screenType, modalNewData, activeSections, SECTIONS_BACKUP} =
+        this.state;
+      const deltaOriginal = Number(data.delta);
+      const isSelectedValue = value !== '' && value > 0 ? true : false;
+      const newDeltaVal =
+        value !== ''
+          ? Number(data.delta) - Number(value) * Number(data.volume)
+          : deltaOriginal;
+      const newAddTotalQuantity =
+        Number(data.volume) *
+        (data.quantityProduct === null ? 1 : Number(data.quantityProduct) + 1);
+
+      const newMinusTotalQuantity =
+        Number(data.totalQuantity) - Number(data.volume);
+
+      const finalTotalQuantity =
+        valueType === 'add' ? newAddTotalQuantity : newMinusTotalQuantity;
+
+      // console.log('data.quantityProduct', data.quantityProduct);
+      // console.log('newTotalQuantity', newTotalQuantity);
+      // console.log(' Number(data.volume)', Number(data.volume));
+
+      console.log('section-->', section);
+
+      let newArr = section.productMappings.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: value,
+              ['isSelected']: isSelectedValue,
+              ['deltaNew']: newDeltaVal,
+              ['totalQuantity']: finalTotalQuantity,
+            }
+          : {
+              ...item,
+              ['deltaNew']: newDeltaVal,
+              // ['totalQuantity']: finalTotalQuantity,
+            },
+      );
+
+      console.log('newArr-->', newArr);
+
+      let LastArrTEst = modalNewData.map((item, i) => console.log('I', i));
+      console.log('LastArrTEst', LastArrTEst);
+
+      let LastArr = modalNewData.map((item, i) =>
+        indexMain === i
+          ? {
+              ...item,
+              ['productMappings']: newArr,
+            }
+          : {
+              ...item,
+              // ['content']: newArr,
+            },
+      );
+
+      console.log('LastArr-->', LastArr);
+
+      const finalArr = LastArr.map((item, index) => {
+        const firstArr = item.productMappings.filter(function (itm) {
+          if (itm.quantityProduct !== '') {
+            return itm.isSelected === true;
+          }
+        });
+        return firstArr;
+      });
+
+      console.log('finAAA', finalArr);
+
+      var merged = [].concat.apply([], finalArr);
+      console.log('merged', merged);
+
+      const basketArr = [];
+      merged.map(item => {
+        basketArr.push({
+          id: '',
+          inventoryId: section.id ? section.id : nul,
+          inventoryProductMappingId: item.id,
+          unitPrice: item.price,
+          quantity: Number(item.quantityProduct),
+          action: 'New',
+          value: Number(item.quantityProduct * item.price * item.packSize),
+        });
+      });
+
+      this.setState({
+        modalNewData: [...LastArr],
         finalBasketData: [...basketArr],
         draftStatus: false,
       });
@@ -764,12 +1003,175 @@ class AddItems extends Component {
               item.inventoryMapping && item.inventoryMapping.id,
             unitPrice: item.price,
             quantity: Number(item.quantityProduct),
-            action:
-              screenType === 'New'
-                ? 'New'
-                : screenType === 'Update' && item.orderItemId !== null
-                ? 'Update'
-                : 'New',
+            action: 'New',
+            value: Number(item.quantityProduct * item.price * item.packSize),
+          });
+        });
+        this.setState({
+          modalData: [...newArr],
+          modalDataBackup: [...newArr],
+          finalBasketData: [...finalArr],
+          draftStatus: false,
+        });
+      }
+    }
+  };
+
+  editQuantityFunThird = (index, type, data, valueType, section) => {
+    console.log('inddex', index);
+    console.log('type', type);
+    console.log('data', data);
+    console.log('valueType', valueType);
+    console.log('section', section);
+
+    const {inventoryStatus, finalBasketData, searchItemInventory} = this.state;
+    if (inventoryStatus) {
+      const headerIndex = section.headerIndex;
+      const valueSec =
+        data.quantityProduct === '' ? Number(0) : Number(data.quantityProduct);
+      console.log('valueSec--> ', valueSec);
+
+      const valueMinus = valueSec - Number(1);
+      console.log('valueMinus--> ', valueMinus);
+
+      const valueAdd = Number(1) + valueSec;
+      console.log('valueAdd--> ', valueAdd);
+
+      const value = valueType === 'add' ? valueAdd : valueMinus;
+      console.log('value--> ', value);
+
+      const {screenType, SECTIONS, activeSections, SECTIONS_BACKUP} =
+        this.state;
+      const deltaOriginal = Number(data.delta);
+      const isSelectedValue = value !== '' && value > 0 ? true : false;
+      const newDeltaVal =
+        value !== ''
+          ? Number(data.delta) - Number(value) * Number(data.volume)
+          : deltaOriginal;
+      const newAddTotalQuantity =
+        Number(data.volume) *
+        (data.quantityProduct === null ? 1 : Number(data.quantityProduct) + 1);
+
+      const newMinusTotalQuantity =
+        Number(data.totalQuantity) - Number(data.volume);
+
+      const finalTotalQuantity =
+        valueType === 'add' ? newAddTotalQuantity : newMinusTotalQuantity;
+
+      // console.log('data.quantityProduct', data.quantityProduct);
+      // console.log('newTotalQuantity', newTotalQuantity);
+      // console.log(' Number(data.volume)', Number(data.volume));
+
+      console.log('section-->', section);
+
+      let newArr = section.content.map((item, i) =>
+        index === i
+          ? {
+              ...item,
+              [type]: value,
+              ['isSelected']: isSelectedValue,
+              ['deltaNew']: newDeltaVal,
+              ['totalQuantity']: finalTotalQuantity,
+            }
+          : {
+              ...item,
+              ['deltaNew']: newDeltaVal,
+              // ['totalQuantity']: finalTotalQuantity,
+            },
+      );
+
+      console.log('newArr-->', newArr);
+
+      console.log('headerIndex-->', headerIndex);
+
+      let test = SECTIONS.map((item, i) => console.log('iiiii', i));
+
+      console.log('test', test);
+
+      let LastArr = SECTIONS.map((item, i) =>
+        headerIndex === i
+          ? {
+              ...item,
+              ['content']: newArr,
+            }
+          : {
+              ...item,
+              // ['content']: newArr,
+            },
+      );
+
+      console.log('LastArr-->', LastArr);
+
+      const finalArr = LastArr.map((item, index) => {
+        const firstArr = item.content.filter(function (itm) {
+          if (itm.quantityProduct !== '') {
+            return itm.isSelected === true;
+          }
+        });
+        return firstArr;
+      });
+
+      // console.log('finAAA', finalArr);
+
+      var merged = [].concat.apply([], finalArr);
+      // console.log('merged', merged);
+
+      const basketArr = [];
+      merged.map(item => {
+        basketArr.push({
+          id: item.orderItemId ? item.orderItemId : null,
+          inventoryId: item.id,
+          inventoryProductMappingId: item.inventoryProductMappingId,
+          unitPrice: item.price,
+          quantity: Number(item.quantityProduct),
+          action: 'New',
+          value: Number(item.quantityProduct * item.price * item.packSize),
+          headerIndex: headerIndex,
+        });
+      });
+
+      this.setState({
+        SECTIONS: [...LastArr],
+        SECTIONS_BACKUP: [...LastArr],
+        finalBasketData: [...basketArr],
+        draftStatus: false,
+      });
+    } else {
+      const valueSec =
+        data.quantityProduct === '' ? Number(0) : Number(data.quantityProduct);
+      const valueMinus = valueSec - Number(1);
+      const valueAdd = Number(1) + valueSec;
+      const value = valueType === 'add' ? valueAdd : valueMinus;
+      const {modalData, screenType} = this.state;
+      const isSelectedValue = value !== '' && value > 0 ? true : false;
+      if (data.isMapped === true) {
+        let newArr = modalData.map((item, i) =>
+          index === i
+            ? {
+                ...item,
+                [type]: value,
+                ['isSelected']: isSelectedValue,
+              }
+            : item,
+        );
+
+        var filteredArray = newArr.filter(function (itm) {
+          if (itm.quantityProduct !== '') {
+            return itm.isSelected === true;
+          }
+        });
+
+        const finalArr = [];
+        filteredArray.map(item => {
+          finalArr.push({
+            id: item.orderItemId ? item.orderItemId : null,
+            inventoryId:
+              item.inventoryMapping && item.inventoryMapping.inventoryId,
+            inventoryProductMappingId:
+              item.inventoryMapping && item.inventoryMapping.id,
+            unitPrice: item.price,
+            quantity: Number(item.quantityProduct),
+            action: 'New',
             value: Number(item.quantityProduct * item.price * item.packSize),
           });
         });
@@ -789,7 +1191,7 @@ class AddItems extends Component {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={{backgroundColor: '#fff', width: wp('87%')}}>
           {section.content.map((item, index) => {
-            // console.log('item213242342342', item);
+            console.log('item213242342342-', item);
             return (
               <View
                 style={{
@@ -1422,16 +1824,16 @@ class AddItems extends Component {
 
       this.setState(
         {
+          SECTIONS: [],
           supplierId,
           catName,
           catId,
           screenType,
           basketId,
           navigateType,
-          finalBasketData: [],
           supplierName,
         },
-        () => this.getInsideInventoryFun(),
+        () => this.updateListFun(),
       );
     } else {
       const {
@@ -1448,7 +1850,7 @@ class AddItems extends Component {
         {
           supplierId,
           catName,
-          screenType,
+          // screenType,
           basketId,
           navigateType,
           finalBasketData: [],
@@ -1460,8 +1862,11 @@ class AddItems extends Component {
   };
 
   getInsideInventoryFun = () => {
-    const {catId, supplierId, basketId} = this.state;
-    const finalBasketId = basketId ? basketId : null;
+    const {catId, supplierId, basketId, firstBasketId} = this.state;
+    const finalBasketId = basketId ? basketId : firstBasketId;
+
+    console.log('finalBasketId---->1223', finalBasketId);
+
     this.setState(
       {
         modalLoader: true,
@@ -1471,6 +1876,7 @@ class AddItems extends Component {
           .then(res => {
             console.log('res---->1223', res);
             const finalArr = res.data;
+
             finalArr.forEach(function (item) {
               item.isSelected = item.quantityProduct ? true : false;
               item.quantityProduct = item.quantityProduct;
@@ -1622,103 +2028,176 @@ class AddItems extends Component {
       productId,
       supplierName,
       finalData,
+      firstBasketId,
     } = this.state;
-    if (screenType === 'New') {
-      console.log('NEWWW');
-      if (finalBasketData.length > 0) {
-        let payload = {
-          supplierId: supplierId,
-          shopingBasketItemList: finalBasketData,
-          customerNumber: finalData.customerNumber,
-          channel: finalData.channel,
-        };
-        // console.log('Payload--> ADDITEMS', payload);
-        addBasketApi(payload)
-          .then(res => {
+
+    const finalBasketId = basketId ? basketId : firstBasketId;
+
+    let payload = {
+      supplierId: supplierId,
+      shopingBasketItemList: finalBasketData,
+      id: finalBasketId,
+    };
+    console.log('UPDATEEE');
+    console.log('Payload--> ELSE', payload);
+    if (finalBasketData.length > 0 || basketId) {
+      updateBasketApi(payload)
+        .then(res => {
+          if (navigateType === 'EditDraft') {
+            console.log('EditDraft');
             this.setState(
               {
-                basketId: res.data && res.data.id,
+                basketLoader: false,
               },
-              () => this.getBasketDataFun(),
+              () => this.navigateToEditDraft(res),
             );
-          })
-          .catch(err => {
-            Alert.alert(
-              `Error - ${err.response.status}`,
-              'Something went wrong',
-              [
-                {
-                  text: translate('Ok'),
-                },
-              ],
-            );
-          });
-      } else {
-        Alert.alert('', translate('Please add atleast one item'), [
-          {
-            text: translate('Ok'),
-            onPress: () => this.closeBasketLoader(),
-            style: 'default',
-          },
-        ]);
-      }
-    } else {
-      let payload = {
-        supplierId: supplierId,
-        shopingBasketItemList: finalBasketData,
-        id: basketId,
-      };
-      console.log('UPDATEEE');
-      console.log('Payload--> ELSE', payload);
-      if (finalBasketData.length > 0 || basketId) {
-        updateBasketApi(payload)
-          .then(res => {
-            if (navigateType === 'EditDraft') {
-              console.log('EditDraft');
-              this.setState(
-                {
-                  basketLoader: false,
-                },
-                () => this.navigateToEditDraft(res),
-              );
-            } else {
-              console.log('EditDraft->ELSE');
+          } else {
+            console.log('EditDraft->ELSE');
 
-              this.setState(
-                {
-                  basketLoader: false,
-                  draftStatus: true,
-                },
-                () => this.navigateToBasket(),
-              );
-            }
-          })
-          .catch(err => {
-            Alert.alert(
-              `Error - ${err.response.status}`,
-              'Something went wrong',
-              [
-                {
-                  text: translate('Ok'),
-                  onPress: () =>
-                    this.setState({
-                      basketLoader: false,
-                    }),
-                },
-              ],
+            this.setState(
+              {
+                basketLoader: false,
+                draftStatus: true,
+              },
+              () => this.navigateToBasket(),
             );
-          });
-      } else {
-        Alert.alert('', translate('Please add atleast one item'), [
-          {
-            text: translate('Ok'),
-            onPress: () => this.closeBasketLoader(),
-            style: 'default',
-          },
-        ]);
-      }
+          }
+        })
+        .catch(err => {
+          console.log('err', err.response);
+          Alert.alert(
+            `Error - ${err.response.status}`,
+            'Something went wrong',
+            [
+              {
+                text: translate('Ok'),
+                onPress: () =>
+                  this.setState({
+                    basketLoader: false,
+                  }),
+              },
+            ],
+          );
+        });
+    } else {
+      Alert.alert('', translate('Please add atleast one item'), [
+        {
+          text: translate('Ok'),
+          onPress: () => this.closeBasketLoader(),
+          style: 'default',
+        },
+      ]);
     }
   };
+
+  // addToBasketFunSec = () => {
+  //   const {
+  //     finalBasketData,
+  //     supplierId,
+  //     screenType,
+  //     basketId,
+  //     navigateType,
+  //     productId,
+  //     supplierName,
+  //     finalData,
+  //   } = this.state;
+  //   if (screenType === 'New') {
+  //     console.log('NEWWW');
+  //     if (finalBasketData.length > 0) {
+  //       let payload = {
+  //         supplierId: supplierId,
+  //         shopingBasketItemList: finalBasketData,
+  //         customerNumber: finalData.customerNumber,
+  //         channel: finalData.channel,
+  //       };
+  //       // console.log('Payload--> ADDITEMS', payload);
+  //       addBasketApi(payload)
+  //         .then(res => {
+  //           this.setState(
+  //             {
+  //               basketId: res.data && res.data.id,
+  //             },
+  //             () => this.getBasketDataFun(),
+  //           );
+  //         })
+  //         .catch(err => {
+  //           Alert.alert(
+  //             `Error - ${err.response.status}`,
+  //             'Something went wrong',
+  //             [
+  //               {
+  //                 text: translate('Ok'),
+  //               },
+  //             ],
+  //           );
+  //         });
+  //     } else {
+  //       Alert.alert('', translate('Please add atleast one item'), [
+  //         {
+  //           text: translate('Ok'),
+  //           onPress: () => this.closeBasketLoader(),
+  //           style: 'default',
+  //         },
+  //       ]);
+  //     }
+  //   } else {
+  //     let payload = {
+  //       supplierId: supplierId,
+  //       shopingBasketItemList: finalBasketData,
+  //       id: basketId,
+  //     };
+  //     console.log('UPDATEEE');
+  //     console.log('Payload--> ELSE', payload);
+  //     if (finalBasketData.length > 0 || basketId) {
+  //       updateBasketApi(payload)
+  //         .then(res => {
+  //           if (navigateType === 'EditDraft') {
+  //             console.log('EditDraft');
+  //             this.setState(
+  //               {
+  //                 basketLoader: false,
+  //               },
+  //               () => this.navigateToEditDraft(res),
+  //             );
+  //           } else {
+  //             console.log('EditDraft->ELSE');
+
+  //             this.setState(
+  //               {
+  //                 basketLoader: false,
+  //                 draftStatus: true,
+  //               },
+  //               () => this.navigateToBasket(),
+  //             );
+  //           }
+  //         })
+  //         .catch(err => {
+  //           console.log('err', err.response);
+  //           Alert.alert(
+  //             `Error - ${err.response.status}`,
+  //             'Something went wrong',
+  //             [
+  //               {
+  //                 text: translate('Ok'),
+  //                 onPress: () =>
+  //                   this.setState({
+  //                     basketLoader: false,
+  //                   }),
+  //               },
+  //             ],
+  //           );
+  //         });
+  //     } else {
+  //       Alert.alert('', translate('Please add atleast one item'), [
+  //         {
+  //           text: translate('Ok'),
+  //           onPress: () => this.closeBasketLoader(),
+  //           style: 'default',
+  //         },
+  //       ]);
+  //     }
+  //   }
+  // };
 
   getBasketDataFun = () => {
     const {basketId} = this.state;
@@ -1799,6 +2278,7 @@ class AddItems extends Component {
       mainDepartId,
       departmentName,
       finalDataSec,
+      firstBasketId,
     } = this.state;
     console.log('FINALDATA', finalData);
     console.log('finalDataSec', finalDataSec);
@@ -1821,6 +2301,7 @@ class AddItems extends Component {
             departmentName,
             mainDepartId,
             basketId,
+            firstBasketId,
           }),
       );
     }
@@ -1871,31 +2352,72 @@ class AddItems extends Component {
   };
 
   searchFunInventory = txt => {
-    this.setState(
-      {
+    console.log('test', txt);
+    if (txt) {
+      this.setState({
         searchItemInventory: txt,
-      },
-      () => this.filterDataInventory(txt),
-    );
+      });
+    } else {
+      this.setState(
+        {
+          searchItemInventory: txt,
+          modalNewData: [],
+        },
+        () => this.updateListFun(),
+      );
+    }
   };
 
-  filterDataInventory = text => {
-    const {SECTIONS_BACKUP} = this.state;
-    //passing the inserted text in textinput
-    const newData = SECTIONS_BACKUP.filter(function (item) {
-      console.log('SECTIONS_BACKUP', SECTIONS_BACKUP);
-      //applying filter for the inserted text in search bar
-      const itemData = item.title ? item.title.toUpperCase() : ''.toUpperCase();
-      const textData = text.toUpperCase();
-      return itemData.indexOf(textData) > -1;
-    });
-    this.setState({
-      //setting the filtered newData on datasource
-      //After setting the data it will automatically re-render the view
-      SECTIONS: newData,
-      searchItemInventory: text,
-    });
+  searchInventoryFun = () => {
+    const {searchItemInventory, supplierId} = this.state;
+    getSearchInventoryApi(searchItemInventory, supplierId)
+      .then(res => {
+        console.log('res---->SEARCH', res);
+        const finalArr = res.data;
+
+        finalArr.map((item, index) => {
+          item.productMappings.forEach(function (item) {
+            item.isSelected = item.quantityProduct ? true : false;
+            item.quantityProduct = item.quantityProduct;
+            item.deltaNew = item.delta;
+            item.totalQuantity = null;
+          });
+        });
+
+        console.log('finalArr', finalArr);
+
+        this.setState({
+          modalNewData: [...finalArr],
+        });
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: translate('Ok'),
+            // onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      });
   };
+
+  // filterDataInventory = text => {
+  //   const {SECTIONS_BACKUP, SECTIONS} = this.state;
+  //   //passing the inserted text in textinput
+  //   const newData = SECTIONS_BACKUP.filter(function (item) {
+  //     //applying filter for the inserted text in search bar
+  //     const itemData = item.title ? item.title.toUpperCase() : ''.toUpperCase();
+  //     const textData = text.toUpperCase();
+  //     return itemData.indexOf(textData) > -1;
+  //   });
+  //   console.log('newData', newData);
+
+  //   this.setState({
+  //     //setting the filtered newData on datasource
+  //     //After setting the data it will automatically re-render the view
+  //     SECTIONS: newData,
+  //     searchItemInventory: text,
+  //   });
+  // };
 
   searchFunSupplier = txt => {
     this.setState(
@@ -2134,12 +2656,7 @@ class AddItems extends Component {
         inventoryProductMappingId: item.inventoryProductMappingId,
         unitPrice: item.price,
         quantity: Number(item.quantityProduct),
-        action:
-          screenType === 'New'
-            ? 'New'
-            : screenType === 'Update' && item.orderItemId !== null
-            ? 'Update'
-            : 'New',
+        action: 'New',
         value: Number(item.quantityProduct * item.price * item.packSize),
         headerIndex: headerIndex,
       });
@@ -2324,6 +2841,47 @@ class AddItems extends Component {
     });
   };
 
+  updateListFun = () => {
+    const {
+      finalBasketData,
+      supplierId,
+      screenType,
+      basketId,
+      navigateType,
+      productId,
+      supplierName,
+      finalData,
+      firstBasketId,
+    } = this.state;
+
+    console.log('basketId', basketId);
+    console.log('firstBasketId', firstBasketId);
+
+    let payload = {
+      supplierId: supplierId,
+      shopingBasketItemList: finalBasketData,
+      id: basketId ? basketId : firstBasketId,
+    };
+    console.log('UPDATEEE');
+    console.log('Payload--> ELSE--UPDATE LSIT', payload);
+    updateBasketApi(payload)
+      .then(res => {
+        this.getInsideInventoryFun();
+      })
+      .catch(err => {
+        console.log('err', err.response);
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: translate('Ok'),
+            onPress: () =>
+              this.setState({
+                basketLoader: false,
+              }),
+          },
+        ]);
+      });
+  };
+
   render() {
     const {
       recipeLoader,
@@ -2374,6 +2932,7 @@ class AddItems extends Component {
       isFreemium,
       loadingImageIcon,
       closeButtonLoader,
+      modalNewData,
     } = this.state;
 
     // console.log('PAGE DATA', pageData);
@@ -2381,7 +2940,9 @@ class AddItems extends Component {
     // console.log('draftStatus', draftStatus);
     // console.log('screenType', screenType);
     // console.log('basketID', basketId);
-    console.log('active Sessions', activeSections);
+    console.log('finalBasketData', finalBasketData);
+    console.log('SEARCH', searchItemInventory);
+    console.log('modalNewData', modalNewData);
 
     return (
       <View style={styles.container}>
@@ -2566,11 +3127,7 @@ class AddItems extends Component {
                     onChangeText={value => this.searchFunInventory(value)}
                   />
                   <TouchableOpacity
-                    onPress={() =>
-                      this.setState({
-                        searchItemInventory: '',
-                      })
-                    }
+                    onPress={() => this.searchInventoryFun()}
                     style={{
                       marginLeft: wp('3%'),
                       padding: 10,
@@ -2671,73 +3228,271 @@ class AddItems extends Component {
             {expandAllStatus ? <Text>Close all</Text> : <Text>Expand all</Text>}
           </TouchableOpacity> */}
 
-          <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
-            <ScrollView style={{}}>
-              {SECTIONS_HORIZONTAL.map((item, index) => {
+          {searchItemInventory && modalNewData.length > 0 ? (
+            <View
+              style={{
+                width: wp('88%'),
+                marginLeft: wp('7%'),
+              }}>
+              {modalNewData.map((item, index) => {
                 return (
                   <View>
-                    <TouchableOpacity
-                      onPress={() => this.onPressInventoryFun(item, index)}
+                    <View
                       style={{
-                        borderRadius: 5,
-                        backgroundColor:
-                          index === listIndex ? '#F2F2F2' : '#fff',
-                        height: 60,
-                        marginRight: 10,
-                        paddingHorizontal: 15,
-                        marginVertical: 10,
-                        justifyContent: 'space-between',
-                        flexDirection: 'row',
-                        alignItems: 'center',
+                        backgroundColor: '#F2F2F2',
+                        paddingVertical: 15,
                       }}>
                       <Text
                         style={{
-                          // color: index === listIndex ? '#black' : 'black',
-                          fontFamily: 'Inter-SemiBold',
-                          fontSize: 12,
+                          color: '#492813',
+                          marginLeft: 10,
                         }}>
-                        {item.title}
+                        {item.name}
                       </Text>
-                      <Image
-                        style={{
-                          height: 15,
-                          width: 15,
-                          resizeMode: 'contain',
-                          marginLeft: wp('3%'),
-                        }}
-                        source={
-                          actionOpen === true
-                            ? img.upArrowIcon
-                            : img.arrowDownIcon
-                        }
-                      />
-                    </TouchableOpacity>
-                    <View>
-                      {index === listIndex ? (
-                        <View style={{}}>
-                          <View style={{}}>
-                            {modalLoader ? (
-                              <ActivityIndicator size="large" color="#5297c1" />
-                            ) : (
-                              <Accordion
-                                expandMultiple
-                                underlayColor="#fff"
-                                sections={SECTIONS}
-                                activeSections={activeSections}
-                                renderHeader={this._renderHeader}
-                                renderContent={this._renderContent}
-                                // onChange={this._updateSections}
-                              />
-                            )}
-                          </View>
-                        </View>
-                      ) : null}
                     </View>
+                    {item &&
+                      item.productMappings.map((itemSec, indexSec) => {
+                        return (
+                          <View
+                            style={{
+                              paddingHorizontal: 10,
+                              backgroundColor: '#fff',
+                            }}>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                flex: 1,
+                              }}>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  flex: 1,
+                                  marginVertical: 10,
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 0.5,
+                                    marginTop: 10,
+                                    marginRight: 10,
+                                  }}>
+                                  {itemSec.isInStock ? (
+                                    <Image
+                                      source={img.inStockIcon}
+                                      style={{
+                                        height: 15,
+                                        width: 15,
+                                        resizeMode: 'contain',
+                                      }}
+                                    />
+                                  ) : (
+                                    <Image
+                                      source={img.outStockIcon}
+                                      style={{
+                                        height: 15,
+                                        width: 15,
+                                        resizeMode: 'contain',
+                                      }}
+                                    />
+                                  )}
+                                </View>
+                                <View style={{flex: 3}}>
+                                  <View style={{}}>
+                                    <Text>{itemSec.productName}</Text>
+                                  </View>
+                                </View>
+                              </View>
+
+                              <View
+                                style={{
+                                  width: wp('20%'),
+                                  justifyContent: 'center',
+                                  marginLeft: wp('6%'),
+                                }}>
+                                <Text>
+                                  {itemSec.comparePrice} € /{' '}
+                                  {itemSec.compareUnit}
+                                </Text>
+                              </View>
+                              <View
+                                style={{
+                                  width: wp('30%'),
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+
+                                  height: hp('5%'),
+                                }}>
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    this.editQuantitySearchFun(
+                                      indexSec,
+                                      'quantityProduct',
+                                      itemSec,
+                                      'minus',
+                                      item,
+                                      'value',
+                                      index,
+                                    )
+                                  }
+                                  style={{
+                                    width: wp('10%'),
+                                    height: hp('5%'),
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}>
+                                  <Text
+                                    style={{
+                                      color: '#5197C1',
+                                      fontSize: 25,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    -
+                                  </Text>
+                                </TouchableOpacity>
+                                <View
+                                  style={{
+                                    width: wp('10%'),
+                                    height: hp('5%'),
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}>
+                                  <TextInput
+                                    placeholder="0"
+                                    keyboardType="number-pad"
+                                    value={
+                                      itemSec.quantityProduct
+                                        ? String(itemSec.quantityProduct)
+                                        : ''
+                                    }
+                                    style={{
+                                      width: wp('10%'),
+                                      height: hp('5%'),
+                                      paddingLeft: 6,
+                                    }}
+                                    onChangeText={value =>
+                                      this.editQuantitySearchFun(
+                                        indexSec,
+                                        'quantityProduct',
+                                        itemSec,
+                                        'input',
+                                        item,
+                                        value,
+                                        index,
+                                      )
+                                    }
+                                  />
+                                </View>
+
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    this.editQuantitySearchFun(
+                                      indexSec,
+                                      'quantityProduct',
+                                      itemSec,
+                                      'add',
+                                      item,
+                                      'value',
+                                      index,
+                                    )
+                                  }
+                                  style={{
+                                    width: wp('10%'),
+                                    height: hp('5%'),
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}>
+                                  <Text
+                                    style={{
+                                      color: '#5197C1',
+                                      fontSize: 25,
+                                      fontWeight: 'bold',
+                                    }}>
+                                    +
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
+                            </View>
+                          </View>
+                        );
+                      })}
                   </View>
                 );
               })}
-            </ScrollView>
-          </View>
+            </View>
+          ) : (
+            <View style={{marginTop: hp('2%'), marginHorizontal: wp('5%')}}>
+              <ScrollView style={{}}>
+                {SECTIONS_HORIZONTAL.map((item, index) => {
+                  return (
+                    <View>
+                      <TouchableOpacity
+                        onPress={() => this.onPressInventoryFun(item, index)}
+                        style={{
+                          borderRadius: 5,
+                          backgroundColor:
+                            index === listIndex ? '#F2F2F2' : '#fff',
+                          height: 60,
+                          marginRight: 10,
+                          paddingHorizontal: 15,
+                          marginVertical: 10,
+                          justifyContent: 'space-between',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}>
+                        <Text
+                          style={{
+                            // color: index === listIndex ? '#black' : 'black',
+                            fontFamily: 'Inter-SemiBold',
+                            fontSize: 12,
+                          }}>
+                          {item.title}
+                        </Text>
+                        <Image
+                          style={{
+                            height: 15,
+                            width: 15,
+                            resizeMode: 'contain',
+                            marginLeft: wp('3%'),
+                          }}
+                          source={
+                            actionOpen === true
+                              ? img.upArrowIcon
+                              : img.arrowDownIcon
+                          }
+                        />
+                      </TouchableOpacity>
+                      <View>
+                        {index === listIndex ? (
+                          <View style={{}}>
+                            <View style={{}}>
+                              {modalLoader ? (
+                                <ActivityIndicator
+                                  size="large"
+                                  color="#5297c1"
+                                />
+                              ) : (
+                                <Accordion
+                                  expandMultiple
+                                  underlayColor="#fff"
+                                  sections={SECTIONS}
+                                  activeSections={activeSections}
+                                  renderHeader={this._renderHeader}
+                                  renderContent={this._renderContent}
+                                  // onChange={this._updateSections}
+                                />
+                              )}
+                            </View>
+                          </View>
+                        ) : null}
+                      </View>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
 
           {/* {SECTIONS.length > 0 || modalData.length > 0 ? (
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -4024,7 +4779,7 @@ class AddItems extends Component {
             style={{
               position: 'absolute',
               right: 20,
-              top: hp('80%'),
+              top: hp('84%'),
               backgroundColor: '#5297c1',
               padding: 15,
               borderRadius: 5,

@@ -1529,6 +1529,7 @@ export const getInsideInventoryNewApi = async (catId, supId, orderId) => {
   const finalURL = orderId
     ? `/inventory/inventories by category and supplier?CategoryId=${catId}&SupplieId=${supId}&shopingBasketId=${orderId}`
     : `/inventory/inventories by category and supplier?CategoryId=${catId}&SupplieId=${supId}`;
+  console.log('finalURL', finalURL);
 
   return axios.get(baseURL + finalURL, {
     headers: {
@@ -2037,6 +2038,24 @@ export const getImageApi = async id => {
       Language: language,
     },
   });
+};
+
+export const getSearchInventoryApi = async (searchText, id) => {
+  const token = await AsyncStorage.getItem('@appToken');
+  const location = await AsyncStorage.getItem('@location');
+  const language = await AsyncStorage.getItem('Language');
+
+  return axios.get(
+    baseURL +
+      `/Inventory/search inventories by name and supplier?Name=${searchText}&SupplierId=${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        LocationId: location,
+        Language: language,
+      },
+    },
+  );
 };
 
 export const deleteImageApi = async (id, payload) => {

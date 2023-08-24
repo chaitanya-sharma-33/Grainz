@@ -133,41 +133,46 @@ class PendingOrderDelivery extends Component {
   };
 
   async componentDidMount() {
-    // this.props.navigation.addListener('focus', () => {
-    const {route} = this.props;
-    const finalData = route.params.finalData;
-    const finalArrivedDate = route.params.finalArrivedDate;
-    const pageOrderItems = route.params.pageOrderItems;
-    console.log('finalData', finalData);
-    console.log('finalArrivedDate', finalArrivedDate);
+    this.props.navigation.addListener('focus', () => {
+      const {route} = this.props;
+      const finalData = route.params.finalData;
+      const finalArrivedDate = route.params.finalArrivedDate;
+      const pageOrderItems = route.params.pageOrderItems;
+      const pageDetailsData = route.params.pageDetailsData;
+      console.log('finalData', finalData);
+      console.log('finalArrivedDate', finalArrivedDate);
+      console.log('pageOrderItems', pageOrderItems);
+      console.log('pageDetailsData --> ', pageDetailsData);
 
-    this.setState({
-      finalData,
-      finalOrderDate: moment(finalData.orderDate).format('DD/MM/YYYY'),
-      productionDateOrder: moment.utc(finalData.orderDate).format(),
-      finalDeliveryDate: moment(finalData.deliveryDate).format('DD/MM/YYYY'),
-      productionDateDelivery: moment.utc(finalData.deliveryDate).format(),
-      productionDateArrived: moment.utc(finalData.deliveredDate).format(),
-      deliveryReference: finalData.orderReference,
-      pageAmbientTemp: finalData.ambientTemp
-        ? finalData.ambientTemp.toString()
-        : '',
-      pageChilledTemp: finalData.chilledTemp
-        ? finalData.chilledTemp.toString()
-        : '',
-      pageFrozenTemp: finalData.frozenTemp
-        ? finalData.frozenTemp.toString()
-        : '',
-      pageNotes: finalData.notes,
-      finalArrivedDate: finalArrivedDate,
-      itemId: finalData.id,
-      invoiceNumber: finalData.invoiceNumber,
-      pageOrderItems,
-      placedBy: finalData.placedBy,
+      this.setState({
+        pageDetailsData,
+        finalData,
+        finalOrderDate: moment(finalData.orderDate).format('DD/MM/YYYY'),
+        productionDateOrder: moment.utc(finalData.orderDate).format(),
+        finalDeliveryDate: moment(finalData.deliveryDate).format('DD/MM/YYYY'),
+        productionDateDelivery: moment.utc(finalData.deliveryDate).format(),
+        productionDateArrived: moment.utc(finalData.deliveredDate).format(),
+        deliveryReference: pageDetailsData && pageDetailsData.orderReference,
+        pageAmbientTemp:
+          pageDetailsData && pageDetailsData.ambientTemp
+            ? pageDetailsData && pageDetailsData.ambientTemp.toString()
+            : '',
+        pageChilledTemp: pageDetailsData.chilledTemp
+          ? pageDetailsData && pageDetailsData.chilledTemp.toString()
+          : '',
+        pageFrozenTemp: pageDetailsData.frozenTemp
+          ? pageDetailsData && pageDetailsData.frozenTemp.toString()
+          : '',
+        pageNotes: pageDetailsData.notes,
+        finalArrivedDate: finalArrivedDate,
+        itemId: finalData.id,
+        invoiceNumber: pageDetailsData.invoiceNumber,
+        pageOrderItems,
+        placedBy: finalData.placedBy,
+      });
+      this.getProfileDataFun();
+      this.getImageFun(finalData.id);
     });
-    this.getProfileDataFun();
-    this.getImageFun(finalData.id);
-    // });
   }
 
   myProfileFun = () => {
@@ -348,7 +353,9 @@ class PendingOrderDelivery extends Component {
           {
             loaderCompStatus: false,
           },
-          () => this.props.navigation.navigate('PendingDeliveryAdminScreen'),
+          () => this.props.navigation.goBack(),
+          // ,
+          // () => this.props.navigation.navigate('PendingDeliveryAdminScreen'),
         );
       })
       .catch(err => {

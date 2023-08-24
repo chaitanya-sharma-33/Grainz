@@ -145,11 +145,15 @@ class NewOrderThird extends Component {
     this.props.navigation.addListener('focus', () => {
       const {route} = this.props;
       const finalData = route.params.finalData;
+      const firstBasketId = route.params.firstBasketId;
       console.log('finalData', finalData);
+      console.log('firstBasketId', firstBasketId);
+
       this.getDepartmentData();
       if (finalData) {
         this.setState({
           finalData,
+          firstBasketId,
         });
       }
     });
@@ -183,7 +187,7 @@ class NewOrderThird extends Component {
 
   onPressFun = item => {
     console.log('item', item);
-    const {finalData} = this.state;
+    const {finalData, firstBasketId} = this.state;
     this.props.navigation.navigate('AddItemsOrderScreen', {
       departID: item.id,
       departName: item.name,
@@ -193,13 +197,16 @@ class NewOrderThird extends Component {
       finalData,
       finalDataSec: '',
       basketId: '',
+      firstBasketId,
     });
   };
 
   render() {
     const {buttonsLoader, buttons, showMoreStatus, finalData} = this.state;
 
-    const trimmedName = finalData && finalData.supplierName.substring(0, 10);
+    // const trimmedName = finalData && finalData.supplierName.substring(0, 10);
+    const trimmedName = finalData && finalData.supplierName;
+
     console.log('trimmedName', trimmedName);
     return (
       <View style={styles.container}>

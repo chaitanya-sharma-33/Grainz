@@ -1303,7 +1303,7 @@ class EditDraftOrder extends Component {
     const {basketId, apiDeliveryDate} = this.state;
     let payload = {};
     console.log('apiDeliveryDate', apiDeliveryDate);
-    // console.log('basketId', basketId);
+    console.log('basketId', basketId);
 
     setDeliveryDateApi(basketId, apiDeliveryDate, payload)
       .then(res => {
