@@ -180,6 +180,7 @@ class ViewDraftOrders extends Component {
   hitDeleteApi = () => {
     const {draftsOrderData, productId} = this.state;
     let payload = draftsOrderData;
+    console.log('PAYLOAD', payload);
     deleteOrderApi(productId, payload)
       .then(res => {
         this.setState({

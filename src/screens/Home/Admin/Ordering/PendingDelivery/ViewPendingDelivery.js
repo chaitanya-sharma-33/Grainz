@@ -252,7 +252,7 @@ class ViewPendingDelivery extends Component {
               data.deliveredDate &&
               moment(data.deliveredDate).format('DD/MM/YYYY'),
             loaderCompStatus: false,
-            totalValue: data.htva.toFixed(2),
+            totalValue: data.htva && data.htva.toFixed(2),
             userName: data.checkedBy,
           },
           () => this.createFinalData(),

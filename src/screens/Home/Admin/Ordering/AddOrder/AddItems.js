@@ -245,18 +245,9 @@ class AddItems extends Component {
       });
   };
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener(
-      'hardwareBackPress',
-      this.onBackButtonPressed,
-    );
-  }
-
-  onBackButtonPressed() {
-    return this.goBackFun();
-  }
-
   async componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
+
     this.getData();
 
     this.props.navigation.addListener('focus', () => {
@@ -302,9 +293,19 @@ class AddItems extends Component {
         () => this.getManualLogsData(),
       );
     });
-
-    BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
   }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.onBackButtonPressed,
+    );
+  }
+
+  onBackButtonPressed = () => {
+    this.goBackFun();
+    return true;
+  };
 
   myProfile = () => {
     this.props.navigation.navigate('MyProfile');

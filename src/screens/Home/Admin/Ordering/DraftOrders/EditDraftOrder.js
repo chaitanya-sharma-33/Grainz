@@ -762,6 +762,8 @@ class EditDraftOrder extends Component {
       id: basketId,
     };
 
+    console.log('PAYLOAD', payload);
+
     updateBasketApi(payload)
       .then(res => {
         this.setState(

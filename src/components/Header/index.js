@@ -99,7 +99,7 @@ class index extends Component {
               }}
             />
 
-            <View
+            {/* <View
               style={{
                 justifyContent: 'space-around',
                 flexDirection: 'row',
@@ -117,7 +117,7 @@ class index extends Component {
                   {environmentName}
                 </Text>
               </View>
-            </View>
+            </View> */}
           </TouchableOpacity>
           <View
             style={{

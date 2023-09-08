@@ -3,7 +3,7 @@
     "BaseURL": "https://web-grainz-dev.azurewebsites.net/api"
   },
   "STAGING": {
-    "BaseURL": "https://grainzwebapiq.azurewebsites.net/api"
+    "BaseURL": "https://grainzwebapi.azurewebsites.net/api"
   },
   "STAGING_TWO": {
     "BaseURL": "https://web-grainz-uat.azurewebsites.net/api"

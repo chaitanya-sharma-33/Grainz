@@ -59,7 +59,7 @@ export class index extends Component {
           }}
           originWhitelist={['*']}
           source={{
-            uri: 'https://web-grainz-dev.azurewebsites.net/#/auth/signup',
+            uri: 'https://grainz.com/#/auth/signup',
           }}
           style={{
             flex: 1,
