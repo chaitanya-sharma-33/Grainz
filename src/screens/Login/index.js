@@ -472,13 +472,13 @@ class index extends Component {
                     </Text>
                   )}
                 </TouchableOpacity>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => this.signInFun()}
                   style={styles.signInStyling}>
                   <Text style={styles.signInStylingText}>
                     {translate('SignUp')}
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity
                   onPress={() => this.setModalVisibleForgetPass(true)}
                   style={styles.forgotPassStyling}>
