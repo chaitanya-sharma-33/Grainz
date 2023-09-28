@@ -910,9 +910,10 @@ class EditDraftOrder extends Component {
         index === i
           ? {
               ...item,
-              [type]: valueMinus,
-              ['calculatedQuantity']: finalQuantityMinus,
-              ['value']: finalValueMinus,
+              [type]: valueMinus >= 0 ? valueMinus : 0,
+              ['calculatedQuantity']:
+                finalQuantityMinus >= 0 ? finalQuantityMinus : 0,
+              ['value']: finalValueMinus >= 0 ? finalValueMinus : 0,
               ['action']: 'Update',
             }
           : item,

@@ -1149,7 +1149,7 @@ class ViewPendingDelivery extends Component {
         modalUserQuantityDelivered: item.userQuantityDelivered,
         modalQuantityInvoiced: item.quantityInvoiced,
         modalUserQuantityInvoiced: item.userQuantityInvoiced,
-        modalPricePaid: item.orderValue.toFixed(2),
+        modalPricePaid: item && item.orderValue.toFixed(2),
         modalNotes: item.notes,
         finalArrivalDateSpecific: moment(item.arrivedDate).format('DD-MM-YYYY'),
         volume: item.inventoryMapping
@@ -4602,7 +4602,7 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       fontSize: 14,
                                     }}>
-                                    {translate('Number')}
+                                    {translate('_Number')}
                                   </Text>
                                 </View>
                                 <View
@@ -4614,7 +4614,7 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       fontSize: 14,
                                     }}>
-                                    {translate('Quantity')}
+                                    {translate('_Quantity')}
                                   </Text>
                                 </View>
 
@@ -4654,7 +4654,7 @@ class ViewPendingDelivery extends Component {
                                     style={{
                                       fontSize: 14,
                                     }}>
-                                    {translate('Order')}
+                                    {translate('Ordered')}
                                   </Text>
                                 </View>
 

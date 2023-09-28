@@ -275,7 +275,7 @@ class NewOrderThird extends Component {
                         }}>
                         <TextInput
                           value={trimmedName}
-                          numberOfLines={1}
+                          // numberOfLines={1}
                           editable={false}
                           style={{
                             fontSize: 14,

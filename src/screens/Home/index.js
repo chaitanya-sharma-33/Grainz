@@ -178,12 +178,24 @@ class index extends Component {
   };
 
   componentDidMount() {
-    this.getUserLocationFun();
     this.props.navigation.addListener('focus', async () => {
-      const location = await AsyncStorage.getItem('@locationName');
+      const locationName = await AsyncStorage.getItem('@locationName');
+      const location = await AsyncStorage.getItem('@location');
+      console.log('locationName', locationName);
+
+      if (location === undefined || location === null || location === '') {
+        this.getUserLocationFun();
+      } else {
+        this.setState(
+          {
+            finalLocation: location,
+          },
+          () => this.setCurrentLocFun(),
+        );
+      }
       this.getData();
       this.setState({
-        finalLocationName: location,
+        finalLocationName: locationName,
       });
     });
     this.setLanguage();
@@ -233,6 +245,7 @@ class index extends Component {
 
   setCurrentLocFun = () => {
     const {finalLocation} = this.state;
+    console.log('FINAL-LOC', finalLocation);
     setCurrentLocation(finalLocation)
       .then(res => {
         console.log('res-SETLOC', res);

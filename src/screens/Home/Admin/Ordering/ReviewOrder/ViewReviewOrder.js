@@ -3544,54 +3544,54 @@ class ViewReviewOrder extends Component {
                   </View>
                 </View>
 
-                <View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      flex: 1,
-                      backgroundColor: '#FFFFFF',
-                      paddingVertical: hp('3%'),
-                      borderTopLeftRadius: 5,
-                      borderTopRightRadius: 5,
-                      paddingHorizontal: 20,
-                    }}>
-                    <TouchableOpacity
-                      disabled={switchValueAll ? false : true}
-                      onPress={() =>
-                        this.setState({isAuditStatus: !isAuditStatus})
-                      }
+                {switchValueAll ? (
+                  <View>
+                    <View
                       style={{
-                        flex: 1,
                         flexDirection: 'row',
-                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flex: 1,
+                        backgroundColor: '#FFFFFF',
+                        paddingVertical: hp('3%'),
+                        borderTopLeftRadius: 5,
+                        borderTopRightRadius: 5,
+                        paddingHorizontal: 20,
                       }}>
-                      <View
+                      <TouchableOpacity
+                        disabled={switchValueAll ? false : true}
+                        onPress={() =>
+                          this.setState({isAuditStatus: !isAuditStatus})
+                        }
                         style={{
-                          borderRadius: 100,
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
                         }}>
-                        <CheckBox
-                          disabled={true}
-                          value={isAuditStatus}
+                        <View
                           style={{
-                            height: 20,
-                            width: 20,
-                          }}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter-Regular',
-                          marginLeft: 10,
-                          textAlign: 'center',
-                        }}>
-                        {translate('Audit Complete')}
-                        {/* (You can select when all items are checked
-                        correct) */}
-                      </Text>
-                    </TouchableOpacity>
+                            borderRadius: 100,
+                          }}>
+                          <CheckBox
+                            disabled={true}
+                            value={isAuditStatus}
+                            style={{
+                              height: 20,
+                              width: 20,
+                            }}
+                          />
+                        </View>
+                        <Text
+                          style={{
+                            fontFamily: 'Inter-Regular',
+                            marginLeft: 10,
+                            textAlign: 'center',
+                          }}>
+                          {translate('Audit Complete')}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
+                ) : null}
               </View>
 
               <View style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -4192,13 +4192,15 @@ class ViewReviewOrder extends Component {
                           ? item.inventoryMapping.volume
                           : item.grainzVolume;
                         const modalQuantityDelivered =
-                          item.quantityDelivered.toFixed(2);
+                          item && item.quantityDelivered;
+
                         const modalUserQuantityDelivered =
-                          item.userQuantityDelivered;
+                          item && item.userQuantityDelivered;
                         const modalQuantityInvoiced =
-                          item.quantityInvoiced.toFixed(2);
+                          item && item.quantityInvoiced;
+
                         const modalUserQuantityInvoiced =
-                          item.userQuantityInvoiced;
+                          item && item.userQuantityInvoiced;
                         const modalPricePaid = Number(item.orderValue).toFixed(
                           2,
                         );
@@ -4333,7 +4335,7 @@ class ViewReviewOrder extends Component {
                                     style={{
                                       fontSize: 14,
                                     }}>
-                                    {translate('Number')}
+                                    {translate('_Number')}
                                   </Text>
                                 </View>
                                 <View
@@ -4345,7 +4347,7 @@ class ViewReviewOrder extends Component {
                                     style={{
                                       fontSize: 14,
                                     }}>
-                                    {translate('Quantity')}
+                                    {translate('_Quantity')}
                                   </Text>
                                 </View>
 
@@ -4385,7 +4387,7 @@ class ViewReviewOrder extends Component {
                                     style={{
                                       fontSize: 14,
                                     }}>
-                                    {translate('Order')}
+                                    {translate('Ordered')}
                                   </Text>
                                 </View>
 
@@ -4397,7 +4399,7 @@ class ViewReviewOrder extends Component {
                                     borderRadius: 6,
                                   }}>
                                   <TextInput
-                                    placeholder={translate('Order')}
+                                    placeholder={translate('Ordered')}
                                     editable={false}
                                     value={String(modalQuantityOrdered)}
                                     style={{
@@ -4420,7 +4422,7 @@ class ViewReviewOrder extends Component {
                                   }}>
                                   <View style={{flex: 1}}>
                                     <TextInput
-                                      placeholder={translate('Quantity')}
+                                      placeholder={translate('_Quantity')}
                                       editable={false}
                                       value={String(
                                         volume * modalQuantityOrdered,
@@ -5081,7 +5083,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                {translate('Product Code')}
+                                {translate('_Product code')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -5137,7 +5139,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                {translate('Ordered No')}
+                                {translate('_Ordered No')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -5163,7 +5165,7 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                {translate('Ordered Qty')}
+                                {translate('_Ordered Qty')}
                               </Text>
                               <Text
                                 numberOfLines={1}
@@ -5195,10 +5197,10 @@ class ViewReviewOrder extends Component {
                                 style={{
                                   fontSize: 12,
                                 }}>
-                                {translate('Delivered No')}
+                                {translate('_Delivered No')}
                               </Text>
                               <TextInput
-                                placeholder="Delivered"
+                                placeholder="_Delivered No"
                                 keyboardType="numeric"
                                 style={{
                                   width: 80,
@@ -5241,7 +5243,7 @@ class ViewReviewOrder extends Component {
                                   alignItems: 'center',
                                 }}>
                                 <TextInput
-                                  placeholder="Delivered Qty."
+                                  placeholder="_Delivered Qty"
                                   value={
                                     modalUserQuantityDelivered &&
                                     String(modalUserQuantityDelivered)
@@ -5433,7 +5435,7 @@ class ViewReviewOrder extends Component {
                                   alignItems: 'center',
                                 }}>
                                 <TextInput
-                                  placeholder={translate('Order Value Ex-VAT')}
+                                  placeholder={translate('_Ordered Val Actual')}
                                   keyboardType="number-pad"
                                   style={{
                                     width: 80,

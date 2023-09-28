@@ -142,11 +142,17 @@ class ReviewOrderDelivery extends Component {
       this.setState({
         pageDetailsData,
         finalData,
-        finalOrderDate: moment(finalData.orderDate).format('DD/MM/YYYY'),
-        productionDateOrder: moment.utc(finalData.orderDate).format(),
-        finalDeliveryDate: moment(finalData.deliveryDate).format('DD/MM/YYYY'),
-        productionDateDelivery: moment.utc(finalData.deliveryDate).format(),
-        productionDateArrived: moment.utc(finalData.deliveredDate).format(),
+        finalOrderDate: moment(pageDetailsData.orderDate).format('DD/MM/YYYY'),
+        productionDateOrder: moment.utc(pageDetailsData.orderDate).format(),
+        finalDeliveryDate: moment(pageDetailsData.deliveryDate).format(
+          'DD/MM/YYYY',
+        ),
+        productionDateDelivery: moment
+          .utc(pageDetailsData.deliveryDate)
+          .format(),
+        productionDateArrived: moment
+          .utc(pageDetailsData.deliveredDate)
+          .format(),
         deliveryReference: pageDetailsData && pageDetailsData.orderReference,
         pageAmbientTemp: pageDetailsData.ambientTemp
           ? pageDetailsData && pageDetailsData.ambientTemp.toString()
@@ -159,8 +165,8 @@ class ReviewOrderDelivery extends Component {
           : '',
         pageNotes: pageDetailsData && pageDetailsData.notes,
         finalArrivedDate:
-          finalData.deliveredDate &&
-          moment(finalData.deliveredDate).format('DD/MM/YYYY'),
+          pageDetailsData.deliveredDate &&
+          moment(pageDetailsData.deliveredDate).format('DD/MM/YYYY'),
         itemId: finalData.id,
         invoiceNumber: pageDetailsData && pageDetailsData.invoiceNumber,
         pageOrderItems,
@@ -265,8 +271,12 @@ class ReviewOrderDelivery extends Component {
   };
 
   processOrderFun() {
-    this.processOrderFunSec();
-    this.processOrderFunThird();
+    this.setState(
+      {
+        saveLoader: true,
+      },
+      () => this.processOrderFunThird(),
+    );
   }
 
   processOrderFunSec = () => {
@@ -309,7 +319,14 @@ class ReviewOrderDelivery extends Component {
     console.log('PAYLOAD----->PROCESS ORDER', payload);
 
     processPendingOrderApi(payload)
-      .then(res => {})
+      .then(res => {
+        this.setState(
+          {
+            saveLoader: false,
+          },
+          () => this.props.navigation.goBack(),
+        );
+      })
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
@@ -346,12 +363,13 @@ class ReviewOrderDelivery extends Component {
     deliveredDateUpdateApi(id, deliveredDate, deliveryDate)
       .then(res => {
         console.log('res', res);
-        this.setState(
-          {
-            loaderCompStatus: false,
-          },
-          () => this.props.navigation.goBack(),
-        );
+        this.processOrderFunSec();
+        // this.setState(
+        //   {
+        //     loaderCompStatus: false,
+        //   },
+        //   () =>    this.processOrderFunSec();
+        // );
       })
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
@@ -928,6 +946,7 @@ class ReviewOrderDelivery extends Component {
                     }}>
                     <TextInput
                       value={pageAmbientTemp}
+                      keyboardType="number-pad"
                       onChangeText={value =>
                         this.setState({
                           pageAmbientTemp: value,
@@ -960,6 +979,7 @@ class ReviewOrderDelivery extends Component {
                     }}>
                     <TextInput
                       value={pageChilledTemp}
+                      keyboardType="number-pad"
                       onChangeText={value =>
                         this.setState({
                           pageChilledTemp: value,
@@ -992,6 +1012,7 @@ class ReviewOrderDelivery extends Component {
                     }}>
                     <TextInput
                       value={pageFrozenTemp}
+                      keyboardType="number-pad"
                       onChangeText={value =>
                         this.setState({
                           pageFrozenTemp: value,

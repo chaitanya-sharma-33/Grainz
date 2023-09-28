@@ -147,11 +147,17 @@ class PendingOrderDelivery extends Component {
       this.setState({
         pageDetailsData,
         finalData,
-        finalOrderDate: moment(finalData.orderDate).format('DD/MM/YYYY'),
-        productionDateOrder: moment.utc(finalData.orderDate).format(),
-        finalDeliveryDate: moment(finalData.deliveryDate).format('DD/MM/YYYY'),
-        productionDateDelivery: moment.utc(finalData.deliveryDate).format(),
-        productionDateArrived: moment.utc(finalData.deliveredDate).format(),
+        finalOrderDate: moment(pageDetailsData.orderDate).format('DD/MM/YYYY'),
+        productionDateOrder: moment.utc(pageDetailsData.orderDate).format(),
+        finalDeliveryDate: moment(pageDetailsData.deliveryDate).format(
+          'DD/MM/YYYY',
+        ),
+        productionDateDelivery: moment
+          .utc(pageDetailsData.deliveryDate)
+          .format(),
+        productionDateArrived: moment
+          .utc(pageDetailsData.deliveredDate)
+          .format(),
         deliveryReference: pageDetailsData && pageDetailsData.orderReference,
         pageAmbientTemp:
           pageDetailsData && pageDetailsData.ambientTemp
@@ -269,8 +275,12 @@ class PendingOrderDelivery extends Component {
   };
 
   processOrderFun() {
-    this.processOrderFunSec();
-    this.processOrderFunThird();
+    this.setState(
+      {
+        saveLoader: true,
+      },
+      () => this.processOrderFunThird(),
+    );
   }
 
   processOrderFunSec = () => {
@@ -312,8 +322,16 @@ class PendingOrderDelivery extends Component {
     console.log('PAYLOAD----->PROCESS ORDER', payload);
 
     processPendingOrderApi(payload)
-      .then(res => {})
+      .then(res => {
+        this.setState(
+          {
+            saveLoader: false,
+          },
+          () => this.props.navigation.goBack(),
+        );
+      })
       .catch(err => {
+        console.log('err', err.response);
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
           {
             text: 'Okay',
@@ -337,6 +355,7 @@ class PendingOrderDelivery extends Component {
     } = this.state;
 
     console.log('final', finalData);
+    console.log('productionDateArrived', productionDateArrived);
 
     const id = finalData.id;
     const deliveredDate = moment.utc(productionDateArrived).format();
@@ -349,14 +368,16 @@ class PendingOrderDelivery extends Component {
     deliveredDateUpdateApi(id, deliveredDate, deliveryDate)
       .then(res => {
         console.log('res', res);
-        this.setState(
-          {
-            loaderCompStatus: false,
-          },
-          () => this.props.navigation.goBack(),
-          // ,
-          // () => this.props.navigation.navigate('PendingDeliveryAdminScreen'),
-        );
+        this.processOrderFunSec();
+        // this.setState(
+        //   {
+        //     loaderCompStatus: false,
+        //   },
+        //   () =>     this.processOrderFunSec()
+        //   ,
+        //   // ,
+        //   // () => this.props.navigation.navigate('PendingDeliveryAdminScreen'),
+        // );
       })
       .catch(err => {
         Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
@@ -936,6 +957,7 @@ class PendingOrderDelivery extends Component {
                     }}>
                     <TextInput
                       value={pageAmbientTemp}
+                      keyboardType="number-pad"
                       onChangeText={value =>
                         this.setState({
                           pageAmbientTemp: value,
@@ -968,6 +990,7 @@ class PendingOrderDelivery extends Component {
                     }}>
                     <TextInput
                       value={pageChilledTemp}
+                      keyboardType="number-pad"
                       onChangeText={value =>
                         this.setState({
                           pageChilledTemp: value,
@@ -1000,6 +1023,7 @@ class PendingOrderDelivery extends Component {
                     }}>
                     <TextInput
                       value={pageFrozenTemp}
+                      keyboardType="number-pad"
                       onChangeText={value =>
                         this.setState({
                           pageFrozenTemp: value,

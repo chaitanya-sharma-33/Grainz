@@ -180,12 +180,19 @@ class index extends Component {
 
   storeLocationFun = async res => {
     const {finalLocation, finalLocationName} = this.state;
-    // console.log('res-STORE', finalLocation);
+    console.log('res-STORE', finalLocationName);
     await AsyncStorage.setItem('@location', finalLocation);
     await AsyncStorage.setItem('@locationName', finalLocationName);
     const finalData = (res.data && res.data.isFreemium).toString();
     console.log('final', finalLocationName);
     await AsyncStorage.setItem('@isFreemium', finalData);
+
+    this.setState(
+      {
+        pageLoader: true,
+      },
+      () => this.updateUserFunSec(),
+    );
   };
 
   removeToken = async () => {
@@ -249,12 +256,6 @@ class index extends Component {
 
   updateUserFun = () => {
     this.setCurrentLocFun();
-    this.setState(
-      {
-        pageLoader: true,
-      },
-      () => this.updateUserFunSec(),
-    );
   };
   updateUserFunSec = () => {
     const {
@@ -281,9 +282,12 @@ class index extends Component {
 
     updateUserApi(payload)
       .then(res => {
-        this.setState({
-          pageLoader: false,
-        });
+        this.setState(
+          {
+            pageLoader: false,
+          },
+          () => this.props.navigation.navigate('HomeScreen'),
+        );
         console.log('Res', res);
       })
       .catch(err => {
