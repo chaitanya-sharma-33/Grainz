@@ -111,6 +111,7 @@ class Basket extends Component {
       emailData: '',
       validateDateData: '',
       stockStatus: false,
+      deliveryDateStatus: false,
     };
   }
 
@@ -364,9 +365,10 @@ class Basket extends Component {
         index === i
           ? {
               ...item,
-              [type]: valueMinus,
-              ['calculatedQuantity']: finalQuantityMinus,
-              ['value']: finalValueMinus,
+              [type]: valueMinus >= 0 ? valueMinus : 0,
+              ['calculatedQuantity']:
+                finalQuantityMinus >= 0 ? finalQuantityMinus : 0,
+              ['value']: finalValueMinus >= 0 ? finalValueMinus : 0,
               ['action']: 'Update',
             }
           : item,
@@ -435,6 +437,43 @@ class Basket extends Component {
         () => this.sendFunSec(),
       );
     }
+  };
+
+  validateDateSendFun = () => {
+    const {supplierValue, apiDeliveryDate, deliveryDateStatus} = this.state;
+    console.log('supplierValue', supplierValue);
+    let payload = {};
+    console.log('apiDeliveryDate', apiDeliveryDate);
+    // console.log('basketId', basketId);
+    const finalDate = deliveryDateStatus
+      ? apiDeliveryDate
+      : apiDeliveryDate.toISOString();
+
+    console.log('finalDate', finalDate);
+
+    validateDeliveryDateApi(payload, supplierValue, finalDate)
+      .then(res => {
+        console.log('res-validateDateFun', res);
+        console.log('res-validateDateFun', res.data);
+
+        if (res.data === '') {
+          this.sendFTPFun();
+        } else {
+          this.openDatePickerModal(res);
+        }
+      })
+      .catch(err => {
+        console.log('err', err.response);
+        // Alert.alert(
+        //   `Error - ${err.response.status}`,
+        //   'Something went wrong-1',
+        //   [
+        //     {
+        //       text: translate('Ok'),
+        //     },
+        //   ],
+        // );
+      });
   };
 
   sendFTPFun = () => {
@@ -731,6 +770,43 @@ class Basket extends Component {
       });
   };
 
+  addDraftFun = () => {
+    const {
+      apiDeliveryDate,
+      apiOrderDate,
+      placedByValue,
+      supplierId,
+      basketId,
+      finalApiData,
+      finalDataSec,
+    } = this.state;
+    let payload = {
+      id: basketId ? basketId : firstBasketId,
+      supplierId: supplierId,
+      orderDate: apiOrderDate,
+      deliveryDate: apiDeliveryDate,
+      placedBy: placedByValue,
+      shopingBasketItemList: finalApiData,
+      customerNumber: finalDataSec.customerNumber,
+      finalData: finalDataSec.channel,
+    };
+
+    console.log('Payload--> ADD DRAFT', payload);
+    addDraftApi(payload)
+      .then(res => {
+        console.log('res-addDraft', res);
+        this.saveAndUpdateFun();
+      })
+      .catch(err => {
+        Alert.alert(`Error - ${err.response.status}`, 'Something went wrong', [
+          {
+            text: translate('Ok'),
+            // onPress: () => this.closeLoaderComp(),
+          },
+        ]);
+      });
+  };
+
   saveDraftFun = () => {
     const {
       apiDeliveryDate,
@@ -818,8 +894,11 @@ class Basket extends Component {
   saveAndUpdateFun = () => {
     const {editStatus} = this.state;
     if (editStatus) {
+      console.log('UPDATE');
+
       this.updateBasketFun();
     } else {
+      console.log('SAVE');
       this.saveDraftFun();
     }
   };
@@ -962,15 +1041,20 @@ class Basket extends Component {
   };
 
   handleConfirmDeliveryDate = date => {
+    console.log('date', date);
+
     const {finalOrderDate} = this.state;
     const finalDeliveryDate = moment(date).format('DD/MM/YYYY');
 
     let newdate = moment(date).format('DD/MM/YYYY');
     let apiDeliveryDate = date.toISOString();
+
+    console.log('apiDeliveryDate', apiDeliveryDate);
     this.setState(
       {
         finalDeliveryDate: newdate,
         apiDeliveryDate,
+        deliveryDateStatus: true,
       },
       () => this.validateDateFun(),
     );
@@ -1245,6 +1329,7 @@ class Basket extends Component {
       {
         loaderCompStatus: true,
       },
+      // () => this.addDraftFun(),
       () => this.saveAndUpdateFun(),
     );
   };
@@ -3562,7 +3647,7 @@ class Basket extends Component {
             </TouchableOpacity>
             <TouchableOpacity
               // onPress={() => this.sendFun()}
-              onPress={() => this.sendFTPFun()}
+              onPress={() => this.validateDateSendFun()}
               style={{
                 height: hp('7%'),
                 width: wp('87%'),

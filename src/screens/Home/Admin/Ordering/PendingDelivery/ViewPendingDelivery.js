@@ -827,6 +827,10 @@ class ViewPendingDelivery extends Component {
     console.log('item123123123', item);
     const {finalArrivedDate} = this.state;
     if (finalArrivedDate) {
+      const modalValueExpected = item.orderValueExpected;
+      const modalValueExpectedSpilt = Number(modalValueExpected.split(' ')[0]);
+      console.log('modalValueExpectedSpilt', modalValueExpectedSpilt);
+
       this.setState(
         {
           modalData: item,
@@ -840,7 +844,7 @@ class ViewPendingDelivery extends Component {
           priceActual: item.priceActual,
           orderValueExpected: item.orderValueExpected,
           modalUserQuantityInvoiced: item.userQuantityInvoiced,
-          modalPricePaid: item.orderValue.toFixed(2),
+          modalPricePaid: Number(item.orderValue).toFixed(2),
           modalNotes: item.notes ? item.notes : '',
           finalArrivalDateSpecific:
             item.arrivedDate && moment(item.arrivedDate).format('DD/MM/YYYY'),
@@ -858,6 +862,7 @@ class ViewPendingDelivery extends Component {
           productCode: item.productCode,
           flagStatus: item.isFlagged,
           finalUnit: item.unit,
+          modalValueExpectedSpilt,
         },
         () => this.getCreditNote(item.id),
       );
@@ -1311,33 +1316,53 @@ class ViewPendingDelivery extends Component {
   editChecklistFun = (index, type, value, data, valueType) => {
     const {pageOrderItems} = this.state;
 
-    // console.log('data', data);
+    console.log('data', data);
 
     const finalValue = value;
     const volume = data.inventoryMapping && data.inventoryMapping.volume;
     const modalQuantityOrdered = data.quantityOrdered;
+    // const modalQuantityInvoiced = data.quantityInvoiced;
+    // console.log('modalQuantityInvoiced', modalQuantityInvoiced);
+
+    const modalValueExpected = data.orderValueExpected;
+    const modalValueExpectedSpilt = Number(modalValueExpected.split(' ')[0]);
+    console.log('modalValueExpectedSpilt', modalValueExpectedSpilt);
+
     const finalValueSec = value * volume;
     const packSize = data.inventoryMapping
       ? data.inventoryMapping.packSize
       : data.packSize;
 
-    const finalValueThird =
-      (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered;
+    console.log('packSize', packSize);
+
+    const finalValueThird = Number(
+      (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered,
+    ).toFixed(2);
     const unitPrizeModal = data.unitPrice;
 
     const finalChecklist = !data.checklistModalHideStatus;
 
-    const finalValueFourth = value * volume;
-    const finalValueFifth =
-      (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered;
+    const finalValueFourth = Number(value * volume).toFixed(2);
+    const finalValueFifth = Number(
+      (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered,
+    ).toFixed(2);
 
-    const finalPriceInvoiced = (value * packSize * unitPrizeModal).toFixed(2);
+    const finalValueSixth = Number(
+      finalValueFifth * packSize * modalValueExpectedSpilt,
+    ).toFixed(2);
+
+    console.log('finalValueSixth', finalValueSixth);
+
+    const finalPriceInvoiced = Number(
+      value * packSize * unitPrizeModal,
+    ).toFixed(2);
     if (valueType === 'DeliveredNo') {
       let newArr = pageOrderItems.map((item, i) =>
         index === i
           ? {
               ...item,
               [type]: finalValue,
+              ['quantityInvoiced']: finalValue,
               ['userQuantityDelivered']: finalValueSec,
               ['action']: 'Update',
             }
@@ -1388,6 +1413,7 @@ class ViewPendingDelivery extends Component {
               [type]: finalValue,
               ['action']: 'Update',
               ['quantityInvoiced']: finalValueFifth,
+              ['orderValue']: finalValueSixth,
             }
           : item,
       );
@@ -1779,6 +1805,7 @@ class ViewPendingDelivery extends Component {
       userName,
       usersData,
       pageDetailsData,
+      modalValueExpectedSpilt,
     } = this.state;
     console.log('pageData--->', pageData);
     console.log('priceActual--->', priceActual && priceActual.split(' ')[0]);
@@ -3465,7 +3492,7 @@ class ViewPendingDelivery extends Component {
                                                 modalPricePaid: (
                                                   value *
                                                   packSize *
-                                                  unitPrizeModal
+                                                  modalValueExpectedSpilt
                                                 ).toFixed(2),
                                               })
                                             }
@@ -5625,6 +5652,7 @@ class ViewPendingDelivery extends Component {
                                 onChangeText={value =>
                                   this.setState({
                                     modalQuantityDelivered: value,
+                                    modalQuantityInvoiced: value,
                                     modalUserQuantityDelivered: value * volume,
                                   })
                                 }
@@ -5775,6 +5803,15 @@ class ViewPendingDelivery extends Component {
                                             volume * modalQuantityOrdered,
                                           )) *
                                         modalQuantityOrdered,
+                                      modalPricePaid: (
+                                        (value /
+                                          Number(
+                                            volume * modalQuantityOrdered,
+                                          )) *
+                                        modalQuantityOrdered *
+                                        packSize *
+                                        unitPrizeModal
+                                      ).toFixed(2),
                                     })
                                   }
                                 />

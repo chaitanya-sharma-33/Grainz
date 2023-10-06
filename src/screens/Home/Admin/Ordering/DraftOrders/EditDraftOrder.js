@@ -217,6 +217,37 @@ class EditDraftOrder extends Component {
       });
   };
 
+  validateDateSendFun = () => {
+    const {supplierValue, apiDeliveryDate} = this.state;
+    console.log('supplierValue', supplierValue);
+    let payload = {};
+    console.log('apiDeliveryDate', apiDeliveryDate);
+    // console.log('basketId', basketId);
+
+    validateDeliveryDateApi(payload, supplierValue, apiDeliveryDate)
+      .then(res => {
+        console.log('res-validateDateFun', res);
+        console.log('res-validateDateFun', res.data);
+
+        if (res.data === '') {
+          this.sendFun();
+        } else {
+          this.openDatePickerModal(res);
+        }
+      })
+      .catch(err => {
+        // Alert.alert(
+        //   `Error - ${err.response.status}`,
+        //   'Something went wrong-1',
+        //   [
+        //     {
+        //       text: translate('Ok'),
+        //     },
+        //   ],
+        // );
+      });
+  };
+
   sendFun = () => {
     const {finalDeliveryDate} = this.state;
 
@@ -2890,7 +2921,7 @@ class EditDraftOrder extends Component {
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.sendFun()}
+              onPress={() => this.validateDateSendFun()}
               // onPress={() => this.sendFunSec()}
               style={{
                 height: hp('7%'),

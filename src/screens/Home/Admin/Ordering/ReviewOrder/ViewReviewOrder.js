@@ -737,6 +737,10 @@ class ViewReviewOrder extends Component {
 
   showEditModal = (item, index) => {
     console.log('ITEM', item);
+
+    const modalValueExpected = item.orderValueExpected;
+    const modalValueExpectedSpilt = Number(modalValueExpected.split(' ')[0]);
+    console.log('modalValueExpectedSpilt', modalValueExpectedSpilt);
     this.setState(
       {
         modalData: item,
@@ -768,6 +772,7 @@ class ViewReviewOrder extends Component {
         priceExpected: item.priceExpected,
         priceActual: item.priceActual,
         finalUnit: item.unit,
+        modalValueExpectedSpilt,
       },
       () => this.getCreditNote(item.id),
     );
@@ -1077,6 +1082,11 @@ class ViewReviewOrder extends Component {
     const finalValue = value;
     const volume = data.inventoryMapping && data.inventoryMapping.volume;
     const modalQuantityOrdered = data.quantityOrdered;
+
+    const modalValueExpected = data.orderValueExpected;
+    const modalValueExpectedSpilt = Number(modalValueExpected.split(' ')[0]);
+    console.log('modalValueExpectedSpilt', modalValueExpectedSpilt);
+
     const finalValueSec = value * volume;
     const packSize = data.inventoryMapping
       ? data.inventoryMapping.packSize
@@ -1094,6 +1104,9 @@ class ViewReviewOrder extends Component {
     const finalValueFifth =
       (value / Number(volume * modalQuantityOrdered)) * modalQuantityOrdered;
 
+    const finalValueSixth = Number(
+      finalValueFifth * packSize * modalValueExpectedSpilt,
+    ).toFixed(2);
     const finalPriceInvoiced = (value * packSize * unitPrizeModal).toFixed(2);
     if (valueType === 'DeliveredNo') {
       let newArr = pageOrderItems.map((item, i) =>
@@ -1101,6 +1114,7 @@ class ViewReviewOrder extends Component {
           ? {
               ...item,
               [type]: finalValue,
+              ['quantityInvoiced']: finalValue,
               ['userQuantityDelivered']: finalValueSec,
               ['action']: 'Update',
             }
@@ -1151,6 +1165,7 @@ class ViewReviewOrder extends Component {
               [type]: finalValue,
               ['action']: 'Update',
               ['quantityInvoiced']: finalValueFifth,
+              ['orderValue']: finalValueSixth,
             }
           : item,
       );
@@ -1448,6 +1463,7 @@ class ViewReviewOrder extends Component {
       finalArrivedDate,
       pageDetailsData,
       saveStatus,
+      modalValueExpectedSpilt,
     } = this.state;
 
     console.log('pageData', pageData);
@@ -3085,6 +3101,11 @@ class ViewReviewOrder extends Component {
                                                 modalUserQuantityInvoiced:
                                                   value *
                                                   modalOrderedInventoryVolume,
+                                                modalPricePaid: (
+                                                  value *
+                                                  packSize *
+                                                  modalValueExpectedSpilt
+                                                ).toFixed(2),
                                               })
                                             }
                                           />
@@ -5214,6 +5235,7 @@ class ViewReviewOrder extends Component {
                                 onChangeText={value =>
                                   this.setState({
                                     modalQuantityDelivered: value,
+                                    modalQuantityInvoiced: value,
                                     modalUserQuantityDelivered: value * volume,
                                   })
                                 }
@@ -5364,6 +5386,15 @@ class ViewReviewOrder extends Component {
                                             volume * modalQuantityOrdered,
                                           )) *
                                         modalQuantityOrdered,
+                                      modalPricePaid: (
+                                        (value /
+                                          Number(
+                                            volume * modalQuantityOrdered,
+                                          )) *
+                                        modalQuantityOrdered *
+                                        packSize *
+                                        unitPrizeModal
+                                      ).toFixed(2),
                                     })
                                   }
                                 />
