@@ -4536,7 +4536,7 @@ class ViewReviewOrder extends Component {
                                         borderRadius: 6,
                                       }}>
                                       <TextInput
-                                        placeholder={translate('Delivered No')}
+                                        // placeholder={translate('Delivered No')}
                                         value={String(modalQuantityDelivered)}
                                         style={{
                                           width: '100%',
@@ -4566,10 +4566,10 @@ class ViewReviewOrder extends Component {
                                       }}>
                                       <View style={{flex: 1}}>
                                         <TextInput
-                                          placeholder={translate('Quantity')}
-                                          value={String(
-                                            modalUserQuantityDelivered,
-                                          )}
+                                          // placeholder={translate('Quantity')}
+                                          // value={String(
+                                          //   modalUserQuantityDelivered,
+                                          // )}
                                           keyboardType="number-pad"
                                           style={{
                                             width: '100%',
@@ -4660,7 +4660,7 @@ class ViewReviewOrder extends Component {
                                         borderRadius: 6,
                                       }}>
                                       <TextInput
-                                        placeholder={translate('Invoiced')}
+                                        // placeholder={translate('Invoiced')}
                                         value={String(modalQuantityInvoiced)}
                                         style={{
                                           width: '100%',
@@ -4693,9 +4693,9 @@ class ViewReviewOrder extends Component {
                                           flex: 1,
                                         }}>
                                         <TextInput
-                                          placeholder={translate(
-                                            '_Invoiced Qty',
-                                          )}
+                                          // placeholder={translate(
+                                          //   '_Invoiced Qty',
+                                          // )}
                                           value={String(
                                             modalUserQuantityInvoiced,
                                           )}
@@ -4791,7 +4791,7 @@ class ViewReviewOrder extends Component {
                                       }}>
                                       <View style={{flex: 3}}>
                                         <TextInput
-                                          placeholder={translate('Value')}
+                                          // placeholder={translate('Value')}
                                           value={String(item.orderValue)}
                                           keyboardType="number-pad"
                                           style={{

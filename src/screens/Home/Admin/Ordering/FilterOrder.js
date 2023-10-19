@@ -111,7 +111,7 @@ class FilterOrder extends Component {
     } = this.state;
     let payload = {
       suppliers: supplierId ? [supplierId] : [],
-      startDate: fromProductionDate ? fromProductionDate : null,
+      startDate: fromProductionDate ? fromProductionDate : todayDateProd,
       endDate: toProductionDate ? toProductionDate : todayDateProd,
       flagged: flagStatus,
       selectedPage: selectedPage,

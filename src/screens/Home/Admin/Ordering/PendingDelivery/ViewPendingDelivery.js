@@ -4809,7 +4809,7 @@ class ViewPendingDelivery extends Component {
                                         borderRadius: 6,
                                       }}>
                                       <TextInput
-                                        placeholder={translate('Delivered No')}
+                                        // placeholder={translate('Delivered No')}
                                         value={String(modalQuantityDelivered)}
                                         style={{
                                           width: '100%',
@@ -4839,7 +4839,7 @@ class ViewPendingDelivery extends Component {
                                       }}>
                                       <View style={{flex: 1}}>
                                         <TextInput
-                                          placeholder={translate('Quantity')}
+                                          // placeholder={translate('Quantity')}
                                           value={String(
                                             modalUserQuantityDelivered,
                                           )}
@@ -4933,7 +4933,7 @@ class ViewPendingDelivery extends Component {
                                         borderRadius: 6,
                                       }}>
                                       <TextInput
-                                        placeholder={translate('Invoiced')}
+                                        // placeholder={translate('Invoiced')}
                                         value={String(modalQuantityInvoiced)}
                                         style={{
                                           width: '100%',
@@ -4966,9 +4966,9 @@ class ViewPendingDelivery extends Component {
                                           flex: 1,
                                         }}>
                                         <TextInput
-                                          placeholder={translate(
-                                            '_Invoiced Qty',
-                                          )}
+                                          // placeholder={translate(
+                                          //   '_Invoiced Qty',
+                                          // )}
                                           value={String(
                                             modalUserQuantityInvoiced,
                                           )}
@@ -5064,7 +5064,7 @@ class ViewPendingDelivery extends Component {
                                       }}>
                                       <View style={{flex: 3}}>
                                         <TextInput
-                                          placeholder={translate('Value')}
+                                          // placeholder={translate('Value')}
                                           value={String(item.orderValue)}
                                           keyboardType="number-pad"
                                           style={{

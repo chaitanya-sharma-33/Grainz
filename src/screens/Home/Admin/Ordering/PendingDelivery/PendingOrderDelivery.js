@@ -610,6 +610,55 @@ class PendingOrderDelivery extends Component {
             </View>
             <View style={{marginHorizontal: wp('6%'), marginTop: hp('2%')}}>
               <View>
+                <View style={{}}>
+                  <TouchableOpacity
+                    disabled={true}
+                    // onPress={() => this.showDatePickerFunOrder()}
+                    style={{
+                      backgroundColor: '#fff',
+                      padding: 12,
+                      marginBottom: hp('2%'),
+                      borderRadius: 6,
+                    }}>
+                    <View style={{}}>
+                      <Text>{translate('Order Date')}</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 10,
+                        alignItems: 'center',
+                      }}>
+                      <TextInput
+                        placeholder={translate('DD/MM/YY')}
+                        value={finalOrderDate}
+                        editable={false}
+                        style={{
+                          fontWeight: 'bold',
+                          color: 'black',
+                        }}
+                      />
+                      <Image
+                        source={img.calenderIcon}
+                        style={{
+                          width: 20,
+                          tintColor: 'grey',
+                          height: 20,
+                          resizeMode: 'contain',
+                          marginRight: 10,
+                        }}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePickerModal
+                  isVisible={isDatePickerVisibleOrder}
+                  mode={'date'}
+                  onConfirm={this.handleConfirmOrder}
+                  onCancel={this.hideDatePickerOrder}
+                  // minimumDate={minTime}
+                />
                 <View
                   style={{
                     backgroundColor: '#F4F4F4',
@@ -748,55 +797,6 @@ class PendingOrderDelivery extends Component {
                   // minimumDate={minTime}
                 />
 
-                <View style={{}}>
-                  <TouchableOpacity
-                    disabled={true}
-                    // onPress={() => this.showDatePickerFunOrder()}
-                    style={{
-                      backgroundColor: '#fff',
-                      padding: 12,
-                      marginBottom: hp('2%'),
-                      borderRadius: 6,
-                    }}>
-                    <View style={{}}>
-                      <Text>{translate('Order Date')}</Text>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        marginTop: 10,
-                        alignItems: 'center',
-                      }}>
-                      <TextInput
-                        placeholder={translate('DD/MM/YY')}
-                        value={finalOrderDate}
-                        editable={false}
-                        style={{
-                          fontWeight: 'bold',
-                          color: 'black',
-                        }}
-                      />
-                      <Image
-                        source={img.calenderIcon}
-                        style={{
-                          width: 20,
-                          tintColor: 'grey',
-                          height: 20,
-                          resizeMode: 'contain',
-                          marginRight: 10,
-                        }}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <DateTimePickerModal
-                  isVisible={isDatePickerVisibleOrder}
-                  mode={'date'}
-                  onConfirm={this.handleConfirmOrder}
-                  onCancel={this.hideDatePickerOrder}
-                  // minimumDate={minTime}
-                />
                 <View
                   style={{
                     backgroundColor: '#F4F4F4',
