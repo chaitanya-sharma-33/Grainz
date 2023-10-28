@@ -833,6 +833,7 @@ class EditDraftOrder extends Component {
               name: item.name,
               count: item.count,
               displayName: item.displayName,
+              isEnabled: item.isEnabled,
             };
           });
         this.setState({
@@ -2028,6 +2029,7 @@ class EditDraftOrder extends Component {
                     }}>
                     <TouchableOpacity
                       onPress={() => this.onPressFun(item)}
+                      disabled={!item.isEnabled}
                       style={{
                         backgroundColor:
                           item.name === 'Kitchen'

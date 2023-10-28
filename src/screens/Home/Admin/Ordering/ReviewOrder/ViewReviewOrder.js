@@ -1108,6 +1108,10 @@ class ViewReviewOrder extends Component {
       finalValueFifth * packSize * modalValueExpectedSpilt,
     ).toFixed(2);
     const finalPriceInvoiced = (value * packSize * unitPrizeModal).toFixed(2);
+    const finalPriceQuantity = Number(
+      finalValueThird * packSize * unitPrizeModal,
+    ).toFixed(2);
+
     if (valueType === 'DeliveredNo') {
       let newArr = pageOrderItems.map((item, i) =>
         index === i
@@ -1115,8 +1119,10 @@ class ViewReviewOrder extends Component {
               ...item,
               [type]: finalValue,
               ['quantityInvoiced']: finalValue,
+              ['userQuantityInvoiced']: finalValueSec,
               ['userQuantityDelivered']: finalValueSec,
               ['action']: 'Update',
+              ['orderValue']: finalPriceInvoiced,
             }
           : item,
       );
@@ -1132,6 +1138,9 @@ class ViewReviewOrder extends Component {
               [type]: finalValue,
               ['action']: 'Update',
               ['quantityDelivered']: finalValueThird,
+              ['quantityInvoiced']: finalValueThird,
+              ['userQuantityInvoiced']: finalValue,
+              ['orderValue']: finalPriceQuantity,
             }
           : item,
       );
@@ -1165,7 +1174,7 @@ class ViewReviewOrder extends Component {
               [type]: finalValue,
               ['action']: 'Update',
               ['quantityInvoiced']: finalValueFifth,
-              ['orderValue']: finalValueSixth,
+              ['orderValue']: finalPriceQuantity,
             }
           : item,
       );
@@ -5237,6 +5246,7 @@ class ViewReviewOrder extends Component {
                                     modalQuantityDelivered: value,
                                     modalQuantityInvoiced: value,
                                     modalUserQuantityDelivered: value * volume,
+                                    modalUserQuantityInvoiced: value * volume,
                                   })
                                 }
                               />
@@ -5278,12 +5288,28 @@ class ViewReviewOrder extends Component {
                                   onChangeText={value =>
                                     this.setState({
                                       modalUserQuantityDelivered: value,
+                                      modalUserQuantityInvoiced: value,
+                                      modalQuantityInvoiced:
+                                        (value /
+                                          Number(
+                                            volume * modalQuantityOrdered,
+                                          )) *
+                                        modalQuantityOrdered,
                                       modalQuantityDelivered:
                                         (value /
                                           Number(
                                             volume * modalQuantityOrdered,
                                           )) *
                                         modalQuantityOrdered,
+                                      modalPricePaid: (
+                                        (value /
+                                          Number(
+                                            volume * modalQuantityOrdered,
+                                          )) *
+                                        modalQuantityOrdered *
+                                        packSize *
+                                        unitPrizeModal
+                                      ).toFixed(2),
                                     })
                                   }
                                 />

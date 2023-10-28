@@ -2030,6 +2030,7 @@ class AddItems extends Component {
       supplierName,
       finalData,
       firstBasketId,
+      apiDeliveryDate,
     } = this.state;
 
     const finalBasketId = basketId ? basketId : firstBasketId;
@@ -2038,6 +2039,7 @@ class AddItems extends Component {
       supplierId: supplierId,
       shopingBasketItemList: finalBasketData,
       id: finalBasketId,
+      deliveryDate: finalData.productionDateDelivery,
     };
     console.log('UPDATEEE');
     console.log('Payload--> ELSE', payload);

@@ -149,7 +149,7 @@ class NewOrderThird extends Component {
       console.log('finalData', finalData);
       console.log('firstBasketId', firstBasketId);
 
-      this.getDepartmentData();
+      this.getDepartmentData(finalData);
       if (finalData) {
         this.setState({
           finalData,
@@ -160,15 +160,17 @@ class NewOrderThird extends Component {
     this.getProfileDataFun();
   }
 
-  getDepartmentData() {
-    lookupDepartmentsApi()
+  getDepartmentData(data) {
+    console.log('Data->FINALDATA', data);
+    lookupDepartmentsApi(data.supplierId)
       .then(res => {
-        console.log('resss', res.data);
+        console.log('resss->LOOKUPDEPARTMENT', res.data);
         let finalArray = res.data.map((item, index) => {
           return {
             id: item.id,
             name: item.name,
             displayName: item.displayName,
+            isEnabled: item.isEnabled,
           };
         });
         this.setState({
@@ -188,6 +190,7 @@ class NewOrderThird extends Component {
   onPressFun = item => {
     console.log('item', item);
     const {finalData, firstBasketId} = this.state;
+    console.log('FINALDATA', finalData);
     this.props.navigation.navigate('AddItemsOrderScreen', {
       departID: item.id,
       departName: item.name,
@@ -445,6 +448,7 @@ class NewOrderThird extends Component {
                           }}>
                           <TouchableOpacity
                             onPress={() => this.onPressFun(item)}
+                            disabled={!item.isEnabled}
                             style={{
                               backgroundColor:
                                 item.name === 'Kitchen'
