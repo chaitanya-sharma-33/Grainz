@@ -268,6 +268,9 @@ class AddItems extends Component {
       console.log('basketId', basketId);
       console.log('firstBasketId', firstBasketId);
 
+      console.log('finalData----->', finalData);
+      console.log('finalDataSec--->', finalDataSec);
+
       this.setState(
         {
           supplierId: supplierValue,
@@ -2039,7 +2042,6 @@ class AddItems extends Component {
       supplierId: supplierId,
       shopingBasketItemList: finalBasketData,
       id: finalBasketId,
-      deliveryDate: finalData.productionDateDelivery,
     };
     console.log('UPDATEEE');
     console.log('Payload--> ELSE', payload);
@@ -2331,7 +2333,7 @@ class AddItems extends Component {
       finalData: finalData.channel,
     };
 
-    console.log('Payload--> ADD DRAFT', payload);
+    console.log('Payload---------> ADD DRAFT', payload);
     addDraftApi(payload)
       .then(res => {
         this.setState(

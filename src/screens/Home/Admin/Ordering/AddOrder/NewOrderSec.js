@@ -303,12 +303,13 @@ class NewOrderSec extends Component {
       finalData,
       customerNumber,
       channel,
+      productionDateDelivery,
     } = this.state;
     let payload = {
       id: firstBasketId,
       supplierId: supplierId,
       orderDate: apiOrderDate,
-      deliveryDate: apiDeliveryDate,
+      deliveryDate: productionDateDelivery.toISOString(),
       placedBy: '',
       shopingBasketItemList: [],
       customerNumber: customerNumber,
