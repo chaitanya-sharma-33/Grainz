@@ -128,6 +128,12 @@ class index extends Component {
               icon: img.supplierIcon,
               screen: 'SupplierAdminScreen',
             },
+            {
+              id: 2,
+              name: translate('Stock Take'),
+              icon: img.stokeTakeIcon,
+              screen: 'StockTakeScreen',
+            },
             // {
             //   id: 1,
             //   name: translate('Casual purchase'),
@@ -146,13 +152,6 @@ class index extends Component {
             //   name: translate('Reporting'),
             //   icon: img.reportsIcon,
             //   screen: 'ReportingAdminScreen',
-            // },
-
-            // {
-            //   id: 4,
-            //   name: translate('Stock Take'),
-            //   icon: img.stokeTakeIcon,
-            //   screen: 'StockTakeScreen',
             // },
           ],
           buttonsSubHeader: [
@@ -182,6 +181,7 @@ class index extends Component {
       const locationName = await AsyncStorage.getItem('@locationName');
       const location = await AsyncStorage.getItem('@location');
       console.log('locationName', locationName);
+      console.log('location', location);
 
       if (location === undefined || location === null || location === '') {
         this.getUserLocationFun();
@@ -212,6 +212,8 @@ class index extends Component {
           };
         });
 
+        console.log('res-->finalUsersList');
+
         let defaultUser = res.data.map((item, index) => {
           if (item.isDefault === true) {
             return item.id;
@@ -225,6 +227,8 @@ class index extends Component {
         let finalData = defaultUser.filter(function (element) {
           return element !== undefined;
         });
+
+        console.log('res-->finalData', finalData[0]);
 
         let finalDataName = defaultUserName.filter(function (element) {
           return element !== undefined;
@@ -311,7 +315,7 @@ class index extends Component {
                       backgroundColor:
                         item.screen === 'OrderingAdminScreen'
                           ? '#C7408A'
-                          : item.screen === 'ViewPurchaseScreen'
+                          : item.screen === 'StockTakeScreen'
                           ? '#81A91D'
                           : item.screen === 'SupplierAdminScreen'
                           ? '#7662A9'

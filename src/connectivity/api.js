@@ -2,8 +2,8 @@ import axios from 'axios';
 import url from './Environment.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-let baseURL = url['STAGING'].BaseURL;
-// let baseURL = url['STAGING_TWO'].BaseURL;
+// let baseURL = url['STAGING'].BaseURL;
+let baseURL = url['STAGING_TWO'].BaseURL;
 // let baseURL = url['DEV'].BaseURL;
 
 // export const loginApi = payload => {
@@ -19,28 +19,28 @@ let baseURL = url['STAGING'].BaseURL;
 //   );
 // };
 
-export const loginApi = payload => {
-  return axios.post(
-    'https://grainzwebapi.azurewebsites.net/connect/token',
-    payload,
-    {
-      headers: {
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    },
-  );
-};
-
 // export const loginApi = payload => {
-//   const url = 'https://web-grainz-uat.azurewebsites.net/connect/token';
-//   return axios.post(url, payload, {
-//     headers: {
-//       Accept: '*/*',
-//       'Content-Type': 'application/x-www-form-urlencoded',
+//   return axios.post(
+//     'https://grainzwebapi.azurewebsites.net/connect/token',
+//     payload,
+//     {
+//       headers: {
+//         Accept: '*/*',
+//         'Content-Type': 'application/x-www-form-urlencoded',
+//       },
 //     },
-//   });
+//   );
 // };
+
+export const loginApi = payload => {
+  const url = 'https://web-grainz-uat.azurewebsites.net/connect/token';
+  return axios.post(url, payload, {
+    headers: {
+      Accept: '*/*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+};
 
 export async function getMyProfileApi() {
   const token = await AsyncStorage.getItem('@appToken');

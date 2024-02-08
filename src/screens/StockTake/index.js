@@ -139,7 +139,10 @@ class index extends Component {
                           ? img.historyIcon
                           : null
                       }
-                      style={styles.tileImageStyling}
+                      style={{
+                        ...styles.tileImageStyling,
+                        tintColor: item.id === 1 ? 'red' : null,
+                      }}
                     />
                   </View>
                   <View style={styles.tileTextContainer}>

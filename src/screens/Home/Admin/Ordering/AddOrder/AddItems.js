@@ -95,6 +95,7 @@ class AddItems extends Component {
       todayDate: new Date(),
       pageData: '',
       priceFinalBackup: '',
+      nextLoader: false,
       priceFinal: '',
       privatePriceValue: '',
       privatePrice: true,
@@ -2063,6 +2064,7 @@ class AddItems extends Component {
               {
                 basketLoader: false,
                 draftStatus: true,
+                nextLoader: false,
               },
               () => this.navigateToBasket(),
             );
@@ -2260,6 +2262,7 @@ class AddItems extends Component {
     this.setState(
       {
         closeButtonLoader: false,
+        nextLoader: false,
       },
       () => this.props.navigation.navigate('EditDraftOrderScreen'),
     );
@@ -2294,6 +2297,7 @@ class AddItems extends Component {
       this.setState(
         {
           closeButtonLoader: false,
+          nextLoader: false,
         },
         () =>
           this.props.navigation.navigate('BasketOrderScreen', {
@@ -2455,6 +2459,7 @@ class AddItems extends Component {
       {
         closeStatus: true,
         actionOpen: false,
+        nextLoader: true,
         // closeButtonLoader: true,
       },
       () => this.closeBasketFunSec(),
@@ -2483,6 +2488,7 @@ class AddItems extends Component {
       this.setState(
         {
           closeButtonLoader: false,
+          nextLoader: false,
         },
         () =>
           this.props.navigation.navigate('BasketOrderScreen', {
@@ -2938,6 +2944,7 @@ class AddItems extends Component {
       loadingImageIcon,
       closeButtonLoader,
       modalNewData,
+      nextLoader,
     } = this.state;
 
     // console.log('PAGE DATA', pageData);
@@ -4766,14 +4773,14 @@ class AddItems extends Component {
             </View>
           ) : null} */}
         </ScrollView>
-        {closeButtonLoader ? (
+        {nextLoader ? (
           <View
             style={{
               position: 'absolute',
               right: 20,
-              top: hp('80%'),
+              top: hp('84%'),
               backgroundColor: '#5297c1',
-              padding: 10,
+              padding: 15,
               borderRadius: 5,
             }}>
             <ActivityIndicator size="small" color="#fff" />

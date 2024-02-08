@@ -198,6 +198,7 @@ class index extends Component {
   removeToken = async () => {
     await AsyncStorage.removeItem('@appToken');
     await AsyncStorage.removeItem('@locationName');
+    await AsyncStorage.removeItem('@location');
 
     this.props.UserTokenAction(null);
   };
